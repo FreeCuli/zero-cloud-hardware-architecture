@@ -8,6 +8,10 @@
 > **LEGAL NOTICE: CC-BY-ND 4.0 Licensing (Documentation & Specification)**
 > The text, schematics, and definitions within this document are licensed under the Creative Commons Attribution-NoDerivatives 4.0 International License (CC-BY-ND 4.0). You are free to share and redistribute this material in any medium or format, provided you give appropriate credit to FreeCuli. However, if you remix, transform, or build upon the material (e.g., attempt to create a derivative "X-Brand Standard" by altering this text), you may NOT distribute the modified material. This ensures FreeCuli remains the sole, immutable authority over the HFSCA standard.
 
+> [!IMPORTANT]
+> **LEGAL NOTICE: Cross-Referencing & Operational Compliance**
+> This hardware reference architecture is inherently bound to the operational and privacy specifications defined in the official [FreeCuli Smart Kitchen Standards Protocol](https://github.com/FreeCuli/smart-kitchen-standards). Compliance requires simultaneous adhesion to both frameworks. A hardware implementation without the corresponding operational compliance protocol is deemed a violation of the FreeCuli standard.
+
 ## 1. Introduction & The Zero-Cloud Axiom
 
 Traditional "Smart Kitchen & Home" appliances inherently violate user privacy (GDPR/KVKK) by transmitting audio and visual data captured by their microphones and cameras to cloud servers. The **FreeCuli HFSCA (Hands-Free Semantic Culinary Assistant)** architecture, originally built for smart kitchens but universally applicable, eliminates this violation not through software promises, but through **Immutable Laws of Physical Hardware**.
