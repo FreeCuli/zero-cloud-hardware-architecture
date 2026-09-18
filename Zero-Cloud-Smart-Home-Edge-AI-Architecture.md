@@ -1,0 +1,108 @@
+# FreeCuli HFSCA: Zero-Cloud Hardware Reference Architecture v1.0 (The Fortress)
+
+> [!WARNING]
+> **LEGAL NOTICE: CERN-OHL-S v2.0 Licensing (Hardware)**
+> This reference architecture, including its specific hardware flow, data diode implementations, and memory isolation schematics, is licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S). Any physical hardware appliance, smart home device, or Edge AI board that implements, derives from, or utilizes the specific data isolation flow described herein is considered a "Derivative Work" and MUST release its complete hardware schematics under the same CERN-OHL-S license, or obtain a commercial exemption license from FreeCuli.
+
+> [!IMPORTANT]
+> **LEGAL NOTICE: CC-BY-ND 4.0 Licensing (Documentation & Specification)**
+> The text, schematics, and definitions within this document are licensed under the Creative Commons Attribution-NoDerivatives 4.0 International License (CC-BY-ND 4.0). You are free to share and redistribute this material in any medium or format, provided you give appropriate credit to FreeCuli. However, if you remix, transform, or build upon the material (e.g., attempt to create a derivative "X-Brand Standard" by altering this text), you may NOT distribute the modified material. This ensures FreeCuli remains the sole, immutable authority over the HFSCA standard.
+
+## 1. Introduction & The Zero-Cloud Axiom
+
+Traditional "Smart Kitchen & Home" appliances inherently violate user privacy (GDPR/KVKK) by transmitting audio and visual data captured by their microphones and cameras to cloud servers. The **FreeCuli HFSCA (Hands-Free Semantic Culinary Assistant)** architecture, originally built for smart kitchens but universally applicable, eliminates this violation not through software promises, but through **Immutable Laws of Physical Hardware**.
+
+This document defines the *unchangeable and non-negotiable* core hardware flow that any HFSCA-compliant smart home or kitchen appliance (e.g., oven, air conditioner, robot vacuum) MUST possess to guarantee a "Zero-Cloud" environment.
+
+## 2. The Indestructible Fortress: 4 Core Hardware Locks
+
+Any manufacturer wishing to produce an HFSCA-compliant device SHALL physically implement the following 4 hardware rules. Software-based isolations (VLANs, Firewalls, OS-level sandboxing) are STRICTLY UNACCEPTABLE.
+
+### 2.1. Absolute Physical Air-Gap
+Peripherals such as cameras and microphones CANNOT be electrically connected to any network-capable modules of the device (Wi-Fi, Ethernet, Bluetooth SoC). Sensors may ONLY be connected to the isolated **Edge NPU/MCU (Edge AI Chip)** responsible for local processing.
+
+### 2.2. Hardware Unidirectional Data Diode
+The Edge NPU must transmit the inference result (e.g., the command "Set heat to 200 degrees" or "Turn off light") to the device's Main Actuator/MCU. However, this transmission cable MUST be isolated using a **physical data diode** (e.g., an Optocoupler / Opto-isolator). 
+*Rule:* Data (processed commands) may flow FROM the NPU TO the Main Controller; however, a data "read/pull" operation FROM the Main Controller (and external network) TO the NPU or sensors must be electrically impossible. This rule is not limited to optocouplers; ANY electronic component arrangement that physically enforces unidirectional flow falls under this definition and is subject to the license.
+
+### 2.3. Lethal Volatile Buffer
+Sensor data (Raw Audio and Video) is recorded into a temporary SRAM (Volatile Buffer) within the NPU. The exact millisecond the model completes its inference and transmits the result (command) to the Main Controller, the power to the SRAM buffer MUST be cut via a Hardware Interrupt, physically destroying the audio/video data.
+
+### 2.4. The "Poisoned Sensor" Rule
+An absolute rule to prevent engineering bypasses: **ALL (100% without exception) audio and visual sensors** on the device MUST connect EXCLUSIVELY to the isolated NPU. If even a single secondary microphone or sensor is directly connected to the network-capable (Wi-Fi) chip under the excuse of "wake-word detection," the device immediately loses certification and is deemed in violation of the standard.
+
+---
+
+## 3. Hardware Data Flow Schematic
+
+The schematic below illustrates the absolute data flow directions and isolation barriers of an HFSCA-compliant device. This schematic is not a "recommendation"; it is the **Mandatory Reference Architecture** licensed under CERN-OHL-S.
+
+```mermaid
+graph TD
+    %% Components
+    subgraph SENSORS [Sensor Layer - UNDER SURVEILLANCE]
+        MIC[Microphone]
+        CAM[Camera]
+    end
+
+    subgraph EDGE_AI [FreeCuli Edge NPU Layer - ISOLATED]
+        VOL_RAM[(Volatile Buffer / SRAM)]
+        AI_CHIP{Edge NPU / AI Model}
+        HW_KILL[Hardware Power Switch]
+    end
+
+    subgraph ISOLATION [Physical Isolation Barrier]
+        OPTO[Optocoupler / Hardware Data Diode]
+    end
+
+    subgraph MAIN_BOARD [Main Board & External World]
+        MAIN_MCU[Main Controller / Actuator]
+        WIFI[Wi-Fi / Network Module]
+        APPLIANCE((Appliance Motor/Relay <br> e.g., Oven, AC, Light))
+    end
+
+    %% Data Flows (Strict Flow)
+    MIC -->|Raw Audio Data| VOL_RAM
+    CAM -->|Raw Video Data| VOL_RAM
+    
+    VOL_RAM -->|Read Only| AI_CHIP
+    
+    %% After AI Inference completes
+    AI_CHIP -.->|Trigger: Processing Complete| HW_KILL
+    HW_KILL -.->|Cut Power (Data Destruction)| VOL_RAM
+    
+    %% Output
+    AI_CHIP ==>|TX ONLY: Processed Command <br/>e.g., 'Set Temp 200'| OPTO
+    
+    %% Optocoupler allows only one-way traffic
+    OPTO ==>|RX ONLY| MAIN_MCU
+    
+    %% External Connections
+    WIFI <-->|Bi-directional Comm| MAIN_MCU
+    MAIN_MCU -->|Control Signal| APPLIANCE
+
+    %% Styling
+    classDef isolated fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#c62828;
+    classDef open fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef barrier fill:#212121,stroke:#000,stroke-width:3px,color:#fff;
+    classDef diode fill:#ff9800,stroke:#e65100,stroke-width:3px,color:#fff;
+    
+    class EDGE_AI isolated;
+    class MAIN_BOARD open;
+    class ISOLATION barrier;
+    class OPTO diode;
+```
+
+### 3.1 Schematic Explanation
+1. **Sensor Layer:** Raw audio and video write to the `Volatile Buffer` (SRAM).
+2. **Isolated Layer:** The NPU processes the data. The moment it generates a meaningful command (Text or Hex), the `Hardware Power Switch` cuts electricity to the SRAM, physically destroying the original media (Strict GDPR Compliance).
+3. **Isolation Barrier (Optocoupler):** The command is transmitted to the `Main Controller` via the `Hardware Data Diode`. Due to the physical nature of the diode, the `Main Controller` or its attached `Wi-Fi` module cannot reach back into the NPU or listen to the audio flowing from the sensors. Wi-Fi can only transmit state telemetry (e.g., "Device is running, temperature is 200") from the Main Controller to the cloud/mobile app.
+
+## 4. Compliance & Licensing Implications
+
+When any device manufacturer implements the "Physical Air-Gap and Diode" schematic above to release a smart home or kitchen appliance with "Zero-Cloud" privacy guarantees;
+
+1. **Open Source Obligation:** Pursuant to the CERN-OHL-S v2.0 license, the manufacturer MUST publish all motherboard schematics (PCB gerber files, bill of materials) of the said device as open source on GitHub or a public portal.
+2. **Trademark Infringement:** Even if they utilize this hardware architecture, they CANNOT use the terms/logos `FreeCuli Zero-Cloud Certified` or `HFSCA Compliant` on the device, packaging, or marketing without official permission/audit from FreeCuli (Trademark Law).
+3. **Patent Retaliation Clause:** The provision that locks in legal armies: If any technology giant using this standard files a lawsuit against FreeCuli or another manufacturer utilizing this standard claiming, "A portion of this technology is my patent," that giant company's right to use the FreeCuli license is IMMEDIATELY REVOKED WORLDWIDE. This prevents Big Tech firms from acting as "Patent Trolls."
+4. **Commercial Exemption:** Manufacturers wishing to keep their motherboard schematics as a trade secret (e.g., Bosch, Samsung, Xiaomi) MUST purchase a closed-source (proprietary) **Commercial License** from FreeCuli to utilize the FreeCuli standards without license contamination.
