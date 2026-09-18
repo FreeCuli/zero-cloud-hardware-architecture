@@ -1,5 +1,5 @@
 # FreeCuli HFSCA: Zero-Cloud Hardware Reference Architecture v1.0 (The Fortress)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22838474.svg)](https://doi.org/10.5281/zenodo.22838474)
 > [!WARNING]
 > **LEGAL NOTICE: CERN-OHL-S v2.0 Licensing (Hardware)**
 > This reference architecture, including its specific hardware flow, data diode implementations, and memory isolation schematics, is licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S). Any physical hardware appliance, smart home device, or Edge AI board that implements, derives from, or utilizes the specific data isolation flow described herein is considered a "Derivative Work" and MUST release its complete hardware schematics under the same CERN-OHL-S license, or obtain a commercial exemption license from FreeCuli.
