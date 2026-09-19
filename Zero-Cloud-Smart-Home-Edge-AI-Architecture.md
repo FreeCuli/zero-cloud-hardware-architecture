@@ -73,10 +73,10 @@ graph TD
     
     %% After AI Inference completes
     AI_CHIP -.->|Trigger: Processing Complete| HW_KILL
-    HW_KILL -.->|Cut Power (Data Destruction)| VOL_RAM
+    HW_KILL -.->|"Cut Power (Data Destruction)"| VOL_RAM
     
     %% Output
-    AI_CHIP ==>|TX ONLY: Processed Command <br/>e.g., 'Set Temp 200'| OPTO
+    AI_CHIP ==>|"TX ONLY: Processed Command <br/>e.g., 'Set Temp 200'"| OPTO
     
     %% Optocoupler allows only one-way traffic
     OPTO ==>|RX ONLY| MAIN_MCU
