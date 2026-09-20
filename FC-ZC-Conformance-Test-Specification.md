@@ -1,6 +1,10 @@
 # FREECULI ZERO-CLOUD CONFORMANCE TEST SPECIFICATION (FC-ZC-CTS v1.0)
 **Draft Experimental Methodology for Verifiable Physical Privacy**
 
+> [!IMPORTANT]
+> **Technical Compliance Verifiers (NOT IP Detectors)**
+> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's device strictly adheres to the HFSCA v1.0 hardware constraints (Air-Gap, Unidirectional Diode, Volatile Buffer Power-Cut).
+
 > **"FreeCuli does not require you to trust FreeCuli. It requires you to reproduce the test."**
 
 This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart oven, assistant, white goods, etc.) must pass to comply with the FC-ZC v1.0 standard.
@@ -35,21 +39,21 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 **Objective:** Verify that only processed commands (e.g., "Turn on Light") can travel from the NPU to the Main MCU, and absolutely no data can leak backwards from the Main MCU to the NPU.
 * **Test Setup:** Probes are connected to the TX and RX pins on both sides of the isolation barrier (e.g., Optocoupler) between the NPU and the Main MCU.
 * **Attack Model:** Reverse-channel injection (Fuzzing). High-frequency 3.3V / 5V dummy data packets are forcefully injected backwards from the receiving (RX) pin on the Main MCU side towards the hardware diode.
-* **Measuring Device:** Multi-channel Oscilloscope (Min. 1 GHz bandwidth), High-speed Signal Generator.
+* **Measuring Device:** Multi-channel Oscilloscope (Min. **5 GHz** bandwidth), High-speed Signal Generator.
 * **Pass/Fail Threshold:**
-    * **PASS:** Data or voltage injected by the Main MCU results in total silence (0V or constant Logic High) on the TX pin of the NPU side. Backward signal propagation is physically blocked.
-    * **FAIL:** Signals injected in the reverse direction cause readable logical fluctuations (Logic State Changes), even at the millivolt level, on the NPU pin.
+    * **PASS:** Data or voltage injected by the Main MCU results in total silence on the TX pin of the NPU side, strictly below the noise floor or **< 5mV peak-to-peak (mVpp)**. Backward signal propagation is physically blocked.
+    * **FAIL:** Signals injected in the reverse direction cause readable logical fluctuations (Logic State Changes) above 5mVpp on the NPU pin.
 
 ---
 
 ### FC-ZC-004: Volatile Data Destruction (SRAM Remanence Threshold)
 **Objective:** Verify that the moment the AI model completes its inference, the power to the volatile memory holding the sensor data is cut off, destroying the data irretrievably.
 * **Test Setup:** An oscilloscope probe is connected to the VCC power line of the Volatile Buffer (SRAM) inside/outside the NPU. A 5-second reference audio/video clip is fed to the sensor.
-* **Attack Model:** At the exact millisecond the inference signal is transmitted (Cut-off Event), liquid nitrogen is applied to the power supply to freeze the memory (Cold-Boot Attack), followed by an attempt to extract a physical memory dump.
-* **Measuring Device:** Liquid Nitrogen, High-speed Logic Analyzer, JTAG memory dump module.
+* **Attack Model:** At the exact millisecond the inference signal is transmitted (Cut-off Event), liquid nitrogen or cryospray (**-20°C**) is applied to the power supply to freeze the memory (Cold-Boot Attack), followed by an attempt to extract a physical memory dump.
+* **Measuring Device:** Liquid Nitrogen/Cryospray, High-speed Logic Analyzer, JTAG memory dump module.
 * **Pass/Fail Threshold:**
-    * **PASS:** At the hardware interrupt, the SRAM VCC voltage drops to 0V within 10 microseconds. In the memory dump obtained via the Cold-Boot attack, the Mathematical Remanence Threshold of the reference audio/video is below 0.01% (Irreversible cryptographic noise).
-    * **FAIL:** The power cut is delayed, or structural characteristics of the sensor data (audio frequency, image matrix) can be even partially recovered from the memory dump due to remanent charge.
+    * **PASS:** At the hardware interrupt, the SRAM VCC voltage drops to 0V within **< 10 milliseconds (ms)**. In the memory dump obtained via the Cold-Boot attack, the Mathematical Remanence Threshold of the reference audio/video is below 0.01% (Irreversible cryptographic noise).
+    * **FAIL:** The power cut is delayed beyond 10ms, or structural characteristics of the sensor data (audio frequency, image matrix) can be even partially recovered from the memory dump due to remanent charge.
 
 ---
 
