@@ -3,65 +3,65 @@
 
 > **"FreeCuli does not require you to trust FreeCuli. It requires you to reproduce the test."**
 
-Bu şartname, FC-ZC v1.0 standardına uymak isteyen herhangi bir donanımın (akıllı fırın, asistan, beyaz eşya vb.) laboratuvar ortamında geçmesi gereken **yanlışlanabilir (falsifiable) ve tekrarlanabilir (reproducible)** saldırı ve test senaryolarını tanımlar.
+This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart oven, assistant, white goods, etc.) must pass to comply with the FC-ZC v1.0 standard.
 
 ---
 
-## 🔬 TEST PROTOKOLLERİ VE LABORATUVAR METODOLOJİSİ
+## 🔬 TEST PROTOCOLS AND LABORATORY METHODOLOGY
 
 ### FC-ZC-001: Threat Model (Network SoC Exploitation)
-**Hedef:** Ağ işlemcisinin (Wi-Fi/Bluetooth SoC) tamamen ele geçirilmesi durumunda bile sensör verisinin (ham ses/görüntü) izole bölgeden dışarı çıkarılamadığının ispatı.
-* **Test Setup (Düzenek):** Cihaz standart ev ağına bağlanır. Main MCU / Network SoC birimi üzerindeki JTAG/UART portları fiziksel olarak aktif edilir veya ağ üzerinden sıfır gün (zero-day) yetki yükseltme (Root) simülasyonu çalıştırılır.
-* **Attack Model (Saldırı Modeli):** Ağ çipinde en yüksek çekirdek (Kernel) yetkisiyle, izole NPU (Edge AI) belleğine (RAM/SRAM) ve sensör veriyollarına (I2C/SPI/I2S) yönelik aktif okuma, bellek dökümü (memory dump) ve rastgele komut enjeksiyonu saldırıları gerçekleştirilir.
-* **Measuring Device (Ölçüm Cihazı):** Lojik Analizör (En az 500 MS/s), JTAG/SWD Debugger.
-* **Pass/Fail Threshold (Eşik):** 
-    * **PASS:** Network SoC üzerinden yapılan hiçbir sorgu, NPU belleğinden veya sensör veri hatlarından tek bir bit bile okuyamaz (Hardware Fault/Timeout alınır).
-    * **FAIL:** Ağ işlemcisi, NPU belleğinin herhangi bir adres bloğuna "Read" (Okuma) erişimi sağlayabilir.
+**Objective:** Prove that even in the event of a total compromise of the network processor (Wi-Fi/Bluetooth SoC), sensor data (raw audio/video) cannot be exfiltrated from the isolated domain.
+* **Test Setup:** The device is connected to a standard home network. JTAG/UART ports on the Main MCU / Network SoC are physically enabled, or a remote zero-day privilege escalation (Root) simulation is executed.
+* **Attack Model:** Operating with maximum Kernel privileges on the network chip, active read attempts, memory dumps, and arbitrary command injection attacks are executed against the isolated NPU (Edge AI) memory (RAM/SRAM) and sensor buses (I2C/SPI/I2S).
+* **Measuring Device:** Logic Analyzer (Min. 500 MS/s), JTAG/SWD Debugger.
+* **Pass/Fail Threshold:** 
+    * **PASS:** No query initiated from the Network SoC can read a single bit from the NPU memory or sensor data lines (Hardware Fault/Timeout is received).
+    * **FAIL:** The network processor successfully gains "Read" access to any address block of the NPU memory.
 
 ---
 
 ### FC-ZC-002: Sensor / Network Domain Separation (Electrical Air-Gap)
-**Hedef:** Ağ yongası ile sensörler arasında hiçbir fiziksel, elektriksel veya parazitik (cross-talk) veri yolunun olmadığının kanıtlanması.
-* **Test Setup (Düzenek):** Cihazın güç bağlantısı kesilir ve PCB (Baskı Devre Kartı) cihazdan tamamen ayrılır.
-* **Attack Model (Saldırı Modeli):** Kamera (MIPI CSI) ve Mikrofon (I2S/PDM) pinlerinden, Main MCU ve Wi-Fi/BLE çipi pinlerine doğru yüksek frekanslı RF sinyalleri basılır ve iletkenlik (continuity) taraması yapılır.
-* **Measuring Device (Ölçüm Cihazı):** Vektör Ağ Analizörü (VNA), TDR (Time-Domain Reflectometer), PCB X-Ray (Çok katmanlı kartlar için).
-* **Pass/Fail Threshold (Eşik):**
-    * **PASS:** Sensör pinleri ile Network Domain pinleri arasındaki empedans ölçümü "Sonsuz" (Açık Devre) çıkmalı, kapasitif veya indüktif sinyal sızıntısı gürültü tabanının (Noise Floor) altında olmalıdır.
-    * **FAIL:** Katmanlar arası (via) veya yan yana giden yollar yüzünden (cross-talk) sensör sinyalinin ağ çipinin pinlerinde okunabilir bir voltaj yaratması.
+**Objective:** Prove the absence of any physical, electrical, or parasitic (cross-talk) data path between the network chip and the sensors.
+* **Test Setup:** The device is powered off, and the PCB (Printed Circuit Board) is completely isolated from the chassis.
+* **Attack Model:** High-frequency RF signals are injected from the Camera (MIPI CSI) and Microphone (I2S/PDM) pins towards the Main MCU and Wi-Fi/BLE chip pins to scan for electrical continuity.
+* **Measuring Device:** Vector Network Analyzer (VNA), Time-Domain Reflectometer (TDR), PCB X-Ray (for multi-layer boards).
+* **Pass/Fail Threshold:**
+    * **PASS:** Impedance measurement between Sensor pins and Network Domain pins yields "Infinite" (Open Circuit), and any capacitive or inductive signal leakage remains below the Noise Floor.
+    * **FAIL:** Inter-layer vias or parallel trace routing (cross-talk) causes the sensor signal to induce a readable voltage on the network chip pins.
 
 ---
 
-### FC-ZC-003: Unidirectional Data Flow (Donanımsal Veri Diyotu)
-**Hedef:** NPU'dan Main MCU'ya sadece işlenmiş komutların (örn: "Işığı Aç") gidebildiğini, Main MCU'dan NPU'ya geriye doğru hiçbir verinin sızamadığını doğrulamak.
-* **Test Setup (Düzenek):** NPU ile Main MCU arasındaki izolasyon bariyerinin (Optokuplör vb.) her iki tarafındaki TX ve RX pinlerine proplar bağlanır.
-* **Attack Model (Saldırı Modeli):** "Reverse-channel injection" (Ters kanal enjeksiyonu). Main MCU tarafındaki alıcı (RX) pini üzerinden, donanımsal diyota doğru ters yönde 3.3V / 5V yüksek frekanslı sahte veri paketleri (Fuzzing) zorla basılır.
-* **Measuring Device (Ölçüm Cihazı):** Çok kanallı Osiloskop (En az 1 GHz bant genişliği), Yüksek hızlı Sinyal Jeneratörü.
-* **Pass/Fail Threshold (Eşik):**
-    * **PASS:** Main MCU tarafından basılan veri veya voltaj, NPU tarafındaki TX pininde tam bir sessizlik (0V veya sabit Logic High) yaratır. Geriye doğru sinyal geçişi fiziksel olarak bloke edilir.
-    * **FAIL:** Ters yönde basılan sinyaller NPU pini üzerinde milivolt seviyesinde bile olsa okunabilir mantıksal dalgalanmalara (Logic State Change) yol açar.
+### FC-ZC-003: Unidirectional Data Flow (Hardware Data Diode)
+**Objective:** Verify that only processed commands (e.g., "Turn on Light") can travel from the NPU to the Main MCU, and absolutely no data can leak backwards from the Main MCU to the NPU.
+* **Test Setup:** Probes are connected to the TX and RX pins on both sides of the isolation barrier (e.g., Optocoupler) between the NPU and the Main MCU.
+* **Attack Model:** Reverse-channel injection (Fuzzing). High-frequency 3.3V / 5V dummy data packets are forcefully injected backwards from the receiving (RX) pin on the Main MCU side towards the hardware diode.
+* **Measuring Device:** Multi-channel Oscilloscope (Min. 1 GHz bandwidth), High-speed Signal Generator.
+* **Pass/Fail Threshold:**
+    * **PASS:** Data or voltage injected by the Main MCU results in total silence (0V or constant Logic High) on the TX pin of the NPU side. Backward signal propagation is physically blocked.
+    * **FAIL:** Signals injected in the reverse direction cause readable logical fluctuations (Logic State Changes), even at the millivolt level, on the NPU pin.
 
 ---
 
-### FC-ZC-004: Volatile Data Destruction (SRAM Kalıntı Eşiği)
-**Hedef:** Yapay zeka modeli çıkarımı (inference) bitirdiği anda, sensör verisinin tutulduğu uçucu belleğin gücünün kesilip verinin kurtarılamaz şekilde silindiğini doğrulamak.
-* **Test Setup (Düzenek):** NPU içindeki/dışındaki Volatile Buffer (SRAM) güç hattına (VCC) osiloskop probu bağlanır. Sensöre 5 saniyelik referans bir ses/görüntü verilir.
-* **Attack Model (Saldırı Modeli):** Çıkarım (inference) sinyali gönderildiği milisaniyede (Cut-off Event), cihazın güç kaynağına sıvı nitrojen uygulanarak bellek dondurulur (Cold-Boot Attack) ve fiziksel bellek dökümü alınmaya çalışılır.
-* **Measuring Device (Ölçüm Cihazı):** Sıvı Nitrojen, Yüksek hızlı Lojik Analizör, JTAG bellek döküm modülü.
-* **Pass/Fail Threshold (Eşik):**
-    * **PASS:** Donanımsal kesme (Interrupt) anında SRAM VCC voltajı 10 mikrosaniye içinde 0V'a düşer. Cold-Boot atağı sonucunda elde edilen bellek dökümünde, referans ses/görüntünün matematiksel kalıntı oranı (Mathematical Remanence Threshold - $\tau_{rem}$) %0.01'in altındadır (Geri döndürülemez kriptografik gürültü).
-    * **FAIL:** Güç kesintisi gecikir veya kalıntı şarj nedeniyle sensör verisinin yapısal özellikleri (ses frekansı, görüntü matrisi) bellek dökümünden kısmen bile olsa geri kazanılabilir.
+### FC-ZC-004: Volatile Data Destruction (SRAM Remanence Threshold)
+**Objective:** Verify that the moment the AI model completes its inference, the power to the volatile memory holding the sensor data is cut off, destroying the data irretrievably.
+* **Test Setup:** An oscilloscope probe is connected to the VCC power line of the Volatile Buffer (SRAM) inside/outside the NPU. A 5-second reference audio/video clip is fed to the sensor.
+* **Attack Model:** At the exact millisecond the inference signal is transmitted (Cut-off Event), liquid nitrogen is applied to the power supply to freeze the memory (Cold-Boot Attack), followed by an attempt to extract a physical memory dump.
+* **Measuring Device:** Liquid Nitrogen, High-speed Logic Analyzer, JTAG memory dump module.
+* **Pass/Fail Threshold:**
+    * **PASS:** At the hardware interrupt, the SRAM VCC voltage drops to 0V within 10 microseconds. In the memory dump obtained via the Cold-Boot attack, the Mathematical Remanence Threshold of the reference audio/video is below 0.01% (Irreversible cryptographic noise).
+    * **FAIL:** The power cut is delayed, or structural characteristics of the sensor data (audio frequency, image matrix) can be even partially recovered from the memory dump due to remanent charge.
 
 ---
 
-### FC-ZC-009: Side-Channel & Metadata Leakage (Yan Kanal ve Metaveri Sızıntısı)
-**Hedef:** Elektromanyetik yayılımlar veya güç tüketimindeki dalgalanmalar üzerinden ev içindeki faaliyetlerin (ne konuşulduğu, kimin odada olduğu) tahmin edilemeyeceğini doğrulamak.
-* **Test Setup (Düzenek):** Cihaz yankısız ve elektromanyetik yalıtımlı (Faraday) bir test odasına alınır. Sensörlere bilinen farklı ses komutları (örn: sessizlik, normal konuşma, gürültü) verilir.
-* **Attack Model (Saldırı Modeli):** Differential Power Analysis (DPA) ve Simple Power Analysis (SPA). Cihazın çektiği akımdaki dalgalanmalar ve yaydığı elektromanyetik sinyaller (Tempest Attack) yüksek hassasiyetle kaydedilir ve yapay zeka sınıflandırıcıları ile (Machine Learning) ses verisi geri oluşturulmaya (reconstruct) çalışılır.
-* **Measuring Device (Ölçüm Cihazı):** Elektromanyetik (EM) Prob, Akım Trafosu, Osiloskop, Spektrum Analizörü.
-* **Pass/Fail Threshold (Eşik):**
-    * **PASS:** Elde edilen güç/EM dalgalanmaları ile içerideki ses faaliyeti arasındaki Karşılıklı Bilgi (Mutual Information - $I(X;Y)$) istatistiksel sıfır noktasına yakındır. Saldırgan algoritma, sesin içeriğini rastgele tahminden (Random Guessing) daha yüksek bir doğrulukla sınıflandıramaz.
-    * **FAIL:** Güç tüketimi eğrileri analiz edilerek, evde birinin olup olmadığı veya hangi kelimelerin söylendiği (örn: "Işığı Aç" veya "Alarmı Kur") dışarıdan %50'den yüksek bir başarı oranıyla tahmin edilebilir.
+### FC-ZC-009: Side-Channel & Metadata Leakage
+**Objective:** Verify that in-home activities (conversations, occupancy) cannot be inferred through electromagnetic emissions or power consumption fluctuations.
+* **Test Setup:** The device is placed in an anechoic and electromagnetically shielded (Faraday) test chamber. Known audio commands (e.g., silence, normal speech, noise) are fed to the sensors.
+* **Attack Model:** Differential Power Analysis (DPA) and Simple Power Analysis (SPA). Fluctuations in the device's current draw and electromagnetic emissions (Tempest Attack) are recorded with high precision, and machine learning classifiers attempt to reconstruct the audio data.
+* **Measuring Device:** Electromagnetic (EM) Probe, Current Transformer, Oscilloscope, Spectrum Analyzer.
+* **Pass/Fail Threshold:**
+    * **PASS:** The Mutual Information between the captured power/EM fluctuations and the internal audio activity is near statistical zero. The attacking algorithm cannot classify the audio content with a higher accuracy than Random Guessing.
+    * **FAIL:** By analyzing power consumption curves, an external observer can predict with greater than 50% accuracy whether someone is home or which specific words were spoken (e.g., "Turn on Light" vs. "Set Alarm").
 
 ---
 
-> **Not:** Bu doküman, FreeCuli GitHub deposunda `FC-ZC-Conformance-Test-Specification.md` adıyla bağımsız bir standart olarak yayınlanmak üzere kurgulanmıştır. Bu metin, donanım üreticilerine gönderilecek olan "Meydan Okuma ve Sertifikasyon" paketinin kalbidir.
+> **Note:** This document serves as the official standalone Conformance Test Specification within the FreeCuli GitHub repository. It constitutes the core of the "Challenge and Certification" package for hardware manufacturers.
