@@ -4,6 +4,7 @@ The indestructible, privacy-first hardware reference methodology for Server-Inde
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838474-blue)](https://doi.org/10.5281/zenodo.22838474)
 [![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
+[![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 ## Overview
 This repository contains the official, strictly falsifiable **ZC-CORE Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency.
