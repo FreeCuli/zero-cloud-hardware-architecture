@@ -57,6 +57,39 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
+### FC-ZC-005: Secure Boot (Firmware Signature Verification)
+**Objective:** Verify that the Edge NPU refuses to execute unauthorized or tampered AI models and firmware.
+* **Test Setup:** A malicious firmware image (with a modified AI model designed to leak data) is flashed directly into the NPU's non-volatile memory (Flash/eMMC).
+* **Attack Model:** The device is powered on. The attacker monitors the NPU boot sequence to see if the modified firmware is executed.
+* **Measuring Device:** Logic Analyzer (boot sequence trace), JTAG/SWD Debugger.
+* **Pass/Fail Threshold:**
+    * **PASS:** The NPU's burnt-in Secure Boot ROM detects the invalid cryptographic signature, halts the boot process immediately, and triggers a hardware lock (Red LED / Error state). The malicious code is never executed.
+    * **FAIL:** The NPU boots the modified firmware successfully.
+
+---
+
+### FC-ZC-006: Debug Port Isolation (Hardware Lockout)
+**Objective:** Verify that physical debug interfaces (JTAG, SWD, UART) routing into the Trusted Domain are completely unusable by an attacker with physical access.
+* **Test Setup:** The device casing is opened. The attacker locates the JTAG/SWD test pads on the PCB connected to the NPU.
+* **Attack Model:** An external JTAG debugger is connected in an attempt to halt the processor during active inference and dump the contents of the SRAM holding the raw sensor data.
+* **Measuring Device:** JTAG/SWD Debugger, Logic Analyzer.
+* **Pass/Fail Threshold:**
+    * **PASS:** The JTAG/SWD interface is unresponsive (eFuses blown, traces physically cut, or cryptographic authentication required). No memory dump can be initiated.
+    * **FAIL:** The debugger successfully connects, halts the CPU, and reads memory addresses.
+
+---
+
+### FC-ZC-007: Secure Update Mechanism (Cryptographic Boundary)
+**Objective:** Ensure that firmware updates pushed from the Untrusted Domain (Wi-Fi/Main MCU) into the Trusted Domain (NPU) are strictly verified before installation.
+* **Test Setup:** The network chip attempts to push a maliciously crafted, unsigned firmware update file across the data diode (or via a dedicated, secure out-of-band update channel if implemented).
+* **Attack Model:** The attacker controls the manufacturer's OTA (Over-The-Air) update server or performs a Man-in-the-Middle (MitM) attack to push a fake update package to the NPU.
+* **Measuring Device:** Network packet analyzer, JTAG Debugger.
+* **Pass/Fail Threshold:**
+    * **PASS:** The NPU rejects the update package due to an invalid cryptographic signature before writing it to active memory.
+    * **FAIL:** The NPU accepts and installs the unsigned or improperly signed update package.
+
+---
+
 ### FC-ZC-009: Side-Channel & Metadata Leakage
 **Objective:** Verify that in-home activities (conversations, occupancy) cannot be inferred through electromagnetic emissions or power consumption fluctuations.
 * **Test Setup:** The device is placed in an anechoic and electromagnetically shielded (Faraday) test chamber. Known audio commands (e.g., silence, normal speech, noise) are fed to the sensors.
