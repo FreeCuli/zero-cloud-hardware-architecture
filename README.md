@@ -18,6 +18,8 @@ By enforcing Physical Data Diodes, Trust Boundaries, and Lethal Volatile Buffers
    * Falsifiable adversarial laboratory attack scenarios (e.g., 5GHz oscilloscope reverse-channel fuzzing, -20°C SRAM cold-boot extraction, JTAG isolation tests).
 3. **[ZC-CORE Defensive Publication (Prior Art Matrix)](Zero-Cloud-Defensive-Publication.md)**
    * A legally structured claim-style matrix designed as an ultimate Defensive Publication. It explicitly defines all negative-space escape routes (e.g., capacitive isolators, secure enclaves, memory zeroization) to establish undeniable Prior Art against future patenting by third parties.
+4. **[Dual-Licensing Framework](DUAL-LICENSING.md)**
+   * Commercial manufacturers (e.g., Bosch, Siemens, Aselsan) must obtain a Commercial Exemption License. Open-source implementers are free under CERN-OHL-S.
 
 ## Commercial Certification
 Industrial manufacturers utilizing this architecture in proprietary hardware must acquire a B2B Certification and Trademark License to ensure compliance and legally display the #FreeCULI badge. See [FreeCuli.com](https://freeculi.com) for details.
