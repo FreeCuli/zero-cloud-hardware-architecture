@@ -1,14 +1,14 @@
-# FreeCuli Zero-Cloud Hardware Architecture (FC-ZC v1.0)
+# FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology
 
-The indestructible, privacy-first hardware reference architecture for Edge AI smart home appliances.
+The indestructible, privacy-first hardware reference methodology for Server-Independent Edge AI devices (Smart Home, Medical, Industrial, Defense).
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838474-blue)](https://doi.org/10.5281/zenodo.22838474)
 [![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 
 ## Overview
-This repository contains the official, strictly falsifiable hardware constraints required to achieve true "Zero-Cloud" compliance under the FreeCuli HFSCA methodology. 
+This repository contains the official, strictly falsifiable **ZC-CORE Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency.
 
-By enforcing Physical Data Diodes and Lethal Volatile Buffers, this architecture completely eradicates the possibility of unauthorized data exfiltration (microphone/camera streams) from smart appliances, protecting against both state-sponsored espionage and third-party GDPR/KVKK non-consent violations.
+By enforcing Physical Data Diodes, Trust Boundaries, and Lethal Volatile Buffers, this methodology completely eradicates the possibility of unauthorized data exfiltration (microphone/camera streams) from any IoT appliance. It protects against state-sponsored espionage and guarantees third-party GDPR/KVKK compliance by design.
 
 ## Core Documents
 

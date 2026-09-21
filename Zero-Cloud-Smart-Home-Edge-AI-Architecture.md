@@ -1,29 +1,33 @@
-# FreeCuli HFSCA: Zero-Cloud Hardware Reference Architecture v1.0 (The Fortress)
+# FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology (The Fortress)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838474-blue)](https://doi.org/10.5281/zenodo.22838474)
+
+> [!NOTE]
+> **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE standard** for all privacy-critical, server-independent autonomous edge devices (Home, Medical, Industrial, Defense).
+
 > [!WARNING]
 > **LEGAL NOTICE: CERN-OHL-S v2.0 Licensing (Hardware)**
 > This reference architecture, including its specific hardware flow, data diode implementations, and memory isolation schematics, is licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S). Any physical hardware appliance, smart home device, or Edge AI board that implements, derives from, or utilizes the specific data isolation flow described herein is considered a "Derivative Work" and MUST release its complete hardware schematics under the same CERN-OHL-S license, or obtain a commercial exemption license from FreeCuli.
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: CC-BY-ND 4.0 Licensing (Documentation & Specification)**
-> The text, schematics, and definitions within this document are licensed under the Creative Commons Attribution-NoDerivatives 4.0 International License (CC-BY-ND 4.0). You are free to share and redistribute this material in any medium or format, provided you give appropriate credit to FreeCuli. However, if you remix, transform, or build upon the material (e.g., attempt to create a derivative "X-Brand Standard" by altering this text), you may NOT distribute the modified material. This ensures FreeCuli remains the sole, immutable authority over the HFSCA standard.
+> The text, schematics, and definitions within this document are licensed under the Creative Commons Attribution-NoDerivatives 4.0 International License (CC-BY-ND 4.0). You are free to share and redistribute this material in any medium or format, provided you give appropriate credit to FreeCuli. However, if you remix, transform, or build upon the material (e.g., attempt to create a derivative "X-Brand Standard" by altering this text), you may NOT distribute the modified material. This ensures FreeCuli remains the sole, immutable authority over the ZC-CORE standard.
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: Cross-Referencing & Operational Compliance**
 > This hardware reference architecture is inherently bound to the operational and privacy specifications defined in the official [FreeCuli Smart Kitchen Standards Protocol](https://github.com/FreeCuli/smart-kitchen-standards). Compliance requires simultaneous adhesion to both frameworks. A hardware implementation without the corresponding operational compliance protocol is deemed a violation of the FreeCuli standard.
 
-## 1. Introduction & The Zero-Cloud Axiom
+## 1. Introduction & The "Trust Boundary" Axiom
 
-Traditional "Smart Kitchen & Home" appliances inherently violate user privacy (GDPR/KVKK) by transmitting audio and visual data captured by their microphones and cameras to cloud servers. The **FreeCuli HFSCA (Hands-Free Semantic Culinary Assistant)** architecture, originally built for smart kitchens but universally applicable, eliminates this violation not through software promises, but through **Immutable Laws of Physical Hardware**.
+Traditional cloud-connected IoT devices inherently violate user privacy (GDPR/KVKK) by transmitting raw sensory data (audio/visual) to external networks. The **FreeCuli ZC-CORE Methodology** eliminates this violation not through software promises, but through **Hardware-Enforced Trust Boundaries**.
 
-This document defines the *unchangeable and non-negotiable* core hardware flow that any HFSCA-compliant smart home or kitchen appliance (e.g., oven, air conditioner, robot vacuum) MUST possess to guarantee a "Zero-Cloud" environment.
+The core axiom of Zero-Cloud is that **sensitive raw sensor data cannot leave the Trusted Processing Domain.** The device's primary intelligent functions must be **Server-Independent**.
 
-## 2. The Indestructible Fortress: 4 Core Hardware Locks
+## 2. The Indestructible Fortress: Mandatory Hardware Locks
 
-Any manufacturer wishing to produce an HFSCA-compliant device SHALL physically implement the following 4 hardware rules. Software-based isolations (VLANs, Firewalls, OS-level sandboxing) are STRICTLY UNACCEPTABLE.
+Any manufacturer wishing to produce a ZC-CORE compliant device SHALL physically implement the following hardware rules. Software-based isolations (VLANs, Firewalls) are STRICTLY UNACCEPTABLE as primary barriers.
 
-### 2.1. Absolute Physical Air-Gap
-Peripherals such as cameras and microphones CANNOT be electrically connected to any network-capable modules of the device (Wi-Fi, Ethernet, Bluetooth SoC). Sensors may ONLY be connected to the isolated **Edge NPU/MCU (Edge AI Chip)** responsible for local processing.
+### 2.1. Absolute Physical Air-Gap (Sensor Isolation)
+Peripherals such as cameras and microphones CANNOT be electrically connected to any network-capable modules of the device (Wi-Fi, Ethernet, Bluetooth SoC). Sensors may ONLY be connected to the isolated **Edge NPU/MCU (Trusted Domain)** responsible for local processing.
 
 ### 2.2. Hardware Unidirectional Data Diode
 The Edge NPU must transmit the inference result (e.g., the command "Set heat to 200 degrees" or "Turn off light") to the device's Main Actuator/MCU. However, this transmission cable MUST be isolated using a **physical data diode** (e.g., an Optocoupler / Opto-isolator). 
@@ -35,9 +39,33 @@ Sensor data (Raw Audio and Video) is recorded into a temporary SRAM (Volatile Bu
 ### 2.4. The "Poisoned Sensor" Rule
 An absolute rule to prevent engineering bypasses: **ALL (100% without exception) audio and visual sensors** on the device MUST connect EXCLUSIVELY to the isolated NPU. If even a single secondary microphone or sensor is directly connected to the network-capable (Wi-Fi) chip under the excuse of "wake-word detection," the device immediately loses certification and is deemed in violation of the standard.
 
+### 2.5. Secure Boot (Chain of Trust)
+Physical isolation is meaningless if an attacker can manipulate the Edge AI firmware. The Edge NPU MUST implement Hardware Secure Boot. It must cryptographically verify the signature of the trusted firmware against a burnt-in ROM key before executing it. Executing unauthorized firmware within the Trusted Domain is a critical violation.
+
+### 2.6. Debug Port Isolation (Anti-Extraction)
+Leaving hardware debug interfaces (JTAG, SWD, UART) physically open and unauthenticated compromises the Trust Boundary. An attacker with physical access must NOT be able to halt the NPU and dump the raw audio/video from SRAM. Debug ports routing into the Trusted Domain MUST be physically severed, cryptographically locked, or blown (eFuse) in production environments.
+
+### 2.7. Secure Update Mechanism
+Server-Independence does not mean "Never Updated." However, any firmware or AI model updates sent from the Untrusted Domain (Main MCU/Wi-Fi) into the Trusted Domain (NPU) must pass through a strict cryptographic Verification and Authorization layer. 
+
+### 2.8. Power & Control Plane Isolation
+A data diode only protects the data line. The control plane (Power, Reset, Clock, DMA) of the NPU must also be isolated. An attacker controlling the Main MCU must NOT be able to artificially manipulate the clock or reset pins of the NPU to interrupt the Lethal Volatile Buffer destruction sequence or extract latent data.
+
+### 2.9. ZC-CORE Threat Model & Mitigations
+To ensure verifiability, the ZC-CORE methodology guarantees protection against the following explicit attack vectors:
+
+| Attacker Profile | Target | Required ZC-CORE Mitigation |
+| :--- | :--- | :--- |
+| **Remote Attacker (Wi-Fi Hack)** | Microphone/Camera Data | **Physical Air-Gap** (Sensor Isolation) |
+| **Compromised Main MCU** | Read raw data from NPU | **Hardware Data Diode** (One-way boundary) |
+| **Physical Attacker (Repairman)** | Extract latent audio from RAM | **Lethal Volatile Buffer** (Power kill) |
+| **Supply-Chain Attacker** | Run malicious AI inference | **Secure Boot** (Signature verification) |
+| **Physical Attacker (Lab)** | JTAG RAM Dump | **Debug Isolation** (eFuse/Lock) |
+| **Compromised Update Server** | Push malicious firmware to NPU | **Secure Update** (Cryptographic check) |
+
 ---
 
-## 3. Hardware Data Flow Schematic
+## 3. ZC-CORE Hardware Data Flow Schematic
 
 The schematic below illustrates the absolute data flow directions and isolation barriers of an HFSCA-compliant device. This schematic is not a "recommendation"; it is the **Mandatory Reference Architecture** licensed under CERN-OHL-S.
 
