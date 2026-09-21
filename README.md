@@ -12,11 +12,12 @@ By enforcing Physical Data Diodes, Trust Boundaries, and Lethal Volatile Buffers
 
 ## Core Documents
 
-* 🏗️ **[Reference Architecture (Zero-Cloud-Smart-Home-Edge-AI-Architecture.md)](./Zero-Cloud-Smart-Home-Edge-AI-Architecture.md)**
-  The foundational specification detailing the hardware boundaries, data flow schematic, and the mandatory 14-clause HFSCA methodology.
-
-* 🧪 **[Conformance Test Specification (FC-ZC-Conformance-Test-Specification.md)](./FC-ZC-Conformance-Test-Specification.md)**
-  The adversarial hardware testing protocols required to verify isolation compliance. Includes oscilloscope testing for reverse-channel leakage and cold-boot SRAM extraction methodologies.
+1. **[The ZC-CORE Hardware Fortress (Architecture Document)](Zero-Cloud-Smart-Home-Edge-AI-Architecture.md)**
+   * Mandatory specifications for Physical Air-Gap, Hardware Data Diode (Optocoupler), Lethal Volatile Buffer (SRAM destruction), and Trust Boundary security pillars.
+2. **[FC-ZC Conformance Test Specification (CTS)](FC-ZC-Conformance-Test-Specification.md)**
+   * Falsifiable adversarial laboratory attack scenarios (e.g., 5GHz oscilloscope reverse-channel fuzzing, -20°C SRAM cold-boot extraction, JTAG isolation tests).
+3. **[ZC-CORE Defensive Publication (Prior Art Matrix)](Zero-Cloud-Defensive-Publication.md)**
+   * A legally structured claim-style matrix designed as an ultimate Defensive Publication. It explicitly defines all negative-space escape routes (e.g., capacitive isolators, secure enclaves, memory zeroization) to establish undeniable Prior Art against future patenting by third parties.
 
 ## Commercial Certification
 Industrial manufacturers utilizing this architecture in proprietary hardware must acquire a B2B Certification and Trademark License to ensure compliance and legally display the #FreeCULI badge. See [FreeCuli.com](https://freeculi.com) for details.
