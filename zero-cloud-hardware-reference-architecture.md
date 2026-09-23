@@ -1,4 +1,4 @@
-# FreeCuli ZC-CORE v3.1.0: Universal Zero-Cloud Hardware Methodology for AIoT & Edge AI
+# FreeCuli ZC-CORE v3.1.0: Universal Hardware Reference Architecture
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 

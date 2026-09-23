@@ -1,4 +1,4 @@
-# ZC-CORE Brand, Trademark & Certification Policy (v3.1)
+# FreeCuli ZC-CORE v3.1.0: Brand & Trademark Policy
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
