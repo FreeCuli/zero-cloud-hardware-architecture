@@ -3,11 +3,11 @@
 
 > [!IMPORTANT]
 > **Technical Compliance Verifiers (NOT IP Detectors)**
-> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's device strictly adheres to the HFSCA v1.0 hardware constraints (Air-Gap, Unidirectional Diode, Volatile Buffer Power-Cut).
+> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's device strictly adheres to the **ZC-CORE v2.1** hardware constraints (Air-Gap, Unidirectional Diode, Volatile Buffer Power-Cut, Secure Boot, Debug Isolation, Secure Update, Power/Control Plane Isolation).
 
 > **"FreeCuli does not require you to trust FreeCuli. It requires you to reproduce the test."**
 
-This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart oven, assistant, white goods, etc.) must pass to comply with the FC-ZC v1.0 standard.
+This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart home, medical, industrial, defense) must pass to comply with the **ZC-CORE v2.1 standard**.
 
 ---
 
@@ -57,14 +57,20 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-### FC-ZC-005: Secure Boot (Firmware Signature Verification)
-**Objective:** Verify that the Edge NPU refuses to execute unauthorized or tampered AI models and firmware.
-* **Test Setup:** A malicious firmware image (with a modified AI model designed to leak data) is flashed directly into the NPU's non-volatile memory (Flash/eMMC).
-* **Attack Model:** The device is powered on. The attacker monitors the NPU boot sequence to see if the modified firmware is executed.
-* **Measuring Device:** Logic Analyzer (boot sequence trace), JTAG/SWD Debugger.
+### FC-ZC-005: Secure Boot (Hardware Root of Trust & Rollback Protection)
+**Objective:** Verify that the Edge NPU refuses to execute unauthorized or tampered AI models and firmware, and that the root of trust is anchored in hardware — not software.
+* **Test Setup A (Tampered Firmware):** A malicious firmware image (with a modified AI model designed to leak data) is flashed directly into the NPU's non-volatile memory (Flash/eMMC).
+* **Test Setup B (Rollback Attack):** A legitimately signed but intentionally older/vulnerable firmware version is pushed to the NPU via the update channel.
+* **Test Setup C (Root of Trust Audit):** The manufacturer's secure boot implementation is examined for key storage location.
+* **Attack Model A:** The device is powered on. The attacker monitors the NPU boot sequence to see if the modified firmware executes.
+* **Attack Model B:** The attacker attempts to downgrade firmware to a version containing a known vulnerability.
+* **Attack Model C:** Attacker attempts to extract or override signing keys via software.
+* **Measuring Device:** Logic Analyzer (boot sequence trace), JTAG/SWD Debugger, Firmware binary analysis tools.
 * **Pass/Fail Threshold:**
-    * **PASS:** The NPU's burnt-in Secure Boot ROM detects the invalid cryptographic signature, halts the boot process immediately, and triggers a hardware lock (Red LED / Error state). The malicious code is never executed.
-    * **FAIL:** The NPU boots the modified firmware successfully.
+    * **PASS (A):** The NPU's Secure Boot ROM detects the invalid cryptographic signature, halts immediately, and triggers a hardware lock state. The malicious code is never executed.
+    * **PASS (B):** The NPU rejects the downgraded firmware due to anti-rollback counter mismatch (eFuse-burned version counter or monotonic counter in hardware security module).
+    * **PASS (C):** Signing keys are stored in hardware-protected memory (OTP/eFuse, Hardware Security Module, or Secure Element). Software-only key storage in Flash without hardware protection constitutes a **FAIL**.
+    * **FAIL:** The NPU boots modified firmware, accepts a rollback, or keys are recoverable from software-accessible memory.
 
 ---
 
@@ -90,6 +96,21 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
+### FC-ZC-008: Power & Control Plane Isolation (Anti-Manipulation)
+**Objective:** Verify that the Main MCU (Untrusted Domain) cannot manipulate the NPU's (Trusted Domain) hardware control signals — specifically Reset, Clock, and DMA — to interrupt, delay, or bypass the Lethal Volatile Buffer destruction sequence.
+* **Test Setup:** The device is placed under active inference with a known audio clip. Probes are attached to the NPU's RST (Reset), CLK (Clock), and DMA request lines at the PCB level. The Main MCU is granted maximum software privileges.
+* **Attack Model A (Reset Injection):** At the exact millisecond the AI inference completes and the power-cut sequence begins, the attacker attempts to force a hardware reset on the NPU via the RST pin, attempting to freeze SRAM contents before power is fully cut.
+* **Attack Model B (Clock Manipulation):** The attacker attempts to slow or halt the NPU clock to extend the window between inference completion and SRAM power-cut, enabling a cold-boot extraction window.
+* **Attack Model C (DMA Hijack):** The attacker attempts to initiate a DMA read transfer from Main MCU directly into NPU SRAM address space before the destruction sequence completes.
+* **Measuring Device:** Multi-channel Oscilloscope (Min. 1 GHz), Logic Analyzer, DMA controller register reader.
+* **Pass/Fail Threshold:**
+    * **PASS (A):** The NPU Reset pin is not electrically reachable from the Main MCU domain (physically isolated, or gated through the isolation barrier). External reset cannot halt the power-cut sequence.
+    * **PASS (B):** The NPU clock source is isolated from the Main MCU's clock domain. External clock manipulation does not affect the hardware interrupt timing of the power-cut.
+    * **PASS (C):** DMA transactions originating from the Main MCU domain cannot address NPU SRAM memory regions. Memory Protection Unit (MPU) or hardware bus isolation blocks all cross-domain DMA transfers.
+    * **FAIL:** Any of the above attack vectors successfully delays or prevents SRAM power-cut, or allows a read of SRAM contents across domain boundaries.
+
+---
+
 ### FC-ZC-009: Side-Channel & Metadata Leakage
 **Objective:** Verify that in-home activities (conversations, occupancy) cannot be inferred through electromagnetic emissions or power consumption fluctuations.
 * **Test Setup:** The device is placed in an anechoic and electromagnetically shielded (Faraday) test chamber. Known audio commands (e.g., silence, normal speech, noise) are fed to the sensors.
@@ -101,4 +122,60 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-> **Note:** This document serves as the official standalone Conformance Test Specification within the FreeCuli GitHub repository. It constitutes the core of the "Challenge and Certification" package for hardware manufacturers.
+## 🔬 DEFENSIVE PUBLICATION ALTERNATIVE IMPLEMENTATION TESTS
+
+> [!NOTE]
+> The following tests (FC-ZC-010 through FC-ZC-012) apply to manufacturers who implement ZC-CORE using the **alternative topologies** disclosed in the Zero-Cloud Defensive Publication (Zenodo DOI: 10.5281/zenodo.22838473). Each alternative must meet **equivalent or stronger** security guarantees than the primary implementation. "Alternative" does not mean "weaker."
+
+---
+
+### FC-ZC-010: Capacitive / Magnetic Isolator Alternative (Data Diode Equivalency)
+**Objective:** Verify that a manufacturer implementing an alternative unidirectional isolation barrier (capacitive isolator, magnetic/inductive coupler, digital isolator with RF coupling, or galvanic isolation IC) achieves the same physical one-way data constraint as the primary optocoupler-based design.
+* **Test Setup:** Identical to FC-ZC-003 (Unidirectional Data Flow), substituting the optocoupler with the manufacturer's alternative isolation component.
+* **Additional Audit Requirement:** Manufacturer must document the alternative component's datasheet confirmation of unidirectional signal propagation and provide CMRR (Common-Mode Rejection Ratio) specifications showing immunity to reverse signal injection.
+* **Forbidden Bypass:** Any alternative isolation implementation that includes a hardware or software "diagnostic mode," "loopback mode," or "bidirectional override" capability — even if disabled by default — constitutes an automatic **FAIL**. The isolation must be physically unconditional.
+* **Attack Model:** Identical reverse-channel fuzzing as FC-ZC-003, adapted to the alternative component's signal characteristics.
+* **Measuring Device:** Multi-channel Oscilloscope (Min. 5 GHz), VNA, component-appropriate signal generator.
+* **Pass/Fail Threshold:**
+    * **PASS:** Reverse-injected signals on the Main MCU side result in < 5mVpp on the NPU side. No bidirectional override capability exists in any operational mode.
+    * **FAIL:** Signal propagates in reverse direction above 5mVpp, OR a diagnostic/loopback mode that enables bidirectional communication is discovered.
+
+---
+
+### FC-ZC-011: Secure Enclave Alternative (NPU Isolation Equivalency)
+**Objective:** Verify that a manufacturer using a Secure Enclave (e.g., ARM TrustZone, RISC-V PMP zones, or dedicated Secure Element) instead of a discrete dedicated NPU achieves equivalent Trust Boundary isolation between the sensor processing domain and the network domain.
+* **Test Setup:** The device uses a single SoC with a hardware-partitioned secure enclave handling all sensor data and AI inference. The non-secure world runs the network stack and Main MCU functions.
+* **Audit Requirements:**
+    * Manufacturer must provide Memory Protection Unit (MPU/PMP) configuration documentation proving sensor data memory regions are exclusively accessible from the secure world.
+    * World-switch (non-secure → secure) call audit: Only explicitly whitelisted API calls may enter the secure enclave. Arbitrary memory reads from non-secure world must be architecturally blocked.
+* **Attack Model A:** From the non-secure world (where Wi-Fi/network stack runs), attempt direct memory reads to secure enclave SRAM regions holding raw sensor data.
+* **Attack Model B:** Attempt to load a non-secure world application that exploits a shared memory buffer or inter-world communication channel to extract sensor data.
+* **Measuring Device:** JTAG Debugger (TrustZone-aware), Memory access audit log, Side-channel power probe.
+* **Pass/Fail Threshold:**
+    * **PASS (A):** All direct memory access attempts to secure enclave regions from non-secure world generate hardware faults (Memory Abort / Access Violation). Zero bytes readable.
+    * **PASS (B):** No shared memory buffer or IPC channel exposes raw sensor data to non-secure world. Only processed inference results (text commands) exit via the defined secure API.
+    * **FAIL:** Any path exists for non-secure world code to read raw audio/video data, even indirectly via shared buffers, covert channels, or timing side-channels.
+
+---
+
+### FC-ZC-012: Memory Zeroization Alternative (Volatile Buffer Equivalency)
+**Objective:** Verify that a manufacturer using cryptographic memory zeroization (software-triggered active overwrite) instead of hardware power-cut achieves equivalent irreversible data destruction within the required time threshold.
+* **Test Setup:** The device completes an inference cycle using memory zeroization instead of a hardware power interrupt. A known audio clip is used as test input.
+* **Audit Requirements:**
+    * Manufacturer must demonstrate that the zeroization routine is triggered by a hardware interrupt (not a software thread that can be preempted or delayed).
+    * The zeroization must overwrite all SRAM addresses that contained raw sensor data with cryptographically random bytes (not sequential zeros, which are predictable).
+    * The zeroization routine itself must not be interruptible by non-secure world processes.
+* **Attack Model A (Timing Window):** Attacker attempts to freeze execution (via Reset, Clock manipulation, or JTAG halt) during the zeroization routine to capture partially-overwritten data.
+* **Attack Model B (Incomplete Zeroization):** Attacker performs forensic RAM analysis to check whether structured audio/video patterns remain in any memory region after zeroization completion.
+* **Attack Model C (Preemption Attack):** Attacker triggers a high-priority interrupt from the non-secure world to preempt the zeroization routine before completion.
+* **Measuring Device:** JTAG memory dump module, Oscilloscope (zeroization timing), Forensic RAM analysis tools.
+* **Pass/Fail Threshold:**
+    * **PASS (A):** Zeroization completes within **< 10ms** of inference completion trigger, identical to the hardware power-cut threshold. Any freeze attempt during zeroization finds only partially overwritten (cryptographically irrecoverable) data.
+    * **PASS (B):** Post-zeroization memory forensic analysis yields zero recoverable structural patterns from the original audio/video input. Mathematical Remanence Threshold < 0.01%.
+    * **PASS (C):** The zeroization interrupt handler has the highest hardware priority and cannot be preempted by any non-secure world interrupt.
+    * **FAIL:** Any attack vector recovers structured data from memory post-zeroization, OR zeroization takes > 10ms, OR non-secure interrupts can preempt the zeroization routine.
+
+---
+
+> **Note:** This document serves as the official standalone Conformance Test Specification within the FreeCuli ZC-CORE ecosystem. It constitutes the core of the "Challenge and Certification" package for hardware manufacturers across all sectors (Smart Home, Medical, Industrial, Defense).
+
