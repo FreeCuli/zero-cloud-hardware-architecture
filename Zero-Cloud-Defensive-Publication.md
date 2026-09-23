@@ -1,28 +1,26 @@
-# ZC-CORE Defensive Publication
+# ZC-CORE Defensive Publication (Prior Art for AIoT & Edge AI)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 ## Claim-Style Prior-Art Matrix & Technical Disclosure
 
-**Project:** FreeCuli ZC-CORE
-**Purpose:** Defensive Publication / Prior-Art Establishment
+**Project:** FreeCuli ZC-CORE v3.0
+**Purpose:** Defensive Publication / Prior-Art Establishment for Universal AIoT and Edge AI
 **Reference Publication:** Zenodo DOI 10.5281/zenodo.22838473
-**Version:** 1.0 — Defensive Publication Draft
+**Version:** 3.0 — Comprehensive AIoT Hardware Security
 **Publication Strategy:** Claim-style technical disclosure; not a patent application and not an assertion that any particular claim is patentable.
 
 ---
 
 ## 1. Purpose and Legal Character of This Publication
 
-This document intentionally describes, in claim-style and implementation-specific language, a broad family of hardware architectures, functional relationships, security boundaries, timing relationships, testing methodologies, and equivalent implementations for server-independent Edge-AI devices.
+This document intentionally describes, in claim-style and implementation-specific language, a broad family of hardware architectures, functional relationships, security boundaries, timing relationships, testing methodologies, and equivalent implementations for server-independent AIoT and Edge AI devices.
 
 The purpose is defensive publication.
 
-The disclosed subject matter is intended to establish publicly accessible technical prior art for the disclosed combinations and their reasonably foreseeable implementations, including implementations created independently or through clean-room engineering.
+The disclosed subject matter establishes publicly accessible technical prior art for the disclosed combinations and their reasonably foreseeable implementations, including implementations created independently or through clean-room engineering.
 
-This document does not assert that every disclosed element is novel, patentable, copyrightable, or exclusively owned by FreeCuli.
-
-Known elements such as physical data diodes, optical isolation, volatile memory, secure boot, hardware debug isolation, and secure update mechanisms may individually be known technologies. The relevant disclosure therefore focuses particularly on their architectural relationships, functional constraints, security boundaries, timing dependencies, alternative physical implementations, and combinations within a server-independent Edge-AI device.
+Known elements such as physical data diodes, optical isolation, volatile memory, secure boot, hardware debug isolation, and secure update mechanisms may individually be known technologies. The relevant disclosure focuses particularly on their architectural relationships, functional constraints, security boundaries, timing dependencies, zeroization methodologies, alternative physical implementations, and combinations within a server-independent AIoT / Edge AI device.
 
 ---
 
@@ -30,7 +28,7 @@ Known elements such as physical data diodes, optical isolation, volatile memory,
 
 ## ZC-CORE-001 — Server-Independent Physical Trust Boundary
 
-A server-independent Edge-AI apparatus comprising:
+A server-independent AIoT / Edge AI apparatus comprising:
 
 1. one or more ambient sensors configured to acquire raw sensory information;
 2. a trusted processing domain comprising an Edge-AI processor;
@@ -39,15 +37,14 @@ A server-independent Edge-AI apparatus comprising:
 5. a physical isolation boundary separating the trusted processing domain from the network domain;
 6. a hardware-enforced communication mechanism configured to permit a defined information flow from the trusted processing domain toward the control/network domain;
 7. the hardware-enforced communication mechanism being physically configured to prevent a reverse information flow from the control/network domain toward the trusted processing domain;
-8. a hardware-controlled memory destruction or invalidation mechanism configured to terminate availability of at least a portion of the raw sensory information following completion of a defined local inference operation; and
+8. a hardware-controlled memory destruction or cryptographic zeroization mechanism configured to terminate availability of ALL copies of the raw sensory information (including cache, registers, and DMA buffers) following completion of a defined local inference operation; and
 9. the apparatus being operable to produce an actuator command without requiring transmission of the raw sensory information to a remote server.
 
 ### Functional relationship
 
 The architecture is not merely a collection of independent security components.
-
 The components cooperate such that:
-**sensor acquisition → trusted local inference → controlled command release → raw-data destruction → actuator/network operation**
+**sensor acquisition → trusted local inference → controlled command release → absolute raw-data destruction → AIoT actuator/network operation**
 occurs without requiring the network domain to obtain read access to the raw sensory domain.
 
 ---
@@ -58,30 +55,11 @@ occurs without requiring the network domain to obtain read access to the raw sen
 
 A device according to ZC-CORE-001 wherein:
 
-1. a microphone, camera, image sensor, acoustic sensor, biometric sensor, environmental sensor, or other privacy-sensitive sensor is electrically coupled to the trusted Edge-AI domain;
+1. a microphone, camera, image sensor, acoustic sensor, biometric sensor, environmental sensor, or other privacy-sensitive sensor is electrically coupled exclusively to the trusted Edge AI domain;
 2. the sensor is not electrically coupled to the network-capable processor;
 3. the network-capable processor cannot directly address, sample, configure, read, or otherwise obtain raw sensor information;
 4. no software-defined firewall, VLAN, operating-system sandbox, process permission, or virtual network boundary is relied upon as the sole isolation mechanism;
 5. the separation is implemented at one or more physical hardware layers.
-
-### Alternative implementations
-
-The physical separation may comprise:
-- separate IC packages;
-- separate power domains;
-- separate ground domains;
-- separate PCB regions;
-- separate PCBs;
-- isolated buses;
-- galvanically isolated interfaces;
-- optical interfaces;
-- magnetic interfaces;
-- capacitive interfaces;
-- mechanically separated modules;
-- physically disconnected network traces;
-- dedicated trusted-domain connectors;
-- hardware-controlled switches;
-- combinations thereof.
 
 ---
 
@@ -91,34 +69,11 @@ The physical separation may comprise:
 
 A device according to ZC-CORE-001 wherein:
 
-1. the Edge-AI processor generates a processed representation, command, classification, control instruction, or semantic result from locally acquired sensor information;
-2. the processed result is transferred toward a main controller or actuator controller;
+1. the Edge AI processor generates a processed representation, command, classification, control instruction, or semantic result from locally acquired sensor information;
+2. the processed result is transferred toward a main controller or AIoT actuator;
 3. the transfer occurs through a physical unidirectional communication boundary;
 4. the receiving controller is unable to electrically transmit a read request, command, query, clocked reverse transaction, or equivalent information-bearing signal into the trusted sensor/AI domain;
 5. reverse communication is prohibited by hardware topology rather than solely by software policy.
-
-### Alternative one-way mechanisms
-
-The physical one-way boundary may be implemented using:
-- optical optocouplers;
-- opto-isolators;
-- magnetic couplers;
-- inductive couplers;
-- capacitive isolation;
-- digital isolation ICs;
-- RF-coupled unidirectional interfaces;
-- transmit-only interfaces;
-- physically terminated receive paths;
-- write-only hardware buses;
-- tri-state logic permanently constrained to one direction;
-- diode-like semiconductor structures;
-- FPGA-configured hardware paths combined with physical direction enforcement;
-- ASIC implementations;
-- integrated semiconductor implementations;
-- discrete component implementations;
-- combinations thereof.
-
-The disclosed architecture is therefore not limited to an optocoupler.
 
 ---
 
@@ -138,25 +93,19 @@ A physical communication boundary wherein:
 
 ---
 
-# 6. Lethal Volatile Buffer — Claim Family ZC-CORE-005
+# 6. Lethal Volatile Buffer & Zeroization — Claim Family ZC-CORE-005
 
-## ZC-CORE-005 — Post-Inference Volatile Sensor Data Destruction
+## ZC-CORE-005 — Post-Inference Absolute Data Destruction
 
 A device comprising:
 
 1. a privacy-sensitive sensor;
 2. a volatile memory region configured to temporarily store raw sensor information;
-3. an Edge-AI processor configured to perform inference on the raw sensor information;
-4. an inference-completion event generated by the Edge-AI processing domain;
-5. a hardware-controlled power switch, isolation switch, reset mechanism, memory-domain disable mechanism, or equivalent hardware mechanism responsive to the inference-completion event;
-6. the mechanism causing the volatile memory region to become unpowered, inaccessible, invalidated, or otherwise unavailable following the inference-completion event;
-7. the resulting memory state preventing normal recovery of the previously stored raw sensor information.
-
-### Important scope
-
-The mechanism is not limited to: SRAM, DRAM, a particular semiconductor vendor, a particular voltage, a particular switch topology, or a particular interrupt architecture.
-
-The volatile storage may comprise any memory technology whose stored information is lost or rendered inaccessible through the disclosed hardware-controlled destruction/invalidation operation.
+3. an Edge AI processor configured to perform inference on the raw sensor information;
+4. an inference-completion event generated by the Edge AI processing domain;
+5. a hardware-controlled power switch, isolation switch, reset mechanism, memory-domain disable mechanism, or cryptographic zeroization mechanism responsive to the inference-completion event;
+6. the mechanism causing ALL physical or logical copies of the sensor data (including CPU registers, cache lines, DMA buffers, scratchpad memory, temporary tensors, and main SRAM) to become unpowered, inaccessible, invalidated, or overwritten following the inference-completion event;
+7. the resulting memory state preventing forensic or normal recovery of the previously stored raw sensor information.
 
 ---
 
@@ -173,12 +122,10 @@ The disclosed data destruction mechanism may comprise any of the following:
 7. disabling the memory power domain;
 8. removing retention power;
 9. disconnecting a memory bank;
-10. overwriting volatile storage through dedicated hardware;
+10. overwriting ALL volatile storage (registers, cache, DMA buffers, tensors) through dedicated hardware or un-optimizable software loops (cryptographic zeroization) with random bytes;
 11. combining power removal with cryptographic invalidation;
 12. combining physical isolation with hardware-controlled zeroization;
 13. any equivalent mechanism producing the same security property.
-
-The disclosure therefore covers the security function rather than a single named component.
 
 ---
 
@@ -197,9 +144,9 @@ A discrete diode implementation may be replaced by an ASIC.
 ### E.
 SRAM may be replaced by another volatile memory technology.
 ### F.
-Power interruption may be replaced or supplemented by hardware zeroization.
+Power interruption may be replaced or supplemented by hardware/cryptographic zeroization of all caching layers.
 ### G.
-A dedicated NPU may be replaced by an MCU, DSP, FPGA, ASIC, secure enclave, or heterogeneous processor.
+A dedicated NPU may be replaced by an MCU, DSP, FPGA, ASIC, secure enclave, TrustZone partition, or heterogeneous processor.
 ### H.
 A separate PCB may be replaced by a physically partitioned multi-domain PCB.
 ### I.
