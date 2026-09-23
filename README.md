@@ -32,7 +32,7 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
 ### 🛡️ Prior Art & Legal
 3. **[Zero-Cloud Defensive Publication (Prior Art Specification)](zero-cloud-core-defensive-publication.md)**
    * A legally binding, timestamped disclosure establishing unquestionable global prior-art to prevent third-party patenting.
-4. **[ZC-CORE Dual-Licensing Framework](DUAL-LICENSING.md)**
+4. **[ZC-CORE Dual-Licensing Framework](zero-cloud-dual-licensing.md)**
    * Open-source (CERN-OHL-S) rules vs. Commercial Exemption (B2B) licensing models and patent retaliation clauses.
 5. **[ZC-CORE Scope & Boundary Definition](zero-cloud-core-scope-boundary.md)**
    * Explicit definitions of what the standard guarantees (on-device privacy) vs. what it does not (cloud security).

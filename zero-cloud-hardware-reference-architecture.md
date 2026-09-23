@@ -7,7 +7,7 @@
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: Separation of Technical Standard and Legal Licensing**
-> This document defines the strict **technical architecture and engineering properties** of the ZC-CORE methodology. For all legal licensing models, CERN-OHL-S implications, patent retaliation clauses, and commercial exemption terms, refer strictly to the `DUAL-LICENSING.md` document in this repository.
+> This document defines the strict **technical architecture and engineering properties** of the ZC-CORE methodology. For all legal licensing models, CERN-OHL-S implications, patent retaliation clauses, and commercial exemption terms, refer strictly to the `zero-cloud-dual-licensing.md` document in this repository.
 
 ## 1. Introduction & The "Trust Boundary" Axiom
 
@@ -128,4 +128,4 @@ graph TD
 ## 4. Methodological & Functional Equivalency (Defensive Publication)
 The strict security properties defined in this architecture (e.g., unidirectional data flow, memory zeroization, sensor isolation) apply universally to any functional equivalent. Any alternative component (e.g., magnetic isolators, secure enclaves) that replicates the security properties of these hardware locks falls under the ZC-CORE framework as detailed in the Defensive Publication (Zenodo DOI: 10.5281/zenodo.22838473). Evidence-based proof is strictly required via the FC-ZC-CTS.
 
-*(For open-source obligations, CERN-OHL-S licensing, trademark rules, and commercial B2B licensing, please refer to DUAL-LICENSING.md).*
+*(For open-source obligations, CERN-OHL-S licensing, trademark rules, and commercial B2B licensing, please refer to zero-cloud-dual-licensing.md).*
