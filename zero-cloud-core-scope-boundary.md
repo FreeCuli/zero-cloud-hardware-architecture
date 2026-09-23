@@ -26,4 +26,3 @@ To prevent misinterpretation of the methodology's capabilities and to strictly d
 | **Future Memory Technologies** | Covered | Functionally covered under the Technology-Neutral Equivalence Principle. |
 | **Side-Channel Attacks (Power/Timing)** | Partially Covered | Mitigated at the Control-Plane (M5) level, but deep cryptographic DPA (Differential Power Analysis) is outside the primary scope. |
 | **Software-Only Isolation (Hypervisors)** | Explicitly Banned | Explicitly outside the ZC-CORE trusted methodology. |
-

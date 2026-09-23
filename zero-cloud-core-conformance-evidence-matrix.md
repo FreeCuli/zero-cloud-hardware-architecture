@@ -24,4 +24,3 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Interpretation
 Manufacturers claiming ZC-CORE compliance SHALL provide the specific physical evidence listed in this matrix. Software assertions or documentation-only claims are strictly insufficient for M-Invariant validation.
-

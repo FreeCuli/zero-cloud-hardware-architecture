@@ -27,4 +27,3 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | **M8** (Data Destruction) | AT-003, AT-004 | Hardware power-cut, Cryptographic zeroization (SRAM/Cache/DMA/Scratchpad) | All persistent and temporary copies MUST become irreversibly unrecoverable. |
 | **M9** (Complete Inventory) | AT-009, AT-006 | Strict PCB BOM, Complete peripheral accounting | Every sensor and acquisition path MUST be accounted for inside the boundary. |
 | **M10** (Independent Evidence) | All | Third-party Lab Reports (Oscilloscope, X-Ray, Firmware Hashes) | Conformance MUST rely on objective physical evidence, not vendor claims. |
-

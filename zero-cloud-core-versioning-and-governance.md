@@ -23,4 +23,3 @@ Devices certified under previous major versions retain their certification *for 
 
 ## 4. Amendment Process and Deprecation
 Any proposal to amend the ZC-CORE methodology MUST address the `zero-cloud-core-attack-taxonomy.md` by proving how the proposed amendment mitigates existing or newly discovered attack classes. Technologies or mechanisms found vulnerable to new Attack Classes SHALL be formally deprecated in the next MINOR release.
-

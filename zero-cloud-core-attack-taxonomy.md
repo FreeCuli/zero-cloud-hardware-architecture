@@ -51,4 +51,3 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ### AT-010: AI Output / Metadata Leakage
 *   **Description:** The semantic output of the AI model is overly permissive, allowing the network domain to reconstruct the original raw sensor data.
 *   **Vector:** Excessive diagnostic logging, over-parameterized output payloads.
-

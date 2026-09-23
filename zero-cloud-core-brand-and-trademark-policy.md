@@ -31,4 +31,3 @@ To prevent false marketing and establish a clear governance hierarchy, ZC-CORE r
 
 ## Commercial Exemption & B2B Licensing
 Manufacturers utilizing FreeCuli's proprietary reference hardware designs (PCB schematics) must adhere to the CERN-OHL-S open-source obligations. To bypass these obligations and keep hardware designs proprietary while obtaining the official certification badge, manufacturers must acquire a Commercial Exemption and B2B Trademark License. Refer to `zero-cloud-dual-licensing.md`.
-
