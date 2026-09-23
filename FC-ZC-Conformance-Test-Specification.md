@@ -1,20 +1,20 @@
-# FREECULI ZERO-CLOUD CONFORMANCE TEST SPECIFICATION (FC-ZC-CTS v3.0)
+# FREECULI ZERO-CLOUD CONFORMANCE TEST SPECIFICATION (FC-ZC-CTS v3.1.0)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 **Evidence-Based Methodology for Verifiable Physical Privacy in AIoT and Edge AI**
 
 **Version History:**
-* **v3.0.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
+* **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
 * **v2.1.0:** Original feature-based physical isolation constraints.
 
 > [!IMPORTANT]
 > **Technical Compliance Verifiers (NOT IP Detectors)**
-> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's AIoT device strictly adheres to the **ZC-CORE v3.0** hardware constraints.
+> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's AIoT device strictly adheres to the **ZC-CORE v3.1.0** hardware constraints.
 
 > **"FreeCuli does not require you to trust FreeCuli. It requires you to reproduce the test and provide physical evidence."**
 
-This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart home, medical, industrial, defense, AIoT) must pass to comply with the **ZC-CORE v3.0 Edge AI standard**.
+This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart home, medical, industrial, defense, AIoT) must pass to comply with the **ZC-CORE v3.1.0 Edge AI standard**.
 
 ---
 
