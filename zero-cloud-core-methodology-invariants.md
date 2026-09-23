@@ -1,7 +1,7 @@
 # Methodology Invariants
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
-[![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
+[![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 [![Standard](https://img.shields.io/badge/ZC--CORE-v3.1.0-black.svg)]()
 
@@ -44,9 +44,9 @@ If a hardware design incorporates any of the following, it explicitly **EXITS** 
 ## 4. Hardware vs. Methodology Boundary
 It is critical to distinguish between the **Methodology** and the **Covered Hardware Source**:
 * **ZC-CORE Framework (Methodology):** Comprises this Invariants document, the Architecture, Defensive Publication, and CTS. It defines the public technical standard and prior art.
-* **Reference Hardware (CERN-OHL-S):** The specific open-source hardware schematics, PCB layouts, and data diode board designs provided by FreeCuli.
+* **Reference Hardware (CERN-OHL-S v2.0):** The specific open-source hardware schematics, PCB layouts, and data diode board designs provided by FreeCuli.
 
-Independent manufacturers may adopt the ZC-CORE methodology using their own proprietary hardware designs. However, utilizing FreeCuli's specific Reference Hardware schematics immediately binds the manufacturer to the **Strongly Reciprocal** open-source obligations of the CERN-OHL-S license, unless a Commercial Exemption is acquired. 
+Independent manufacturers may adopt the ZC-CORE methodology using their own proprietary hardware designs. However, utilizing FreeCuli's specific Reference Hardware schematics immediately binds the manufacturer to the **Strongly Reciprocal** open-source obligations of the CERN-OHL-S v2.0 license, unless a Commercial Exemption is acquired. 
 
 ## 5. IPC/CPC Classification Candidates (Patent Search Optimization)
 To ensure this methodology and its associated Defensive Publication are highly discoverable by patent examiners (WIPO, USPTO, EPO) and successfully establish Prior Art against third-party patent attempts, the ZC-CORE methodology maps to the following International Patent Classifications (IPC) and Cooperative Patent Classifications (CPC):

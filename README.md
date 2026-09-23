@@ -3,7 +3,7 @@
 The indestructible, privacy-first hardware reference methodology for Server-Independent AIoT and Edge AI devices (Smart Home, Medical, Industrial, Defense).
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
-[![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
+[![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 ## Overview
@@ -33,7 +33,7 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
 3. **[Zero-Cloud Defensive Publication (Prior Art Specification)](zero-cloud-core-defensive-publication.md)**
    * A legally binding, timestamped disclosure establishing unquestionable global prior-art to prevent third-party patenting.
 4. **[ZC-CORE Dual-Licensing Framework](zero-cloud-dual-licensing.md)**
-   * Open-source (CERN-OHL-S) rules vs. Commercial Exemption (B2B) licensing models and patent retaliation clauses.
+   * Open-source (CERN-OHL-S v2.0) rules vs. Commercial Exemption (B2B) licensing models and patent retaliation clauses.
 5. **[ZC-CORE Scope & Boundary Definition](zero-cloud-core-scope-boundary.md)**
    * Explicit definitions of what the standard guarantees (on-device privacy) vs. what it does not (cloud security).
 

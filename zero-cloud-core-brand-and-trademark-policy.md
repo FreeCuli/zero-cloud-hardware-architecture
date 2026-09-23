@@ -1,7 +1,7 @@
 # Brand & Trademark Policy
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
-[![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
+[![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 [![Standard](https://img.shields.io/badge/ZC--CORE-v3.1.0-black.svg)]()
 
@@ -30,4 +30,4 @@ To prevent false marketing and establish a clear governance hierarchy, ZC-CORE r
 *   **Trademark Usage:** The manufacturer is granted full legal rights to place the **"FreeCuli Certified Zero-Cloud"** logo on product packaging, marketing materials, and digital interfaces.
 
 ## Commercial Exemption & B2B Licensing
-Manufacturers utilizing FreeCuli's proprietary reference hardware designs (PCB schematics) must adhere to the CERN-OHL-S open-source obligations. To bypass these obligations and keep hardware designs proprietary while obtaining the official certification badge, manufacturers must acquire a Commercial Exemption and B2B Trademark License. Refer to `zero-cloud-dual-licensing.md`.
+Manufacturers utilizing FreeCuli's proprietary reference hardware designs (PCB schematics) must adhere to the CERN-OHL-S v2.0 open-source obligations. To bypass these obligations and keep hardware designs proprietary while obtaining the official certification badge, manufacturers must acquire a Commercial Exemption and B2B Trademark License. Refer to `zero-cloud-dual-licensing.md`.
