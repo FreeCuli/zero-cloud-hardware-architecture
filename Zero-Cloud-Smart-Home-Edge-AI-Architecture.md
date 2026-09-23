@@ -1,5 +1,6 @@
 # FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology (The Fortress)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
+[![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 > [!NOTE]
 > **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE standard** for all privacy-critical, server-independent autonomous edge devices (Home, Medical, Industrial, Defense).
