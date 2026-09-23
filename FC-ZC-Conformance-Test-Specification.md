@@ -4,6 +4,10 @@
 
 **Evidence-Based Methodology for Verifiable Physical Privacy in AIoT and Edge AI**
 
+**Version History:**
+* **v3.0.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
+* **v2.1.0:** Original feature-based physical isolation constraints.
+
 > [!IMPORTANT]
 > **Technical Compliance Verifiers (NOT IP Detectors)**
 > The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's AIoT device strictly adheres to the **ZC-CORE v3.0** hardware constraints.

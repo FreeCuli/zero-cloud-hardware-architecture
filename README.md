@@ -15,11 +15,13 @@ By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile 
 
 1. **[The ZC-CORE Hardware Fortress (Architecture Document)](Zero-Cloud-Smart-Home-Edge-AI-Architecture.md)**
    * Mandatory specifications for Physical Air-Gap, Hardware Data Diode (Optocoupler), Lethal Volatile Buffer (SRAM zeroization), and Trust Boundary security pillars for Edge AI.
-2. **[FC-ZC Conformance Test Specification (CTS)](FC-ZC-Conformance-Test-Specification.md)**
+2. **[ZC-CORE Methodology Invariants (M1-M10)](ZC-CORE-METHODOLOGY-INVARIANTS.md)**
+   * The legal and functional "DNA" of the standard. Defines the mandatory causal sequence and explicitly prohibits third-party methodology cloning.
+3. **[FC-ZC Conformance Test Specification (CTS)](FC-ZC-Conformance-Test-Specification.md)**
    * Falsifiable adversarial laboratory attack scenarios requiring mandatory physical evidence (e.g., 5GHz oscilloscope reverse-channel fuzzing, DMA isolation, Sensor Inventories).
-3. **[ZC-CORE Defensive Publication (Prior Art Matrix)](Zero-Cloud-Defensive-Publication.md)**
+4. **[ZC-CORE Defensive Publication (Prior Art Matrix)](Zero-Cloud-Defensive-Publication.md)**
    * A legally structured claim-style matrix designed as an ultimate Defensive Publication. It explicitly defines all negative-space escape routes (e.g., capacitive isolators, memory zeroization) to establish undeniable Prior Art against future patenting by third parties.
-4. **[Dual-Licensing Framework](DUAL-LICENSING.md)**
+5. **[Dual-Licensing Framework](DUAL-LICENSING.md)**
    * Commercial manufacturers must obtain a Commercial Exemption License. Open-source implementers are free under CERN-OHL-S. Contains the strict Patent Retaliation Clause.
 
 ## Commercial Certification
