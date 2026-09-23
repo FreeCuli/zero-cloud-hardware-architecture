@@ -13,7 +13,11 @@
 
 Traditional cloud-connected IoT devices inherently violate user privacy (GDPR/CCPA) by transmitting raw sensory data (audio/visual) to external networks. The **FreeCuli ZC-CORE Methodology** eliminates this violation not through software promises, but through **Hardware-Enforced Trust Boundaries** and **On-Device Edge AI Inference**.
 
-The core axiom of Zero-Cloud AIoT is that **sensitive raw sensor data cannot leave the Trusted Processing Domain.** The device's primary intelligent functions must be **Server-Independent and Mathematically Verifiable**.
+The core axiom of Zero-Cloud AIoT is that **sensitive raw sensor data SHALL NOT leave the Trusted Processing Domain.** The device's primary intelligent functions MUST be **Server-Independent and Mathematically Verifiable**.
+
+### 1.1 Technology-Neutral Equivalence Principle (Normative)
+A mechanism SHALL remain subject to the applicable ZC-CORE security invariant where it performs substantially equivalent data acquisition, storage, processing, buffering, communication, control, or information-transfer functions, regardless of the implementation technology or architectural nomenclature used. 
+This provision is strictly technology-neutral and non-exhaustive. Any specific technological examples provided in this architecture (e.g., "SRAM", "Optocoupler") are **informative and illustrative**, and DO NOT limit the scope of the invariant.
 
 ## 2. The Indestructible Fortress: Mandatory Hardware Locks (v3.0)
 
