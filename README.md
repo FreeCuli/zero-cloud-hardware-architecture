@@ -11,6 +11,14 @@ This repository contains the official, strictly falsifiable **ZC-CORE v3.0 Metho
 
 By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile Zeroization, this methodology completely eradicates the possibility of unauthorized data exfiltration (microphone/camera streams) from any AIoT appliance. It protects against state-sponsored espionage and guarantees third-party GDPR/CCPA compliance by design.
 
+## The Core Philosophy: Implementation Freedom & Methodological Consistency
+
+**1. Implementation Freedom (No Vendor Lock-In)**
+ZC-CORE DOES NOT prescribe a specific programming language, operating system, processor architecture, semiconductor vendor, hardware implementation, AI framework, memory technology, or software stack. Manufacturers are completely free to use any proprietary chip or open-source stack, provided that the normative ZC-CORE security invariants and physical conformance requirements are satisfied. 
+
+**2. Conformance ≠ Code Ownership**
+Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli any ownership over a manufacturer's implementation. A manufacturer retains full Intellectual Property (IP) rights over their proprietary codebase, custom ASIC/SoC designs, and firmware. ZC-CORE standardizes the *security properties and verification methodology*, NOT the vendor's implementation.
+
 ## Core Documents
 
 1. **[The ZC-CORE Hardware Fortress (Architecture Document)](Zero-Cloud-Smart-Home-Edge-AI-Architecture.md)**
