@@ -7,9 +7,9 @@ This document normatively defines the **immutable core identity** (Invariants) o
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
 
 For specific implementation classes, attack vectors, and conformance evidence mapping, this document MUST be read in conjunction with:
-* `ZC-CORE-ATTACK-TAXONOMY.md`
-* `ZC-CORE-IMPLEMENTATION-COVERAGE.md`
-* `ZC-CORE-CONFORMANCE-EVIDENCE-MATRIX.md`
+* `zero-cloud-core-attack-taxonomy.md`
+* `zero-cloud-core-implementation-coverage.md`
+* `zero-cloud-core-conformance-evidence-matrix.md`
 
 ## 2. ZC-CORE Methodology Identity Test (M1-M10)
 To be considered a functional implementation of the ZC-CORE methodology, a system MUST meet the following causal sequence and constraints. 

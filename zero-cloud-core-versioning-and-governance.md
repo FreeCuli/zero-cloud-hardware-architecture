@@ -22,5 +22,5 @@ If a MAJOR version update alters an M-Invariant, the corresponding FC-ZC-CTS tes
 Devices certified under previous major versions retain their certification *for that version only*, but cannot claim compliance with the latest ZC-CORE standard without passing the updated Evidence Matrix.
 
 ## 4. Amendment Process and Deprecation
-Any proposal to amend the ZC-CORE methodology MUST address the `ZC-CORE-ATTACK-TAXONOMY.md` by proving how the proposed amendment mitigates existing or newly discovered attack classes. Technologies or mechanisms found vulnerable to new Attack Classes SHALL be formally deprecated in the next MINOR release.
+Any proposal to amend the ZC-CORE methodology MUST address the `zero-cloud-core-attack-taxonomy.md` by proving how the proposed amendment mitigates existing or newly discovered attack classes. Technologies or mechanisms found vulnerable to new Attack Classes SHALL be formally deprecated in the next MINOR release.
 
