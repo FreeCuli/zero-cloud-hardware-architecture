@@ -4,7 +4,7 @@
 
 **Project:** FreeCuli ZC-CORE
 **Purpose:** Defensive Publication / Prior-Art Establishment
-**Reference Publication:** Zenodo DOI 10.5281/zenodo.22870037
+**Reference Publication:** Zenodo DOI 10.5281/zenodo.22838473
 **Version:** 1.0 — Defensive Publication Draft
 **Publication Strategy:** Claim-style technical disclosure; not a patent application and not an assertion that any particular claim is patentable.
 
