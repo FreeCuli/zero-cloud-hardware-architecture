@@ -54,7 +54,7 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
     * The 4-tier certification hierarchy (Self-Declared to FreeCuli Certified™) and trademark usage rights.
 11. **[ZC-CORE Versioning and Governance Policy](ZC-CORE-VERSIONING-AND-GOVERNANCE.md)**
     * The rigid rules governing how the standard evolves, deprecates old methods, and manages change control.
-12. **[ZC-CORE Release Manifest (v3.1.0)](RELEASE-MANIFEST-v3.1.0.md)**
+12. **[ZC-CORE Release Manifest (v3.1.0)](ZC-CORE-RELEASE-MANIFEST.md)**
     * The cryptographic SHA-256 seal of this release, binding all documents to a verifiable timeline.
 
 ## Commercial Certification

@@ -27,4 +27,4 @@ CD00FE96141A536C67E090D90051964957F3B2316A6D42B621819FAB8D64E990  Zero-Cloud-Def
 `
 
 ## Governance Note
-Any future release (e.g., v3.2.0) MUST compute the SHA-256 hash of this RELEASE-MANIFEST-v3.1.0.md document and include it in its own manifest, creating an unbreakable cryptographic chain of methodology evolution.
+Any future release (e.g., v3.2.0) MUST compute the SHA-256 hash of this ZC-CORE-RELEASE-MANIFEST.md document and include it in its own manifest, creating an unbreakable cryptographic chain of methodology evolution.
