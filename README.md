@@ -1,4 +1,4 @@
-# FreeCuli ZC-CORE v3.1.0: Universal Zero-Cloud Hardware Methodology
+# FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology
 
 The indestructible, privacy-first hardware reference methodology for Server-Independent AIoT and Edge AI devices (Smart Home, Medical, Industrial, Defense).
 
