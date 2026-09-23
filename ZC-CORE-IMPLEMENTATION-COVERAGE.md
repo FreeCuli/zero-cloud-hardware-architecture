@@ -1,5 +1,10 @@
 # ZC-CORE Implementation Coverage Matrix (v3.1)
 
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
+[![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
+[![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
+[![Standard](https://img.shields.io/badge/ZC--CORE-v3.1.0-black.svg)]()
+
 This document provides a normative mapping between ZC-CORE security invariant properties (M1-M10) and their representative implementation families. 
 
 ## Terminology (RFC 2119)
@@ -22,3 +27,4 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | **M8** (Data Destruction) | AT-003, AT-004 | Hardware power-cut, Cryptographic zeroization (SRAM/Cache/DMA/Scratchpad) | All persistent and temporary copies MUST become irreversibly unrecoverable. |
 | **M9** (Complete Inventory) | AT-009, AT-006 | Strict PCB BOM, Complete peripheral accounting | Every sensor and acquisition path MUST be accounted for inside the boundary. |
 | **M10** (Independent Evidence) | All | Third-party Lab Reports (Oscilloscope, X-Ray, Firmware Hashes) | Conformance MUST rely on objective physical evidence, not vendor claims. |
+

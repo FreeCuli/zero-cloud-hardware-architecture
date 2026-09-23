@@ -1,4 +1,4 @@
-# FreeCuli ZC-CORE v3.0: Universal Zero-Cloud Hardware Methodology
+# FreeCuli ZC-CORE v3.1.0: Universal Zero-Cloud Hardware Methodology
 
 The indestructible, privacy-first hardware reference methodology for Server-Independent AIoT and Edge AI devices (Smart Home, Medical, Industrial, Defense).
 
@@ -7,7 +7,7 @@ The indestructible, privacy-first hardware reference methodology for Server-Inde
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 ## Overview
-This repository contains the official, strictly falsifiable **ZC-CORE v3.0 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
+This repository contains the official, strictly falsifiable **ZC-CORE v3.1.0 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
 
 By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile Zeroization, this methodology completely eradicates the possibility of unauthorized data exfiltration (microphone/camera streams) from any AIoT appliance. It protects against state-sponsored espionage and guarantees third-party GDPR/CCPA compliance by design.
 
@@ -59,3 +59,4 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
 
 ## Commercial Certification
 Industrial AIoT manufacturers utilizing this architecture in proprietary hardware must acquire a B2B Certification and Trademark License to ensure compliance and legally display the #FreeCULI badge. See [FreeCuli.com](https://freeculi.com) for details.
+

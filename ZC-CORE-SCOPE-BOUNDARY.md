@@ -1,5 +1,10 @@
 # ZC-CORE Scope & Boundary Definition (v3.1)
 
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
+[![License: CERN-OHL-S](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
+[![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
+[![Standard](https://img.shields.io/badge/ZC--CORE-v3.1.0-black.svg)]()
+
 To prevent misinterpretation of the methodology's capabilities and to strictly define the liability and security guarantees of the FreeCuli standard, this document outlines the absolute Scope Boundaries of ZC-CORE.
 
 ## 1. What ZC-CORE Standardizes (In-Scope)
@@ -21,3 +26,4 @@ To prevent misinterpretation of the methodology's capabilities and to strictly d
 | **Future Memory Technologies** | Covered | Functionally covered under the Technology-Neutral Equivalence Principle. |
 | **Side-Channel Attacks (Power/Timing)** | Partially Covered | Mitigated at the Control-Plane (M5) level, but deep cryptographic DPA (Differential Power Analysis) is outside the primary scope. |
 | **Software-Only Isolation (Hypervisors)** | Explicitly Banned | Explicitly outside the ZC-CORE trusted methodology. |
+
