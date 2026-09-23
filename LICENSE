@@ -1,0 +1,25 @@
+FREECULI ZC-CORE METHODOLOGY
+DUAL-LICENSING FRAMEWORK
+
+The FreeCuli ZC-CORE Architecture and the underlying AIoT/Edge AI methodology operate under a strict Dual-Licensing Model.
+
+======================================================================
+1. HARDWARE LICENSE (CERN-OHL-S v2.0)
+======================================================================
+All hardware designs, PCB schematics, and physical isolation architectures are licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2.0).
+
+Anyone combining or distributing these hardware designs MUST share their derivative hardware schematics openly under the same license, UNLESS a Commercial Exemption License is acquired.
+
+======================================================================
+2. SOFTWARE LICENSE (AGPL-3.0)
+======================================================================
+All associated software, controllers, and firmware logic are licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+
+======================================================================
+COMMERCIAL EXEMPTION (B2B)
+======================================================================
+Manufacturers wishing to integrate the ZC-CORE methodology without open-sourcing their proprietary designs must obtain a Commercial Exemption License.
+
+For full legal definitions, patent retaliation clauses, and trademark usage policies, refer strictly to the official zero-cloud-dual-licensing.md document within this repository.
+
+Copyright (c) 2026 Oytun Ciba (FreeCuli Consortium)
