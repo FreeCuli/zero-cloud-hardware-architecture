@@ -1,4 +1,7 @@
 # FREECULI ZERO-CLOUD CONFORMANCE TEST SPECIFICATION (FC-ZC-CTS v1.0)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
+[![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
+
 **Draft Experimental Methodology for Verifiable Physical Privacy**
 
 > [!IMPORTANT]

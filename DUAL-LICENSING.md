@@ -1,4 +1,6 @@
 # FreeCuli ZC-CORE Dual-Licensing Framework
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
+[![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 The FreeCuli ZC-CORE Architecture and the underlying Edge AI methodology are heavily guarded by strict Open Source licenses (CERN-OHL-S for hardware, AGPL-3.0 for software) designed to prevent Big Tech companies from silently closing the source code and hoarding user data.
 
