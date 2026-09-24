@@ -11,28 +11,80 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify SHA-256 Hashes
-        shell: pwsh
+
+      - name: Verify all canonical documents exist
         run: |
-          $excludePattern = 'DUAL-LICENSING\.md|Zero-Cloud-Smart-Home-Edge-AI-Architecture\.md|Zero-Cloud-Defensive-Publication\.md|FC-ZC-Conformance-Test-Specification\.md|ZERO-CLOUD-RELEASE-MANIFEST\.md|ZC-CORE-METHODOLOGY-INVARIANTS\.md|LICENSE\.md|LICENSE|SECURITY\.md|CONTRIBUTING\.md'
-          $hashes = Get-ChildItem *.md | Where-Object { $_.Name -notmatch $excludePattern } | Get-FileHash -Algorithm SHA256
-          $manifestContent = Get-Content ZERO-CLOUD-RELEASE-MANIFEST.md -Raw
-          $allMatched = $true
-          
-          foreach ($h in $hashes) {
-              $fileName = Split-Path $h.Path -Leaf
-              $expectedHash = $h.Hash
-              
-              if ($manifestContent -match "$expectedHash\s+$fileName") {
-                  Write-Host "[PASS] $fileName"
-              } else {
-                  Write-Host "[FAIL] $fileName (Hash mismatch or missing in manifest)"
-                  $allMatched = $false
-              }
-          }
-          
-          if (-not $allMatched) {
-              Write-Error "One or more files did not match the manifest hashes."
-              exit 1
-          }
-          Write-Host "All hashes successfully verified against the manifest."
+          echo "Checking canonical documents exist..."
+          MISSING=0
+          for f in \
+            "README.md" \
+            "ZERO-CLOUD-RELEASE-MANIFEST.md" \
+            "ZC-CORE-CONFORMANCE-EVIDENCE-PACKAGE.md" \
+            "zero-cloud-core-attack-taxonomy.md" \
+            "zero-cloud-core-brand-and-trademark-policy.md" \
+            "zero-cloud-core-conformance-evidence-matrix.md" \
+            "zero-cloud-core-conformance-test-specification.md" \
+            "zero-cloud-core-defensive-publication.md" \
+            "zero-cloud-core-implementation-coverage.md" \
+            "zero-cloud-core-methodology-invariants.md" \
+            "zero-cloud-core-scope-boundary.md" \
+            "zero-cloud-core-versioning-and-governance.md" \
+            "zero-cloud-dual-licensing.md" \
+            "zero-cloud-hardware-reference-architecture.md"; do
+            if [ ! -f "$f" ]; then
+              echo "[FAIL] Missing: $f"
+              MISSING=1
+            else
+              echo "[PASS] Found: $f"
+            fi
+          done
+          if [ "$MISSING" -ne 0 ]; then exit 1; fi
+
+      - name: Verify SHA-256 hashes against manifest
+        run: |
+          echo "Verifying SHA-256 hashes..."
+          FAIL=0
+          EXCLUDE="DUAL-LICENSING.md|Zero-Cloud-Smart-Home-Edge-AI-Architecture.md|Zero-Cloud-Defensive-Publication.md|FC-ZC-Conformance-Test-Specification.md|ZERO-CLOUD-RELEASE-MANIFEST.md|ZC-CORE-METHODOLOGY-INVARIANTS.md|SECURITY.md|CONTRIBUTING.md|CITATION.cff"
+          MANIFEST=$(cat ZERO-CLOUD-RELEASE-MANIFEST.md)
+          for f in *.md; do
+            if echo "$f" | grep -qE "$EXCLUDE"; then
+              continue
+            fi
+            ACTUAL=$(sha256sum "$f" | awk '{print toupper($1)}')
+            if echo "$MANIFEST" | grep -qi "$ACTUAL"; then
+              echo "[PASS] $f — $ACTUAL"
+            else
+              echo "[FAIL] $f — hash mismatch. Actual: $ACTUAL"
+              FAIL=1
+            fi
+          done
+          if [ "$FAIL" -ne 0 ]; then
+            echo ""
+            echo "RELEASE BLOCKED: One or more SHA-256 hashes do not match the manifest."
+            exit 1
+          fi
+          echo "All SHA-256 hashes verified successfully."
+
+      - name: Verify manifest contains Git provenance
+        run: |
+          if grep -q "Git Commit SHA" ZERO-CLOUD-RELEASE-MANIFEST.md; then
+            echo "[PASS] Git Commit SHA present in manifest."
+          else
+            echo "[FAIL] Git Commit SHA missing from manifest."
+            exit 1
+          fi
+
+      - name: Verify no legacy normative content
+        run: |
+          FAIL=0
+          for f in "DUAL-LICENSING.md" "FC-ZC-Conformance-Test-Specification.md" "ZC-CORE-METHODOLOGY-INVARIANTS.md" "Zero-Cloud-Defensive-Publication.md" "Zero-Cloud-Smart-Home-Edge-AI-Architecture.md"; do
+            if [ -f "$f" ]; then
+              if grep -qi "OBSOLETED\|SUPERSEDED" "$f"; then
+                echo "[PASS] $f correctly marked as superseded."
+              else
+                echo "[FAIL] $f exists but not marked as superseded."
+                FAIL=1
+              fi
+            fi
+          done
+          if [ "$FAIL" -ne 0 ]; then exit 1; fi
