@@ -118,11 +118,12 @@ jobs:
 
       - name: Verify Git tag signature
         run: |
-          echo "Verifying if release tag is cryptographically signed..."
-          if git cat-file -p refs/tags/v3.2.1 | grep -qiE "PGP SIGNATURE|SSH SIGNATURE"; then
-            echo "[PASS] Git Tag v3.2.1 is cryptographically signed."
+          echo "Verifying if release tag is cryptographically signed and VALID..."
+          git config gpg.ssh.allowedSignersFile .github/allowed_signers
+          if git tag -v v3.2.1; then
+            echo "[PASS] Git Tag v3.2.1 signature is VALID and belongs to a trusted signer."
           else
-            echo "[FAIL] Git Tag v3.2.1 is NOT signed! Governance requires an annotated and signed tag."
+            echo "[FAIL] Git Tag v3.2.1 signature verification failed!"
             exit 1
           fi
 
