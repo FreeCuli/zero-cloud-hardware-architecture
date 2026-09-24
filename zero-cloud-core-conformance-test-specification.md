@@ -145,7 +145,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ## Annex B: Normative Laboratory Measurement Protocols & Statistical Calibration
 
-To satisfy the strict validation requirements of the EU Cyber Resilience Act (CRA) and to ensure multi-lab reproducibility, all physical leakage thresholds specified in this document MUST be evaluated under the exact calibration, equipment, and statistical parameters defined below. 
+To provide evidence relevant to selected cybersecurity requirements under the EU Cyber Resilience Act (CRA) and to ensure multi-lab reproducibility, all physical leakage thresholds specified in this document MUST be evaluated under the exact calibration, equipment, and statistical parameters defined below. 
 
 ### 1. Electromagnetic & Power Signal Leakage Calibration (Ref: FC-ZC-002 / FC-ZC-003)
 Any manufacturer claim regarding RF/EM thresholds (e.g., < -80 dBm) or power plane ripple (e.g., < 5 mVpp) SHALL NOT be verified via generic ambient measurements. The testing laboratory MUST execute the following setup:
