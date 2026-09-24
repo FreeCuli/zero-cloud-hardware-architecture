@@ -18,7 +18,7 @@ ZC-CORE does not prescribe or restrict any particular end-user appliance, hardwa
 
 This principle applies across the AIoT value chain, including semiconductor, module, device, appliance, platform, and system-level implementations. 
 
-**2. Conformance â‰  Code Ownership**
+**2. Conformance ≠ Code Ownership**
 Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli any ownership over a manufacturer's implementation. A manufacturer retains full Intellectual Property (IP) rights over their proprietary codebase, custom ASIC/SoC designs, and firmware. ZC-CORE standardizes the *security properties and verification methodology*, NOT the vendor's implementation.
 
 ## Core Documents (RFC 2119-Style Normative Specification)

@@ -130,7 +130,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## ğŸ”¬ MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
+## 🔬 MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
 
 ### FC-ZC-013: Sensor Inventory Completeness Test
 **Objective:** Prevent manufacturers from routing auxiliary sensors (e.g., wake-word microphones) to untrusted domains.
@@ -143,6 +143,22 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 * **Pass/Fail Threshold:**
     * **PASS:** All physical and logical connections entering/leaving the Trusted Domain exactly match the submitted ZC-CORE Interface Inventory.
     * **FAIL:** Discovery of any undocumented connection, debug pad, or shared memory aperture results in an immediate and total failure of ZC-CORE compliance.
+
+---
+
+## 🔬 HIGH-ASSURANCE (C3) EXTERNAL EVALUATIONS (FC-ZC-015+)
+
+### FC-ZC-015: Invasive Physical Assessment (Decapping)
+**Objective:** Verify resilience against invasive physical tampering (Ref: T4).
+* **Pass/Fail Threshold:**
+    * **PASS:** Device is certified to withstand invasive physical attacks following ISO/IEC 17065-accredited procedures (e.g., Common Criteria AVA_VAN.5) by at least two independent accredited laboratories.
+    * **FAIL:** Device fails the invasive decapping and probing assessment or lacks multi-lab certification.
+
+### FC-ZC-016: Fault Injection Assessment (Glitching)
+**Objective:** Verify resilience against voltage/clock fault injection (Ref: T5).
+* **Pass/Fail Threshold:**
+    * **PASS:** Device is certified to mitigate fault injection attempts following ISO/IEC 17065-accredited procedures (e.g., Common Criteria ATE_DPT) by at least two independent accredited laboratories.
+    * **FAIL:** Device fails the fault injection assessment or lacks multi-lab certification.
 
 ## Annex B: Normative Laboratory Measurement Protocols & Statistical Calibration
 
@@ -196,7 +212,21 @@ To prevent manufacturer obfuscation regarding the volatile memory zeroization th
 
 R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
 
+> **Normative Note on "Successfully Reconstructed":** A bit is considered "successfully reconstructed" if any extraction methodology (including exact recovery, statistical inference, correlation, or partial classification) can determine the bit's original state with a statistical accuracy greater than random guessing (p < 0.05 vs. 50% baseline).
+
 * **Timing Parameters (two distinct requirements):**
     * **Destruction-Trigger Latency (`t_latency`):** Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM VCC SHALL drop to 0V within `t_latency < 10 ms`.
     * **Minimum Power-Off Duration (`t_off`):** Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25°C before the forensic extraction attempt.
 * **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
+
+---
+
+## Annex C: ZC-CORE Assurance Profile Matrix (C1/C2/C3)
+
+To ensure absolute traceability for certification, manufacturers MUST declare their target assurance profile, which dictates the mandatory subset of tests and stringency levels:
+
+| Assurance Profile | Required CTS Test IDs | Profile-Specific Normative Parameters |
+| :--- | :--- | :--- |
+| **ZC-CORE-C1 (Consumer)** | FC-ZC-001 through FC-ZC-014 | `MI_upper_bound` = 10^-4 bits<br>TVLA Minimum Traces = 100,000 |
+| **ZC-CORE-C2 (Industrial)** | FC-ZC-001 through FC-ZC-014 | `MI_upper_bound` = 10^-4 bits<br>TVLA Minimum Traces = 1,000,000 |
+| **ZC-CORE-C3 (High-Assurance)** | FC-ZC-001 through FC-ZC-016 | `MI_upper_bound` = 10^-6 bits<br>TVLA Minimum Traces = 5,000,000<br>Invasive/Fault tests (FC-ZC-015, FC-ZC-016) |

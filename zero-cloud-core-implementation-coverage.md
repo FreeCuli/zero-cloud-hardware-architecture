@@ -18,7 +18,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | Invariant | Attack Class Mitigated | Representative / Non-Limiting Implementations | Required Security Property (Normative) |
 | :--- | :--- | :--- | :--- |
 | **M1** (Trusted Acquisition) | AT-009 | Isolated PCB traces, Dedicated Sensor MCU | Raw data SHALL NOT bypass the trusted domain. |
-| **M2** (Physical Boundary) | AT-004 | Discrete NPU, Physical Air-Gap, Hardware Firewalls | Separation MUST be enforced physically, not merely logically. |
+| **M2** (Physical Boundary) | AT-004 | Discrete NPU, Physical Air-Gap, Hardware-Enforced Isolation | Separation MUST be enforced physically, not merely logically. |
 | **M3** (One-Way Flow) | AT-001, AT-008 | Optocoupler, Magnetic/Capacitive Isolator, FPGA, ASIC | Information SHALL flow strictly from Trusted to Untrusted domain. |
 | **M4** (Reverse-Read Block) | AT-001, AT-008 | TX-only transceivers, severed RX lines, un-addressable memory | Reverse read queries MUST be physically impossible. |
 | **M5** (Control-Plane Isolate) | AT-007 | Isolated Clock/Reset trees, Uncontrollable Power rails | Control plane MUST NOT allow manipulation of the trusted execution. |
