@@ -108,10 +108,12 @@ jobs:
             if [ "$TAG_COMMIT" = "$HEAD_COMMIT" ]; then
               echo "[PASS] refs/tags/v3.2.0 strictly resolves to current release HEAD commit ($HEAD_COMMIT)."
             else
-              echo "[INFO] Running during intermediate transition. Tag commit: $TAG_COMMIT, HEAD: $HEAD_COMMIT."
+              echo "[FAIL] Provenance mismatch: refs/tags/v3.2.0 resolves to ($TAG_COMMIT) but HEAD is ($HEAD_COMMIT)."
+              exit 1
             fi
           else
-            echo "[INFO] Tag v3.2.0 not yet fetched in this environment."
+            echo "[FAIL] Required release tag v3.2.0 could not be resolved."
+            exit 1
           fi
 
       - name: Verify no legacy normative content
