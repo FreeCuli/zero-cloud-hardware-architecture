@@ -1,6 +1,6 @@
 # Cryptographic Release Manifest
 
-This cryptographic manifest legally binds the ZC-CORE universal methodology documentation to a verifiable timestamp, establishing incontestable Prior-Art against third-party patenting of equivalent physical privacy concepts.
+This cryptographic manifest legally binds the ZC-CORE universal methodology documentation to a verifiable timestamp, establishing a verifiable, cryptographically sealed Prior-Art timestamp against third-party patenting of equivalent physical privacy concepts.
 
 ## Publication Metadata
 * **Release Version:** ZC-CORE v3.2.0 (Laboratory Normative Upgrade)
@@ -12,7 +12,7 @@ This cryptographic manifest legally binds the ZC-CORE universal methodology docu
 The following hashes guarantee that the technical and legal claims within these core documents have not been altered post-publication.
 
 `	ext
-813A7EB31643A40A8D59368B8DB0C1B3F33A045873A8115ECCC75FD7A52AA678  README.md
+24B8995CC20B5BFED2D895829130693584CE82179DCF745A9C002DDF0F0FE17F  README.md
 F327876C51581F1F0AA1DD7472C41EF81EC32D90BEE1CE4C16A2CBDFE37A69E2  zero-cloud-core-attack-taxonomy.md
 B70D5C9C198C03C6EBB22E8D49B0C01C9ADB219B029AA26FBB6865764AD5E1D7  zero-cloud-core-brand-and-trademark-policy.md
 0BBA8FB7179414A922AF613682110E784850F52CE6BB4E7B9BF2A02C8B1B633F  zero-cloud-core-conformance-evidence-matrix.md
@@ -22,7 +22,7 @@ D7B7352696221A96950567FE837889B9F5E7B23DCB12265F48E20CE47EA89B5F  zero-cloud-cor
 2AD89D9DEF84A6B09BD09810A3320EB97BD779E063F6C918983FD9203FAAFF87  zero-cloud-core-methodology-invariants.md
 D161D13361A515E3437E7B6D1E3CEB66BBBD8DDF5EEF3F36FF11058DA8A6F3EE  zero-cloud-core-scope-boundary.md
 78870ECC44AB5DB564C0D7BFA660F4C24B32BA8DD3BBECC9A120DC7C5E6E86C1  zero-cloud-core-versioning-and-governance.md
-75239CCB4E0D52087FA4CA8E0D14CB766A7CF8056A41FC33736662D8C6224B75  zero-cloud-dual-licensing.md
+49CEEFC713EACD108C6B57FB16A7476715FD1D63C23115366BED0292A11D6565  zero-cloud-dual-licensing.md
 500B02B7888EFFB43603BC36A52B97A72C7D0B826D27BA00071C20B5E6B5E903  zero-cloud-hardware-reference-architecture.md
 `
 
