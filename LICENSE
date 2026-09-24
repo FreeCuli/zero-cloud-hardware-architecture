@@ -8,8 +8,7 @@ DUAL-LICENSING FRAMEWORK & CANONICAL LICENSE NOTICE
 Copyright (c) 2026 Oytun Ciba (FreeCuli Consortium)
 All rights reserved.
 
-This repository operates under a strict Dual-Licensing Model, separating
-open-source community rights from commercial exemptions.
+This repository operates under a strict Dual-Licensing Model, separating open-source community rights from commercial exemptions. The SPDX composite identifier `(CERN-OHL-S-2.0 AND AGPL-3.0-or-later)` at the repository root does NOT apply uniformly to all files. Instead, it describes a composite model where specific artifact classes are governed by specific licenses, as defined below:
 
 ----------------------------------------------------------------------
 1. SCOPE & ARTIFACT CLASSIFICATION MAPPING

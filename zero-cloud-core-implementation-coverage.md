@@ -20,7 +20,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | **M1** (Trusted Acquisition) | AT-009 | Isolated PCB traces, Dedicated Sensor MCU | Raw data SHALL NOT bypass the trusted domain. |
 | **M2** (Physical Boundary) | AT-004 | Discrete NPU, Physical Air-Gap, Hardware-Enforced Isolation, Secure Enclave (subject to FC-ZC-011 M2 equivalence criteria) | Separation MUST be enforced physically or via independently verified equivalent mechanisms. M2-equivalent secure-enclave implementations MUST satisfy all FC-ZC-011 equivalence criteria. |
 | **M3** (One-Way Flow) | AT-001, AT-008 | Optocoupler, Magnetic/Capacitive Isolator, FPGA, ASIC | Information SHALL flow strictly from Trusted to Untrusted domain. |
-| **M4** (Reverse-Read Block) | AT-001, AT-008 | TX-only transceivers, severed RX lines, un-addressable memory | Reverse read queries MUST be physically impossible. |
+| **M4** (Reverse-Read Block) | AT-001, AT-008 | TX-only transceivers, severed RX lines, un-addressable memory | Functional reverse read queries MUST be physically or logically impossible. |
 | **M5** (Control-Plane Isolate) | AT-007 | Isolated Clock/Reset trees, Uncontrollable Power rails | Control plane MUST NOT allow manipulation of the trusted execution. |
 | **M6** (Hardware Integrity) | AT-005 | Secure Boot ROM, Anti-Rollback eFuses, HSM | Execution environment SHALL verify cryptographic integrity. |
 | **M7** (Lifetime Enforcement) | AT-003 | Bounded SRAM buffers, ephemeral memory | Raw data SHALL exist only during the local inference lifecycle. |

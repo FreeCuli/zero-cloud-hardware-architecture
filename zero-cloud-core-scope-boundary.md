@@ -11,6 +11,7 @@ To prevent misinterpretation of the methodology's capabilities and to strictly d
 *   **Hardware-Enforced Local Privacy:** The physical containment of raw sensor data (audio, video, biometrics) strictly within the local device's Trusted Domain.
 *   **Data Taxonomy Definitions:** To ensure strict boundaries, ZC-CORE formally categorizes data into four normative classes:
     * **Raw Sensor Data:** The uncompressed, unmodified analog or digital output directly from a privacy-sensitive sensor.
+    * **Metadata:** Contextual or environmental data (e.g., timestamp, ambient temperature) that does not inherently leak raw sensor states.
     * **Derived Sensor Representation:** Intermediate features (e.g., embeddings, Mel-spectrograms) that might indirectly allow reconstruction of raw data. Must be treated with the exact same containment rules as Raw Sensor Data.
     * **Semantic Result:** The irreversible, abstracted text or low-bandwidth state (e.g., "Person recognized", "Turn on light") that cannot be reversed to raw data. A Semantic Result SHALL NOT be considered compliant merely because it is not raw sensor data. Compliance additionally requires that the released representation does not provide a practical, statistically significant reconstruction channel for the protected raw-sensor information under the declared threat model.
     * **Actuator Command:** The final control signal sent outside the Trusted Domain.

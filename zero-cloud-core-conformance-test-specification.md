@@ -100,8 +100,8 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-009: Formal Side-Channel Leakage Assessment
 **Objective:** Verify that in-home activities cannot be inferred through electromagnetic emissions (Tempest) or power fluctuations.
 * **Pass/Fail Threshold:**
-    * **PASS:** No evaluated temporal hypothesis has `p_i < 0.05/m`. The value `|t| > 4.5` is retained solely as a screening indicator.
-    * **FAIL:** Any single temporal sample point exhibiting `p_i < 0.05/m` constitutes a verifiable side-channel leakage event and results in immediate conformance failure.
+    * **PASS:** No evaluated temporal hypothesis has `p_i < alpha_adjusted` (as defined in Annex B). The value `|t| > 4.5` is retained solely as a screening indicator.
+    * **FAIL:** Any single temporal sample point exhibiting `p_i < alpha_adjusted` constitutes a verifiable side-channel leakage event and results in immediate conformance failure.
 
 ---
 

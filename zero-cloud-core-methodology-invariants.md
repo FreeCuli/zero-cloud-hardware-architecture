@@ -19,8 +19,8 @@ To be considered a functional implementation of the ZC-CORE methodology, a syste
 
 * **M1 (Trusted Sensor Acquisition):** Raw sensor data (audio/video) SHALL NEVER leave the Trusted Domain.
 * **M2 (Hardware-Enforced Domain Boundary):** The separation between the Trusted Domain and the Network/Control Domain MUST be enforced physically, not merely via software isolation (VLANs, sandboxes).
-* **M3 (One-Way Information Flow):** Information SHALL flow strictly from the Trusted Domain to the Network Domain through a physically verifiable unidirectional channel.
-* **M4 (Reverse-Read Impossibility):** It MUST be physically or logically impossible for the Network/Control Domain to request raw data from the Trusted Domain.
+* **M3 (One-Way Information Flow):** Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain through a physically verifiable unidirectional channel. Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain, provided it cannot create a raw-sensor read-back path or a reverse raw-sensor information channel.
+* **M4 (Reverse-Read Impossibility):** It MUST be physically or logically impossible for the Network/Control Domain to execute a functional reverse read (raw sensor read-back) from the Trusted Domain over a physical reverse channel. This is distinct from derived-data inference, reconstruction attacks, or side-channel leakage, which are mitigated by M1, M3, and M5.
 * **M5 (Control-Plane Isolation):** The Trust Boundary MUST encompass not just the data path, but the control, memory, power, reset, clock, DMA, and debug paths.
 * **M6 (Hardware-Rooted Execution Integrity):** The secure boot and update trust chain SHALL strictly cover the entire Trusted Domain, including the AI model weights and parameters.
 * **M7 (Raw-Data Lifetime Enforcement):** The availability of raw data MUST be strictly bound to the local inference lifecycle.
