@@ -9,7 +9,7 @@ The indestructible, privacy-first hardware reference methodology for Server-Inde
 ## Overview
 This repository contains the official, strictly falsifiable **ZC-CORE v3.2.0 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
 
-By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile Zeroization, this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It protects against state-sponsored espionage and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
+By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile Zeroization, this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It is designed to mitigate remote network-based raw-sensor extraction, including attacks originating from compromised network infrastructure, and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
 
 ## The Core Philosophy: Implementation Freedom & Methodological Consistency
 
