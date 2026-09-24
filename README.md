@@ -1,4 +1,4 @@
-﻿# FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology
+# FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology
 
 The indestructible, privacy-first hardware reference methodology for Server-Independent AIoT and Edge AI devices (Smart Home, Medical, Industrial, Defense).
 
@@ -9,7 +9,7 @@ The indestructible, privacy-first hardware reference methodology for Server-Inde
 ## Overview
 This repository contains the official, strictly falsifiable **ZC-CORE v3.2.0 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
 
-By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile Zeroization, this methodology is designed to physically block the possibility of unauthorized data exfiltration (microphone/camera streams) from any AIoT appliance. It protects against state-sponsored espionage and structurally enforces Privacy-by-Design, forming a hardware foundation for GDPR/CCPA compliance.
+By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile Zeroization, this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It protects against state-sponsored espionage and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
 
 ## The Core Philosophy: Implementation Freedom & Methodological Consistency
 
@@ -29,9 +29,9 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
 2. **[ZC-CORE Methodology Invariants](zero-cloud-core-methodology-invariants.md)**
    * The absolute DNA of the standard (M1-M10). The normative technological rules that define ZC-CORE.
 
-### ğŸ›¡ï¸ Prior Art & Legal
+### 🛡️ï¸ Prior Art & Legal
 3. **[Zero-Cloud Defensive Publication (Prior Art Specification)](zero-cloud-core-defensive-publication.md)**
-   * A legally binding, timestamped disclosure establishing unquestionable global prior-art to prevent third-party patenting.
+   * A timestamped technical disclosure establishing public prior-art baseline to prevent third-party patenting.
 4. **[ZC-CORE Dual-Licensing Framework](zero-cloud-dual-licensing.md)**
    * Open-source (CERN-OHL-S v2.0) rules vs. Commercial Exemption (B2B) licensing models and patent retaliation clauses.
 5. **[ZC-CORE Scope & Boundary Definition](zero-cloud-core-scope-boundary.md)**

@@ -1,4 +1,4 @@
-﻿# Conformance Test Specification (CTS)
+# Conformance Test Specification (CTS)
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -8,7 +8,8 @@
 **Evidence-Based Methodology for Verifiable Physical Privacy in AIoT and Edge AI**
 
 **Version History:**
-* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < MI_upper_bound **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
+* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < MI_upper_bound 
+* **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
 * **v2.1.0:** Original feature-based physical isolation constraints.
 
 > [!IMPORTANT]
@@ -17,7 +18,7 @@
 
 > **"FreeCuli does not require you to trust FreeCuli. It requires you to reproduce the test and provide physical evidence."**
 
-This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart home, medical, industrial, defense, AIoT) must pass to comply with the **ZC-CORE v3.1.0 Edge AI standard**.
+This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart home, medical, industrial, defense, AIoT) must pass to comply with the **ZC-CORE v3.2.0 Edge AI standard**.
 
 ---
 
@@ -116,7 +117,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-011: Secure Enclave Alternative (Covert Channel Blocking)
 **Objective:** Verify TrustZone/PMP alternatives achieve physical-equivalent isolation.
 * **Pass/Fail Threshold:**
-    * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL use the FC-ZC-009 TVLA protocol or define specific normative timing leakage thresholds.to block covert channel data exfiltration from shared buffers.
+    * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL strictly use the FC-ZC-009 TVLA protocol for timing leakage assessment.to block covert channel data exfiltration from shared buffers.
     * **FAIL:** Any timing, cache, or shared-memory side-channel allows the non-secure world to infer raw sensor data.
 
 ---
@@ -161,7 +162,7 @@ Real-world physical channels possess inherent thermal and environmental noise. C
 
 To maintain strict scientific falsifiability, the criterion **"Mutual Information = 0"** is hereby structurally replaced with an operational statistical bound:
 
-Criterion: I(X;Y) < MI_upper_bound ? defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
+Criterion: I(X;Y) < MI_upper_bound = defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
 * **Statistical Confidence Level:** Minimum α = 0.05 (95% confidence interval).
 * **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions.
 * **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, ? is fixed at MI_upper_bound = 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
@@ -181,5 +182,5 @@ To prevent manufacturer obfuscation regarding the volatile memory zeroization th
 
 R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
 
-* **Evaluation Protocol:** The testing lab MUST drop power to the isolated volatile memory domain for exactly ?t = 10 ms at an ambient temperature calibrated to 25°C.
-* **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate ? 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
+* **Evaluation Protocol:** The testing lab MUST drop power to the isolated volatile memory domain for exactly delta_t = 10 ms at an ambient temperature calibrated to 25°C.
+* **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.

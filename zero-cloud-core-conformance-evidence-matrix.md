@@ -1,4 +1,4 @@
-﻿# Conformance Evidence Matrix
+# Conformance Evidence Matrix
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -34,7 +34,7 @@ This matrix establishes absolute traceability for independent auditors, mapping 
 | **M3 (One-Way Flow)** | AT-008, AT-010 | FC-ZC-003, FC-ZC-010 | Oscilloscope, Signal Generator | Mutual Info bound I(X;Y) < MI_upper_bound. |
 | **M4 (Reverse-Read Block)** | AT-001, AT-008 | FC-ZC-003 | Oscilloscope injection logs | Strictly < 5mVpp upon reverse probe. |
 | **M5 (Control-Plane Isolate)**| AT-007 | FC-ZC-008 | Trusted-Domain Control Surface Inventory | Zero indirect NPU reset/clock overrides. |
-| **M6 (Hardware Integrity)** | AT-005 | FC-ZC-005, FC-ZC-006, FC-ZC-007, FC-ZC-007 | Signed Bootloader hashes, eFuse maps | Rollback prevention verified. |
+| **M6 (Hardware Integrity)** | AT-005 | FC-ZC-005, FC-ZC-006, FC-ZC-007 | Signed Bootloader hashes, eFuse maps | Rollback prevention verified. |
 | **M7 (Lifetime Enforcement)** | AT-003 | FC-ZC-004, FC-ZC-012 | High-speed logic analyzer traces | Volatile destruction sequence initiated. |
 | **M8 (Data Destruction)** | AT-003, AT-004 | FC-ZC-004, FC-ZC-012 | Forensic recovery analysis | Remanence Rate R_rate <= 0.01%. |
 | **M9 (Complete Inventory)** | AT-009, AT-006 | FC-ZC-013, FC-ZC-014 | Complete BOM, Peripheral accounting | Zero bypass channels exist. |
