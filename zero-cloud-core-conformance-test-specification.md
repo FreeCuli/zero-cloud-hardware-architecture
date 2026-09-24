@@ -188,7 +188,8 @@ The phrase "strict threshold" regarding TVLA is operationally defined under the 
     1. For each temporal point `i`, compute the Welch t-statistic `t_i` and its two-sided p-value `p_i`.
     2. Apply Bonferroni correction: `alpha_adjusted = 0.05 / m`.
     3. **FAIL** if any `p_i < alpha_adjusted`.
-    4. The `|t| > 4.5` threshold serves as an additional fixed screening criterion. Either the corrected p-value criterion OR the `|t| > 4.5` threshold alone is sufficient to trigger a FAIL verdict.
+
+    > **Note:** The `|t| > 4.5` value referenced in this specification is an approximate screening heuristic corresponding to the uncorrected significance level for large sample sizes. The definitive normative decision rule is step 3 above. The `|t| > 4.5` value SHALL NOT be used as an independent FAIL criterion in place of the corrected p-value procedure.
 
 ### 4. Mathematical Definition of "0.01% Remanence" (Ref: FC-ZC-004)
 To prevent manufacturer obfuscation regarding the volatile memory zeroization threshold (< 0.01%), the **Remanence Recovery Rate (R_rate)** is mathematically defined and evaluated via the following formula:
