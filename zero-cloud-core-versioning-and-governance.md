@@ -31,7 +31,7 @@ To ensure the integrity of the methodology, FreeCuli enforces a strict Release F
 1. **Release Candidate** & Technical Review
 2. **Normative Freeze:** No further changes to requirements.
 3. **SHA-256 Manifest Generation:** Creating the verifiable `ZERO-CLOUD-RELEASE-MANIFEST.md`.
-4. **Git Tag:** Annotated tag creation (e.g., `v3.2.0`).
+4. **Git Tag:** Annotated and cryptographically signed tag creation (e.g., GPG or SSH signed, `v3.2.0`).
 5. **Zenodo Publication:** Archival and DOI assignment.
 
 > **Integrity Rule:** Once a release is frozen and tagged, normative files SHALL NOT change without a new release identifier. The final Zenodo artifact package SHA-256 MUST be traceable back to the corresponding Git commit.

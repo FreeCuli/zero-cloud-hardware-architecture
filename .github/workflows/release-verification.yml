@@ -116,6 +116,16 @@ jobs:
             exit 1
           fi
 
+      - name: Verify Git tag signature
+        run: |
+          echo "Verifying if release tag is cryptographically signed..."
+          if git cat-file -p refs/tags/v3.2.0 | grep -qiE "PGP SIGNATURE|SSH SIGNATURE"; then
+            echo "[PASS] Git Tag v3.2.0 is cryptographically signed."
+          else
+            echo "[FAIL] Git Tag v3.2.0 is NOT signed! Governance requires an annotated and signed tag."
+            exit 1
+          fi
+
       - name: Verify no legacy normative content
         run: |
           FAIL=0
