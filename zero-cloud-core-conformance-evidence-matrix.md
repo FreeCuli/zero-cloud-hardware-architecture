@@ -18,7 +18,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | **M2** | AT-004 | FC-ZC-002, FC-ZC-009, FC-ZC-011 | PCB X-Ray, Vector Network Analyzer (VNA) demonstrating <-80 dBm coupling. |
 | **M3, M4** | AT-001, AT-008 | FC-ZC-003 | Oscilloscope injection logs showing 0 bits of reverse data transmission. |
 | **M5** | AT-007 | FC-ZC-008 | Trusted-Domain Control Surface Inventory proving network SoC cannot halt/reset NPU. |
-| **M6** | AT-005 | FC-ZC-005, FC-ZC-006 | Fused JTAG/SWD physical verification; Signed bootloader hashes. |
+| **M6** | AT-005 | FC-ZC-005, FC-ZC-006, FC-ZC-007 | Fused JTAG/SWD physical verification; Signed bootloader hashes. |
 | **M7, M8** | AT-003 | FC-ZC-004, FC-ZC-012 | High-speed logic analyzer traces of SRAM/Cache zeroization occurring within <10ms. |
 | **M10** | All | FC-ZC-014 | Complete Interface Inventory; Independent third-party laboratory certification report. |
 
@@ -34,7 +34,7 @@ This matrix establishes absolute traceability for independent auditors, mapping 
 | **M3 (One-Way Flow)** | AT-008, AT-010 | FC-ZC-003, FC-ZC-010 | Oscilloscope, Signal Generator | Mutual Info bound I(X;Y) < ?. |
 | **M4 (Reverse-Read Block)** | AT-001, AT-008 | FC-ZC-003 | Oscilloscope injection logs | Strictly < 5mVpp upon reverse probe. |
 | **M5 (Control-Plane Isolate)**| AT-007 | FC-ZC-008 | Trusted-Domain Control Surface Inventory | Zero indirect NPU reset/clock overrides. |
-| **M6 (Hardware Integrity)** | AT-005 | FC-ZC-005, FC-ZC-006, FC-ZC-007 | Signed Bootloader hashes, eFuse maps | Rollback prevention verified. |
+| **M6 (Hardware Integrity)** | AT-005 | FC-ZC-005, FC-ZC-006, FC-ZC-007, FC-ZC-007 | Signed Bootloader hashes, eFuse maps | Rollback prevention verified. |
 | **M7 (Lifetime Enforcement)** | AT-003 | FC-ZC-004, FC-ZC-012 | High-speed logic analyzer traces | Volatile destruction sequence initiated. |
 | **M8 (Data Destruction)** | AT-003, AT-004 | FC-ZC-004, FC-ZC-012 | Forensic recovery analysis | Remanence Rate R_rate ? 0.01%. |
 | **M9 (Complete Inventory)** | AT-009, AT-006 | FC-ZC-013, FC-ZC-014 | Complete BOM, Peripheral accounting | Zero bypass channels exist. |

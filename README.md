@@ -1,4 +1,4 @@
-# FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology
+﻿# FreeCuli ZC-CORE: Universal Zero-Cloud Hardware Methodology
 
 The indestructible, privacy-first hardware reference methodology for Server-Independent AIoT and Edge AI devices (Smart Home, Medical, Industrial, Defense).
 
@@ -18,18 +18,18 @@ ZC-CORE does not prescribe or restrict any particular end-user appliance, hardwa
 
 This principle applies across the AIoT value chain, including semiconductor, module, device, appliance, platform, and system-level implementations. 
 
-**2. Conformance ≠ Code Ownership**
+**2. Conformance â‰  Code Ownership**
 Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli any ownership over a manufacturer's implementation. A manufacturer retains full Intellectual Property (IP) rights over their proprietary codebase, custom ASIC/SoC designs, and firmware. ZC-CORE standardizes the *security properties and verification methodology*, NOT the vendor's implementation.
 
-## Core Documents (ISO/IETF-Grade Standardization)
+## Core Documents (RFC 2119-Style Normative Specification)
 
-### 🏗️ Primary Architecture
+### ğŸ—ï¸ Primary Architecture
 1. **[The ZC-CORE Hardware Fortress (Architecture Document)](zero-cloud-hardware-reference-architecture.md)**
    * Mandatory specifications for Physical Air-Gap, Hardware Data Diode, and Trust Boundary security pillars for Edge AI.
 2. **[ZC-CORE Methodology Invariants](zero-cloud-core-methodology-invariants.md)**
    * The absolute DNA of the standard (M1-M10). The normative technological rules that define ZC-CORE.
 
-### 🛡️ Prior Art & Legal
+### ğŸ›¡ï¸ Prior Art & Legal
 3. **[Zero-Cloud Defensive Publication (Prior Art Specification)](zero-cloud-core-defensive-publication.md)**
    * A legally binding, timestamped disclosure establishing unquestionable global prior-art to prevent third-party patenting.
 4. **[ZC-CORE Dual-Licensing Framework](zero-cloud-dual-licensing.md)**
@@ -37,21 +37,21 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
 5. **[ZC-CORE Scope & Boundary Definition](zero-cloud-core-scope-boundary.md)**
    * Explicit definitions of what the standard guarantees (on-device privacy) vs. what it does not (cloud security).
 
-### 🔬 Testing & Evidence
+### ğŸ”¬ Testing & Evidence
 6. **[FC-ZC-Conformance-Test-Specification (CTS)](zero-cloud-core-conformance-test-specification.md)**
    * The physical laboratory procedures (oscilloscope, multimeter, X-Ray) required to prove hardware compliance.
 7. **[ZC-CORE Conformance Evidence Matrix](zero-cloud-core-conformance-evidence-matrix.md)**
    * Maps every invariant and attack vector to the required physical evidence for verification.
 
-### ⚔️ Threat Modeling & Coverage
+### âš”ï¸ Threat Modeling & Coverage
 8. **[ZC-CORE Attack Taxonomy](zero-cloud-core-attack-taxonomy.md)**
    * The official classification of physical and side-channel threats (AT-001 to AT-010) mitigated by the methodology.
 9. **[ZC-CORE Implementation Coverage Matrix](zero-cloud-core-implementation-coverage.md)**
    * Matches normative requirements to representative technology classes (Optical, FPGA, ASICs).
 
-### 🏛️ Governance & Certification
+### ğŸ›ï¸ Governance & Certification
 10. **[ZC-CORE Brand, Trademark & Certification Policy](zero-cloud-core-brand-and-trademark-policy.md)**
-    * The 4-tier certification hierarchy (Self-Declared to FreeCuli Certified™) and trademark usage rights.
+    * The 4-tier certification hierarchy (Self-Declared to FreeCuli Certifiedâ„¢) and trademark usage rights.
 11. **[ZC-CORE Versioning and Governance Policy](zero-cloud-core-versioning-and-governance.md)**
     * The rigid rules governing how the standard evolves, deprecates old methods, and manages change control.
 12. **[ZC-CORE Release Manifest (v3.2.0)](ZERO-CLOUD-RELEASE-MANIFEST.md)**

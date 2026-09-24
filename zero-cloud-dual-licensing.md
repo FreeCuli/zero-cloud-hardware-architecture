@@ -1,4 +1,4 @@
-# Dual-Licensing & Commercial Integration
+﻿# Dual-Licensing & Commercial Integration
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -7,14 +7,14 @@
 
 The FreeCuli ZC-CORE Architecture and the underlying AIoT/Edge AI methodology are guarded by strict Open Source licenses (CERN-OHL-S v2.0 for hardware, AGPL-3.0 for software) designed to protect the integrity of on-device inference and absolute privacy. 
 
-However, we recognize that established AIoT Hardware Manufacturers (B2B)—whether in Smart Home, Defense, Medical IoT, or Industrial Automation—invest heavily in their R&D and may not be legally or commercially capable of open-sourcing their proprietary PCB schematics or internal controller software.
+However, we recognize that established AIoT Hardware Manufacturers (B2B)â€”whether in Smart Home, Defense, Medical IoT, or Industrial Automationâ€”invest heavily in their R&D and may not be legally or commercially capable of open-sourcing their proprietary PCB schematics or internal controller software.
 
 To bridge this gap, FreeCuli operates under a **Dual-Licensing Model**.
 
 ## 1. The Open Source Path (Free)
 If you are an academic institution, an independent developer, or an open-source hardware startup:
 You may implement the FreeCuli ZC-CORE hardware flow completely free of charge.
-**The Obligation:** Under the CERN-OHL-S v2.0 and AGPL-3.0 licenses, you **MUST** publish all of your derivative hardware schematics (Gerber files) and software source code to the public. If you do this, you owe us nothing.
+**The Obligation:** Under the CERN-OHL-S v2.0 and AGPL-3.0 licenses, you **MUST** publish all of your Corresponding Source (including schematics, PCB layout source, BOM, and Gerber manufacturing files) and software source code to the public. If you do this, you owe us nothing.
 
 ## 2. The Commercial Exemption Path (B2B License)
 If you are a commercial AIoT manufacturer (e.g., Bosch, Samsung, Aselsan, Siemens) who wants to utilize the FreeCuli ZC-CORE privacy standards without being forced to open-source your own proprietary trade secrets:
@@ -38,4 +38,4 @@ A device found implementing the ZC-CORE physical isolation hardware locks (Data 
 
 ### How to Apply
 To initiate the commercial licensing and compliance audit process, contact our engineering and legal team:
-📧 **Email:** [info@freeculi.com](mailto:info@freeculi.com)
+ğŸ“§ **Email:** [info@freeculi.com](mailto:info@freeculi.com)
