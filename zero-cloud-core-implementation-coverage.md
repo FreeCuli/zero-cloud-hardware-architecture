@@ -22,7 +22,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | **M3** (One-Way Flow) | AT-001, AT-008 | Optocoupler, Magnetic/Capacitive Isolator, FPGA, ASIC | Information SHALL flow strictly from Trusted to Untrusted domain. |
 | **M4** (Reverse-Read Block) | AT-001, AT-008 | TX-only transceivers, severed RX lines, un-addressable memory | Reverse read queries MUST be physically impossible. |
 | **M5** (Control-Plane Isolate) | AT-007 | Isolated Clock/Reset trees, Uncontrollable Power rails | Control plane MUST NOT allow manipulation of the trusted execution. |
-| **M6** (Hardware Integrity) | AT-005, AT-010 | Secure Boot ROM, Anti-Rollback eFuses, HSM | Execution environment SHALL verify cryptographic integrity. |
+| **M6** (Hardware Integrity) | AT-005 | Secure Boot ROM, Anti-Rollback eFuses, HSM | Execution environment SHALL verify cryptographic integrity. |
 | **M7** (Lifetime Enforcement) | AT-003 | Bounded SRAM buffers, ephemeral memory | Raw data SHALL exist only during the local inference lifecycle. |
 | **M8** (Data Destruction) | AT-003, AT-004 | Hardware power-cut, Cryptographic zeroization (SRAM/Cache/DMA/Scratchpad) | All persistent and temporary copies MUST become irreversibly unrecoverable. |
 | **M9** (Complete Inventory) | AT-009, AT-006 | Strict PCB BOM, Complete peripheral accounting | Every sensor and acquisition path MUST be accounted for inside the boundary. |

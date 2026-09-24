@@ -58,9 +58,9 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 * **Applicability:** The applicable test path depends on the declared destruction mechanism.
 * **Pass/Fail Threshold:**
     * **PASS:** The declared destruction/invalidation mechanism SHALL render all raw-sensor data irrecoverable within the specified timing and remanence limits.
-        * For **power-cut implementations**, SRAM/volatile-memory VCC SHALL fall to 0V within `t_latency < 10 ms`.
-        * For **cryptographic or other equivalent implementations**, the applicable validated destruction mechanism SHALL be evaluated under FC-ZC-012.
-    * **FAIL:** Destruction is delayed beyond 10ms, or structural characteristics of the sensor data can be partially recovered (Remanence Recovery Rate > 0.01%, see Annex B).
+        * For **power-cut implementations**, SRAM/volatile-memory VCC SHALL fall to 0V within `t_latency < 10 ms` from the inference-complete hardware interrupt.
+        * For **cryptographic or other equivalent implementations**, the destruction/invalidation procedure SHALL commence immediately at the inference-complete interrupt and MUST meet the applicable FC-ZC-012 timing and recovery criteria.
+    * **FAIL:** Destruction is delayed beyond the normative timing limits, or structural characteristics of the sensor data can be partially recovered (Remanence Recovery Rate > 0.01%, see Annex B).
 
 ---
 
@@ -74,10 +74,10 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ---
 
 ### FC-ZC-006: Debug Port Isolation (Hardware Lockout)
-**Objective:** Verify that physical debug interfaces (JTAG, SWD, UART) routing into the Trusted Domain are completely unusable.
+**Objective:** Verify that physical debug interfaces routing into the Trusted Domain are completely unusable.
 * **Pass/Fail Threshold:**
-    * **PASS:** All production debug access paths (e.g., JTAG/SWD) SHALL be permanently physically disabled (e.g., traces cut, eFuses blown) OR rendered cryptographically inaccessible under the declared security property and independently verified.
-    * **FAIL:** The debugger successfully connects, halts the CPU, or reads memory addresses.
+    * **PASS:** All production debug and maintenance interfaces (including JTAG, SWD, UART, test pads, boot straps, and equivalent service interfaces) SHALL be permanently physically disabled (e.g., traces cut, eFuses blown) OR rendered cryptographically inaccessible under the declared security property and independently verified.
+    * **FAIL:** The debugger successfully connects, halts the CPU, or reads memory addresses via any service interface.
 
 ---
 
@@ -195,7 +195,7 @@ where MI_upper_bound defines the upper bound of permissible leaked mutual inform
 * **Statistical Confidence Level:** Minimum alpha = 0.05 (95% confidence interval). Confidence intervals SHALL be estimated using a bootstrap procedure with a minimum of 10,000 resamples, computing a two-sided 95% CI from the empirical distribution of the MI estimator.
 * **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions. The i.i.d. requirement SHALL be operationally met via randomized acquisition order, environmental temperature control, stable power-supply calibration, rigorous batch structure analysis, autocorrelation checks, and session separation to ensure trace independence.
 * **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, MI_upper_bound is fixed at 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
-* **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stoegbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
+* **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stoegbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). To ensure reproducibility across laboratories, the exact trace window definition, time alignment procedure, feature extraction/dimensionality reduction policy, and raw sample representation MUST be explicitly documented. No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
 * **Pass/Fail Calculation:** If the upper bound of the computed 95% confidence interval for the MI estimator exceeds `MI_upper_bound`, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
 
 ### 3. Normative TVLA (Test Vector Leakage Assessment) Execution Protocol (Ref: FC-ZC-009)
@@ -210,7 +210,7 @@ The phrase "strict threshold" regarding TVLA is operationally defined under the 
 * **Leakage Threshold (t-value):**
     * **PASS:** No evaluated temporal hypothesis has `p_i < alpha_adjusted`. The value `|t| > 4.5` is retained solely as a screening indicator.
     * **FAIL:** Any single temporal sample point in the processed trace matrix exhibiting `p_i < alpha_adjusted` constitutes a verifiable side-channel leakage event, resulting in an immediate conformance failure.
-* **Multiple-Comparison Correction (Bonferroni Method):** For `m` simultaneous temporal hypotheses (where `m` equals the total number of evaluated temporal sample points in the trace), laboratories SHALL apply the following normative procedure:
+* **Multiple-Comparison Correction (Bonferroni Method):** For `m` simultaneous temporal hypotheses (where `m` equals the total number of evaluated temporal sample points in the post-alignment trace window, including any pre-processed or dimensionality-reduced vectors), laboratories SHALL apply the following normative procedure:
 
     1. For each temporal point `i`, compute the Welch t-statistic `t_i` and its two-sided p-value `p_i`.
     2. Apply Bonferroni correction: `alpha_adjusted = 0.05 / m`.
@@ -228,7 +228,7 @@ R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 1
 * **Timing Parameters (two distinct requirements):**
     * **Destruction-Trigger Latency (`t_latency`):** Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM VCC SHALL drop to 0V within `t_latency < 10 ms`.
     * **Minimum Power-Off Duration (`t_off`):** Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25°C before the forensic extraction attempt.
-* **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
+* **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all storage locations capable of retaining raw-sensor information (including registers, cache, DMA buffers, and scratchpads) MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
 
 ---
 
@@ -249,5 +249,5 @@ To ensure absolute traceability for certification, manufacturers MUST declare th
 | Assurance Profile | Required CTS Test IDs | Profile-Specific Normative Parameters |
 | :--- | :--- | :--- |
 | **ZC-CORE-C1 (Consumer)** | FC-ZC-001 through FC-ZC-014 | `MI_upper_bound` = 10^-4 bits<br>TVLA Minimum Traces = 100,000 |
-| **ZC-CORE-C2 (Industrial)** | FC-ZC-001 through FC-ZC-014 | `MI_upper_bound` = 10^-4 bits<br>TVLA Minimum Traces = 1,000,000 |
+| **ZC-CORE-C2 (Industrial)** | FC-ZC-001 through FC-ZC-014 | `MI_upper_bound` = 10^-4 bits<br>TVLA Minimum Traces = 1,000,000<br>Supply-chain cryptographic evidence: REQUIRED<br>Extended memory zeroization validation: REQUIRED |
 | **ZC-CORE-C3 (High-Assurance)** | FC-ZC-001 through FC-ZC-016 | `MI_upper_bound` = 10^-6 bits<br>TVLA Minimum Traces = 5,000,000<br>Invasive/Fault tests (FC-ZC-015, FC-ZC-016) |

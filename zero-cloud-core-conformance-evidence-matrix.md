@@ -34,7 +34,7 @@ This matrix establishes absolute traceability for independent auditors, mapping 
 | **M2, M4, M5** | AT-001, AT-002, AT-006, AT-007 | FC-ZC-001 | DMA/peripheral bridge isolation logs, bus-master audit | Zero read-capable path from Network Domain to Trusted Domain. |
 | **M1 (Trusted Acquisition)** | AT-001, AT-009 | FC-ZC-013, FC-ZC-014 | Hardware Interface Manifest (HIM), Signed BOM | Zero undocumented sensory paths. |
 | **M2 (Physical Boundary)** | AT-004 | FC-ZC-002, FC-ZC-009, FC-ZC-011 | VNA, TDR, PCB X-Ray | Leakage < -80 dBm (evaluated under CTS Annex B). |
-| **M3 (One-Way Flow)** | AT-008, AT-010 | FC-ZC-003, FC-ZC-010 | Oscilloscope, Signal Generator | Mutual Info bound I(X;Y) < MI_upper_bound. |
+| **M3 (One-Way Flow)** | AT-008, AT-010 | FC-ZC-003 | Oscilloscope, Signal Generator | Mutual Info bound I(X;Y) < MI_upper_bound and Semantic reconstruction prevented. |
 | **M4 (Reverse-Read Block)** | AT-001, AT-008 | FC-ZC-003 | Oscilloscope injection logs | Strictly < 5mVpp upon reverse probe. |
 | **M5 (Control-Plane Isolate)**| AT-007 | FC-ZC-008 | Trusted-Domain Control Surface Inventory | Zero indirect NPU reset/clock overrides. |
 | **M6 (Hardware Integrity)** | AT-005 | FC-ZC-005, FC-ZC-006, FC-ZC-007 | Signed Bootloader hashes, eFuse maps | Rollback prevention verified. |
