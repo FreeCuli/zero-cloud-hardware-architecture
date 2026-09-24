@@ -49,16 +49,16 @@ jobs:
           EXCLUDE="DUAL-LICENSING.md|Zero-Cloud-Smart-Home-Edge-AI-Architecture.md|Zero-Cloud-Defensive-Publication.md|FC-ZC-Conformance-Test-Specification.md|ZERO-CLOUD-RELEASE-MANIFEST.md|ZC-CORE-METHODOLOGY-INVARIANTS.md|SECURITY.md|CONTRIBUTING.md|CITATION.cff"
           MANIFEST=$(cat ZERO-CLOUD-RELEASE-MANIFEST.md)
           
-          # 1. File -> Manifest check
+          # 1. File -> Manifest check (exact HASH + FILENAME line matching)
           for f in *.md; do
             if echo "$f" | grep -qE "$EXCLUDE"; then
               continue
             fi
             ACTUAL=$(sha256sum "$f" | awk '{print toupper($1)}')
-            if echo "$MANIFEST" | grep -qi "$ACTUAL"; then
-              echo "[PASS] $f — $ACTUAL matches manifest"
+            if echo "$MANIFEST" | grep -qiE "^${ACTUAL}\s+${f}$"; then
+              echo "[PASS] $f — $ACTUAL matches exact manifest entry"
             else
-              echo "[FAIL] $f — hash mismatch. Actual: $ACTUAL"
+              echo "[FAIL] $f — hash mismatch or missing exact entry in manifest. Actual: $ACTUAL"
               exit 1
             fi
           done
