@@ -67,10 +67,10 @@ jobs:
 
       - name: Verify manifest contains Git provenance
         run: |
-          if grep -q "Git Commit SHA" ZERO-CLOUD-RELEASE-MANIFEST.md; then
-            echo "[PASS] Git Commit SHA present in manifest."
+          if grep -q "Git Commit Resolution" ZERO-CLOUD-RELEASE-MANIFEST.md; then
+            echo "[PASS] Git Commit Resolution present in manifest."
           else
-            echo "[FAIL] Git Commit SHA missing from manifest."
+            echo "[FAIL] Git Commit Resolution missing from manifest."
             exit 1
           fi
 

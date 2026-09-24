@@ -9,7 +9,7 @@ This manifest records the cryptographic identity, publication metadata, and file
 * **Standardization Level:** RFC 2119 Normative Stricture
 * **Repository:** FreeCuli/zero-cloud-hardware-architecture
 * **Git Tag:** v3.2.0
-* **Git Commit SHA (release tree):** bfd88b55a8cbe9194734517ce8ba32b9aeb8488a
+* **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v3.2.0`
 * **Release Artifact SHA-256:** *(to be computed from Zenodo-generated archive after publication)*
 
 ## Cryptographic Evidence (SHA-256 Hashes)
