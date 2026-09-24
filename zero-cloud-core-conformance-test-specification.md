@@ -116,7 +116,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-011: Secure Enclave Alternative (Covert Channel Blocking)
 **Objective:** Verify TrustZone/PMP alternatives achieve physical-equivalent isolation.
 * **Pass/Fail Threshold:**
-    * **PASS:** Zero bytes readable from non-secure to secure memory. Strict timing side-channel leakage thresholds must be formally met to block covert channel data exfiltration from shared buffers.
+    * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL use the FC-ZC-009 TVLA protocol or define specific normative timing leakage thresholds.to block covert channel data exfiltration from shared buffers.
     * **FAIL:** Any timing, cache, or shared-memory side-channel allows the non-secure world to infer raw sensor data.
 
 ---
