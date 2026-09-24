@@ -46,7 +46,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 **Objective:** Verify that only processed commands can travel from the NPU to the Main MCU, and absolutely no data or *information* can leak backwards.
 * **Measuring Device:** Multi-channel Oscilloscope (Min. **5 GHz** bandwidth), High-speed Signal Generator.
 * **Pass/Fail Threshold:**
-    * **PASS:** Data injected backwards results in strictly < 5mV peak-to-peak (mVpp) on the NPU side, AND formal Information Mutual Information assessment yields 0 (no statistical correlation or data-carrying capacity).
+    * **PASS:** Data injected backwards results in strictly < 5mV peak-to-peak (mVpp) on the NPU side, AND formal Mutual Information assessment yields strictly I\(X;Y\) < ? (See Annex B) (no statistical correlation or data-carrying capacity).
     * **FAIL:** Signals injected in reverse cause readable logical fluctuations, or timing/amplitude variations carry recoverable side-channel data.
 
 ---
@@ -54,7 +54,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-004: Volatile Data Destruction (SRAM Remanence Threshold)
 **Objective:** Verify that when AI inference completes, power to the volatile memory holding sensor data is physically severed.
 * **Pass/Fail Threshold:**
-    * **PASS:** At hardware interrupt, SRAM VCC drops to 0V within **< 10 ms**. Cold-Boot attack forensic extraction yields Mathematical Remanence < 0.01% (Irreversible cryptographic noise).
+    * **PASS:** At hardware interrupt, SRAM VCC drops to 0V within **< 10 ms**. Cold-Boot attack forensic extraction yields Remanence Recovery Rate \(R_rate\) ? 0.01% (See Annex B) (Irreversible cryptographic noise).
     * **FAIL:** Power cut is delayed beyond 10ms, or structural characteristics of the sensor data can be partially recovered.
 
 ---
@@ -95,7 +95,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-009: Formal Side-Channel Leakage Assessment
 **Objective:** Verify that in-home activities cannot be inferred through electromagnetic emissions (Tempest) or power fluctuations.
 * **Pass/Fail Threshold:**
-    * **PASS:** Formal Test Vector Leakage Assessment (TVLA) demonstrates no statistically significant leakage (t-test confidence value below strict threshold).
+    * **PASS:** Formal Test Vector Leakage Assessment (TVLA) demonstrates no statistically significant leakage (t-test absolute t-value bounded exactly at |t| > 4.5 via Welch's t-test (See Annex B)).
     * **FAIL:** The device fails the formal TVLA protocol, showing correlation between power traces and the raw sensor data being processed.
 
 ---
