@@ -1,4 +1,4 @@
-﻿# Universal Hardware Reference Architecture
+# Universal Hardware Reference Architecture
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -14,7 +14,7 @@
 
 ## 1. Introduction & The "Trust Boundary" Axiom
 
-Traditional cloud-connected IoT devices face significant raw-sensor exposure risks by transmitting raw sensory data (audio/visual) to external networks. The **FreeCuli ZC-CORE Methodology** eliminates this violation not through software promises, but through **Hardware-Enforced Trust Boundaries** and **On-Device Edge AI Inference**.
+Traditional cloud-connected IoT devices face significant raw-sensor exposure risks by transmitting raw sensory data (audio/visual) to external networks. The **FreeCuli ZC-CORE Methodology** addresses raw-sensor exposure risks not through software promises, but through **Hardware-Enforced Trust Boundaries** and **On-Device Edge AI Inference**.
 
 The core axiom of Zero-Cloud AIoT is that **sensitive raw sensor data SHALL NOT leave the Trusted Processing Domain.** The device's primary intelligent functions MUST be **Server-Independent and Mathematically Verifiable**.
 
@@ -125,7 +125,7 @@ graph TD
 
 ### 3.1 Schematic Explanation
 1. **Sensor Layer:** Raw audio and video write to the `Volatile Buffer` (SRAM).
-2. **Isolated Layer:** The Edge NPU processes the data locally. The moment it generates a meaningful command (Text or Hex), the `Hardware Power Switch` physically destroys the original media (Strict GDPR/CCPA Compliance).
+2. **Isolated Layer:** The Edge NPU processes the data locally. The moment it generates a meaningful command (Text or Hex), the `Hardware Power Switch` physically destroys the original media (Privacy-by-Design Architecture).
 3. **Isolation Barrier:** The command is transmitted via the `Hardware Data Diode`. The `Main Controller` or its attached `Wi-Fi` module cannot reach back into the NPU or manipulate control surfaces (DMA/Clock) to listen to the audio flowing from the sensors.
 
 ## 4. Methodological & Functional Equivalency (Defensive Publication)

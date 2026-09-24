@@ -7,11 +7,12 @@
 
 ## Claim-Style Prior-Art Matrix & Technical Disclosure
 
-**Project:** FreeCuli ZC-CORE v3.1.0
+**Project:** FreeCuli ZC-CORE v3.2.0
 **Purpose:** Defensive Publication / Prior-Art Establishment for Universal AIoT and Edge AI
 **Version History & Publication Lineage:**
 * **Original Defensive Publication (v2.1.0):** Established core Prior-Art. 
 * **Universal AIoT Revision (v3.1.0):** Expanded claims to universal AIoT, Edge AI, and generalized volatile zeroization methodologies.
+* **Laboratory Normative Upgrade (v3.2.0):** Formalized physical leakage thresholds (Annex B), TVLA protocol, and operational MI bounds. This disclosure remains a continuous publication under the same Concept DOI.
 * **Reference Publication:** All versions permanently indexed under Zenodo Concept DOI 10.5281/zenodo.22838473.
 
 **Publication Strategy:** Claim-style technical disclosure; not a patent application and not an assertion that any particular claim is patentable.

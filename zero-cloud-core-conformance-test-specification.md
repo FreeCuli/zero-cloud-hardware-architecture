@@ -8,13 +8,13 @@
 **Evidence-Based Methodology for Verifiable Physical Privacy in AIoT and Edge AI**
 
 **Version History:**
-* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < MI_upper_bound 
+* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < MI_upper_bound).
 * **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
 * **v2.1.0:** Original feature-based physical isolation constraints.
 
 > [!IMPORTANT]
 > **Technical Compliance Verifiers (NOT IP Detectors)**
-> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's AIoT device strictly adheres to the **ZC-CORE v3.1.0** hardware constraints.
+> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's AIoT device strictly adheres to the **ZC-CORE v3.2.0** hardware constraints.
 
 > **"FreeCuli does not require you to trust FreeCuli. It requires you to reproduce the test and provide physical evidence."**
 
@@ -46,7 +46,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 **Objective:** Verify that only processed commands can travel from the NPU to the Main MCU, and absolutely no data or *information* can leak backwards.
 * **Measuring Device:** Multi-channel Oscilloscope (Min. **5 GHz** bandwidth), High-speed Signal Generator.
 * **Pass/Fail Threshold:**
-    * **PASS:** Data injected backwards results in strictly < 5mV peak-to-peak (mVpp) on the NPU side, AND formal Mutual Information assessment yields strictly I\(X;Y\) < ? (See Annex B) (no statistical correlation or data-carrying capacity).
+    * **PASS:** Data injected backwards results in strictly < 5mV peak-to-peak (mVpp) on the NPU side, AND formal Mutual Information assessment yields strictly I\(X;Y\) < MI_upper_bound (See Annex B) (no statistical correlation or data-carrying capacity).
     * **FAIL:** Signals injected in reverse cause readable logical fluctuations, or timing/amplitude variations carry recoverable side-channel data.
 
 ---
@@ -54,7 +54,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-004: Volatile Data Destruction (SRAM Remanence Threshold)
 **Objective:** Verify that when AI inference completes, power to the volatile memory holding sensor data is physically severed.
 * **Pass/Fail Threshold:**
-    * **PASS:** At hardware interrupt, SRAM VCC drops to 0V within **< 10 ms**. Cold-Boot attack forensic extraction yields Remanence Recovery Rate \(R_rate\) ? 0.01% (See Annex B) (Irreversible cryptographic noise).
+    * **PASS:** At hardware interrupt, SRAM VCC drops to 0V within **< 10 ms**. Cold-Boot attack forensic extraction yields Remanence Recovery Rate \(R_rate\) <= 0.01% (See Annex B) (Irreversible cryptographic noise).
     * **FAIL:** Power cut is delayed beyond 10ms, or structural characteristics of the sensor data can be partially recovered.
 
 ---
@@ -117,7 +117,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-011: Secure Enclave Alternative (Covert Channel Blocking)
 **Objective:** Verify TrustZone/PMP alternatives achieve physical-equivalent isolation.
 * **Pass/Fail Threshold:**
-    * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL strictly use the FC-ZC-009 TVLA protocol for timing leakage assessment.to block covert channel data exfiltration from shared buffers.
+    * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL strictly use the FC-ZC-009 TVLA protocol for timing leakage assessment to block covert channel data exfiltration from shared buffers.
     * **FAIL:** Any timing, cache, or shared-memory side-channel allows the non-secure world to infer raw sensor data.
 
 ---
@@ -162,10 +162,12 @@ Real-world physical channels possess inherent thermal and environmental noise. C
 
 To maintain strict scientific falsifiability, the criterion **"Mutual Information = 0"** is hereby structurally replaced with an operational statistical bound:
 
-Criterion: I(X;Y) < MI_upper_bound = defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
+Criterion: I(X;Y) < MI_upper_bound
+
+where MI_upper_bound defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
 * **Statistical Confidence Level:** Minimum α = 0.05 (95% confidence interval).
 * **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions.
-* **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, ? is fixed at MI_upper_bound = 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
+* **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, MI_upper_bound is fixed at 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
 * **Pass/Fail Calculation:** If the computed empirical mutual information estimator exceeds MI_upper_bound under the defined confidence interval, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
 
 ### 3. Normative TVLA (Test Vector Leakage Assessment) Execution Protocol (Ref: FC-ZC-009)
