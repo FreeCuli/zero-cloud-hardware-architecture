@@ -3,11 +3,12 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Standard](https://img.shields.io/badge/ZC--CORE-v3.1.0-black.svg)]()
+[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.0-black.svg)]()
 
 **Evidence-Based Methodology for Verifiable Physical Privacy in AIoT and Edge AI**
 
 **Version History:**
+* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < ?).
 * **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
 * **v2.1.0:** Original feature-based physical isolation constraints.
 

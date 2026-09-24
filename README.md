@@ -7,7 +7,7 @@ The indestructible, privacy-first hardware reference methodology for Server-Inde
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 ## Overview
-This repository contains the official, strictly falsifiable **ZC-CORE v3.1.0 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
+This repository contains the official, strictly falsifiable **ZC-CORE v3.2.0 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
 
 By enforcing Physical Data Diodes, Trust Boundaries, and Cryptographic Volatile Zeroization, this methodology is designed to physically block the possibility of unauthorized data exfiltration (microphone/camera streams) from any AIoT appliance. It protects against state-sponsored espionage and structurally enforces Privacy-by-Design, forming a hardware foundation for GDPR/CCPA compliance.
 
@@ -54,7 +54,7 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
     * The 4-tier certification hierarchy (Self-Declared to FreeCuli Certified™) and trademark usage rights.
 11. **[ZC-CORE Versioning and Governance Policy](zero-cloud-core-versioning-and-governance.md)**
     * The rigid rules governing how the standard evolves, deprecates old methods, and manages change control.
-12. **[ZC-CORE Release Manifest (v3.1.0)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
+12. **[ZC-CORE Release Manifest (v3.2.0)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
     * The cryptographic SHA-256 seal of this release, binding all documents to a verifiable timeline.
 
 ## Commercial Certification
