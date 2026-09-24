@@ -1,4 +1,4 @@
-﻿# Hardware Attack Taxonomy
+# Hardware Attack Taxonomy
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -17,11 +17,11 @@ In addition to direct physical vectors (AT-Series), ZC-CORE mitigates a broad sp
 
 | Threat ID | Description | ZC-CORE Scope | Primary Mitigation (FC-ZC) |
 | :--- | :--- | :--- | :--- |
-| **T1** | Remote network compromise (Wi-Fi SoC hack) | In-Scope | Physical Air-Gap (FC-ZC-002) |
+| **T1** | Remote network compromise (Wi-Fi SoC hack) | In-Scope | Physical Air-Gap (FC-ZC-002) + Network-Domain Read Isolation (FC-ZC-001) |
 | **T2** | Malicious firmware payload | In-Scope | Trusted Execution Artifact Chain (FC-ZC-005) |
 | **T3** | Supply-chain compromised component | In-Scope | Hardware Interface Manifest (FC-ZC-013) |
-| **T4** | Physical invasive attack (Decapping) | Partial | Covered under C3 High-Assurance Profile |
-| **T5** | Fault injection (Glitching) | Partial | Covered under C3 High-Assurance Profile |
+| **T4** | Physical invasive attack (Decapping) | Partial — C3 only | Covered under C3 High-Assurance Profile. C3 evaluators SHALL follow ISO/IEC 17065-accredited invasive physical security evaluation procedures (e.g., Common Criteria AVA_VAN.5 or equivalent). |
+| **T5** | Fault injection (Glitching) | Partial — C3 only | Covered under C3 High-Assurance Profile. C3 evaluators SHALL follow ISO/IEC 17065-accredited fault injection evaluation procedures (e.g., Common Criteria ATE_DPT or equivalent). |
 | **T6** | Clock/power glitching via Main MCU | In-Scope | Control-Plane Isolation (FC-ZC-008) |
 | **T7** | EM / Power side-channel extraction | In-Scope | Formal TVLA Assessment (FC-ZC-009) |
 | **T8** | Malicious OTA update | In-Scope | Secure Update & Revocation (FC-ZC-007) |

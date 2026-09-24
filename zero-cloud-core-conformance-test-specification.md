@@ -95,8 +95,8 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-009: Formal Side-Channel Leakage Assessment
 **Objective:** Verify that in-home activities cannot be inferred through electromagnetic emissions (Tempest) or power fluctuations.
 * **Pass/Fail Threshold:**
-    * **PASS:** Formal Test Vector Leakage Assessment (TVLA) demonstrates no statistically significant leakage (t-test absolute t-value bounded exactly at |t| > 4.5 via Welch's t-test (See Annex B)).
-    * **FAIL:** The device fails the formal TVLA protocol, showing correlation between power traces and the raw sensor data being processed.
+    * **PASS:** For every evaluated temporal sample point, the Welch t-statistic satisfies |t| ≤ 4.5 after the required multiple-comparison correction (See Annex B).
+    * **FAIL:** Any single temporal sample point exhibiting a corrected |t| > 4.5 constitutes a verifiable side-channel leakage event and results in immediate conformance failure.
 
 ---
 
@@ -165,7 +165,7 @@ To maintain strict scientific falsifiability, the criterion **"Mutual Informatio
 Criterion: I(X;Y) < MI_upper_bound
 
 where MI_upper_bound defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
-* **Statistical Confidence Level:** Minimum α = 0.05 (95% confidence interval).
+* **Statistical Confidence Level:** Minimum α = 0.05 (95% confidence interval). Confidence intervals SHALL be estimated using a bootstrap procedure with a minimum of 10,000 resamples, computing a two-sided 95% CI from the empirical distribution of the MI estimator.
 * **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions.
 * **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, MI_upper_bound is fixed at 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
 * **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stögbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
@@ -176,20 +176,26 @@ The phrase "strict threshold" regarding TVLA is operationally defined under the 
 
 * **Methodology:** Fixed-vs-Random t-testing utilizing Welch's t-test algorithm to detect non-profiled leakage across the entire time-domain trace.
 * **Trace Alignment:** Laboratories MUST implement dynamic time warping (DTW) or elastic alignment algorithms to eliminate clock jitter artifacts before computing statistical variance.
-* **Sample Count:** Minimum 100,000 traces for core consumer appliances (C1); minimum 5,000,000 traces for high-assurance hardware (C3).
+* **Sample Count:**
+    * **C1 (Consumer):** Minimum **100,000** traces.
+    * **C2 (Enhanced Industrial):** Minimum **1,000,000** traces.
+    * **C3 (High-Assurance):** Minimum **5,000,000** traces.
 * **Leakage Threshold (t-value):**
     * **PASS:** For every evaluated temporal sample point, the Welch t-statistic satisfies |t| ≤ 4.5 after the required multiple-comparison correction.
     * **FAIL:** Any single temporal sample point in the processed trace matrix exhibiting a corrected |t| > 4.5 constitutes a verifiable side-channel leakage event, resulting in an immediate conformance failure.
-* **Multiple-Comparison Correction (Bonferroni Method):** For `m` simultaneous temporal hypotheses (where `m` equals the total number of evaluated temporal sample points in the trace), laboratories SHALL apply the Bonferroni correction as follows:
+* **Multiple-Comparison Correction (Bonferroni Method):** For `m` simultaneous temporal hypotheses (where `m` equals the total number of evaluated temporal sample points in the trace), laboratories SHALL apply the following normative procedure:
 
-    `alpha_adjusted = alpha / m`
-
-    where `alpha = 0.05` (95% confidence). The adjusted significance threshold SHALL be used when evaluating each temporal point. The `|t| > 4.5` criterion applies after this correction is applied.
+    1. For each temporal point `i`, compute the Welch t-statistic `t_i` and its two-sided p-value `p_i`.
+    2. Apply Bonferroni correction: `alpha_adjusted = 0.05 / m`.
+    3. **FAIL** if any `p_i < alpha_adjusted`.
+    4. The `|t| > 4.5` threshold serves as an additional fixed screening criterion. Either the corrected p-value criterion OR the `|t| > 4.5` threshold alone is sufficient to trigger a FAIL verdict.
 
 ### 4. Mathematical Definition of "0.01% Remanence" (Ref: FC-ZC-004)
 To prevent manufacturer obfuscation regarding the volatile memory zeroization threshold (< 0.01%), the **Remanence Recovery Rate (R_rate)** is mathematically defined and evaluated via the following formula:
 
 R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
 
-* **Evaluation Protocol:** The testing lab MUST drop power to the isolated volatile memory domain for exactly delta_t = 10 ms at an ambient temperature calibrated to 25°C.
+* **Timing Parameters (two distinct requirements):**
+    * **Destruction-Trigger Latency (`t_latency`):** Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM VCC SHALL drop to 0V within `t_latency < 10 ms`.
+    * **Minimum Power-Off Duration (`t_off`):** Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25°C before the forensic extraction attempt.
 * **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
