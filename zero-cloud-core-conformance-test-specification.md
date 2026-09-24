@@ -48,14 +48,19 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 * **Pass/Fail Threshold:**
     * **PASS:** Data injected backwards results in strictly < 5mV peak-to-peak (mVpp) on the NPU side, AND formal Mutual Information assessment yields strictly I\(X;Y\) < MI_upper_bound (See Annex B) (no statistical correlation or data-carrying capacity).
     * **FAIL:** Signals injected in reverse cause readable logical fluctuations, or timing/amplitude variations carry recoverable side-channel data.
+* **Semantic Output Leakage Assessment (Ref: AT-010):**
+    * In addition to reverse-flow limits, the forward semantic output (diagnostic logs, payload, metadata, timing metadata, confidence values, repeated semantic responses) MUST be evaluated to ensure it does not provide a practical, statistically significant reconstruction channel for the protected raw-sensor state under the declared threat model.
 
 ---
 
-### FC-ZC-004: Volatile Data Destruction (SRAM Remanence Threshold)
-**Objective:** Verify that when AI inference completes, power to the volatile memory holding sensor data is physically severed.
+### FC-ZC-004: Volatile Data Destruction & Remanence Assessment
+**Objective:** Verify that local raw-sensor data is irretrievably destroyed immediately after inference.
+* **Applicability:** The applicable test path depends on the declared destruction mechanism.
 * **Pass/Fail Threshold:**
-    * **PASS:** At hardware interrupt, SRAM VCC drops to 0V within **< 10 ms**. Cold-Boot attack forensic extraction yields Remanence Recovery Rate \(R_rate\) <= 0.01% (See Annex B) (Irreversible cryptographic noise).
-    * **FAIL:** Power cut is delayed beyond 10ms, or structural characteristics of the sensor data can be partially recovered.
+    * **PASS:** The declared destruction/invalidation mechanism SHALL render all raw-sensor data irrecoverable within the specified timing and remanence limits.
+        * For **power-cut implementations**, SRAM/volatile-memory VCC SHALL fall to 0V within `t_latency < 10 ms`.
+        * For **cryptographic or other equivalent implementations**, the applicable validated destruction mechanism SHALL be evaluated under FC-ZC-012.
+    * **FAIL:** Destruction is delayed beyond 10ms, or structural characteristics of the sensor data can be partially recovered (Remanence Recovery Rate > 0.01%, see Annex B).
 
 ---
 
@@ -71,7 +76,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-006: Debug Port Isolation (Hardware Lockout)
 **Objective:** Verify that physical debug interfaces (JTAG, SWD, UART) routing into the Trusted Domain are completely unusable.
 * **Pass/Fail Threshold:**
-    * **PASS:** The JTAG/SWD interface is permanently physically disabled (eFuses blown, traces cut).
+    * **PASS:** All production debug access paths (e.g., JTAG/SWD) SHALL be permanently physically disabled (e.g., traces cut, eFuses blown) OR rendered cryptographically inaccessible under the declared security property and independently verified.
     * **FAIL:** The debugger successfully connects, halts the CPU, or reads memory addresses.
 
 ---
@@ -174,6 +179,7 @@ Any manufacturer claim regarding RF/EM thresholds (e.g., < -80 dBm) or power pla
 ### 2. Measurement Uncertainty & Decision Rule
 To establish a rigorous laboratory standard, the test report MUST define the Measurement Uncertainty Budget. 
 * **Decision Rule:** For any leakage threshold (e.g., `< -80 dBm`), if the measured value plus the calculated expanded measurement uncertainty (with a 95% confidence level, k=2) overlaps the threshold, it is considered a **FAIL**. Guard bands MUST be strictly applied to prevent false compliance due to instrumentation noise.
+* **Measurement Configuration:** Unless explicitly overridden by a specific test, all continuous wave (CW) or broadband leakage limit tests (e.g., `< -80 dBm`) SHALL be evaluated using a Resolution Bandwidth (RBW) of 1 MHz, an RMS detector, and a 50-ohm reference impedance.
 * **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm ± 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
 * **RF Environment:** All measurements MUST occur inside an ISO 17025 accredited fully anechoic chamber (FAC) with an ambient electromagnetic noise floor calibrated strictly below -110 dBm.
 * **Sampling Parameters:** Minimum sampling rate of 10 GS/s with a hardware bandwidth limit set exactly matching the maximum clock frequency of the isolated NPU domain plus its 5th harmonic.
@@ -187,7 +193,7 @@ Criterion: I(X;Y) < MI_upper_bound
 
 where MI_upper_bound defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
 * **Statistical Confidence Level:** Minimum alpha = 0.05 (95% confidence interval). Confidence intervals SHALL be estimated using a bootstrap procedure with a minimum of 10,000 resamples, computing a two-sided 95% CI from the empirical distribution of the MI estimator.
-* **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions. The i.i.d. requirement SHALL be operationally met via randomized acquisition order, environmental temperature control, and stable power-supply calibration.
+* **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions. The i.i.d. requirement SHALL be operationally met via randomized acquisition order, environmental temperature control, stable power-supply calibration, rigorous batch structure analysis, autocorrelation checks, and session separation to ensure trace independence.
 * **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, MI_upper_bound is fixed at 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
 * **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stoegbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
 * **Pass/Fail Calculation:** If the upper bound of the computed 95% confidence interval for the MI estimator exceeds `MI_upper_bound`, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
@@ -217,7 +223,7 @@ To prevent manufacturer obfuscation regarding the volatile memory zeroization th
 
 R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
 
-> **Normative Note on "Successfully Reconstructed":** A bit is considered "successfully reconstructed" if any extraction methodology (including exact recovery, statistical inference, correlation, or partial classification) can determine the bit's original state with a statistically significant improvement over a random guessing baseline (`p < 0.05` after multiple-hypothesis correction for the number of bits evaluated). The assumed attacker capability includes full knowledge of the classifier structure and unlimited access to training baselines on identical counterpart devices.
+> **Normative Note on "Successfully Reconstructed":** A bit is considered "successfully reconstructed" if any extraction methodology (including exact recovery, statistical inference, correlation, or partial classification) can determine the bit's original state with a statistically significant improvement over a random guessing baseline (`p < 0.01` after multiple-hypothesis correction for the number of bits evaluated). The assumed attacker capability includes full knowledge of the classifier structure and unlimited access to training baselines on identical counterpart devices.
 
 * **Timing Parameters (two distinct requirements):**
     * **Destruction-Trigger Latency (`t_latency`):** Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM VCC SHALL drop to 0V within `t_latency < 10 ms`.
