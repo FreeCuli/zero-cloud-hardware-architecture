@@ -3,16 +3,16 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.0-black.svg)]()
+[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.1-black.svg)]()
 
 ## Claim-Style Prior-Art Matrix & Technical Disclosure
 
-**Project:** FreeCuli ZC-CORE v3.2.0
+**Project:** FreeCuli ZC-CORE v3.2.1
 **Purpose:** Defensive Publication / Prior-Art Establishment for Universal AIoT and Edge AI
 **Version History & Publication Lineage:**
 * **Original Defensive Publication (v2.1.0):** Established core Prior-Art. 
 * **Universal AIoT Revision (v3.1.0):** Expanded claims to universal AIoT, Edge AI, and generalized volatile zeroization methodologies.
-* **Laboratory Normative Upgrade (v3.2.0):** Formalized physical leakage thresholds (Annex B), TVLA protocol, and operational MI bounds. This disclosure remains a continuous publication under the same Concept DOI.
+* **Laboratory Normative Upgrade (v3.2.1):** Formalized physical leakage thresholds (Annex B), TVLA protocol, and operational MI bounds. This disclosure remains a continuous publication under the same Concept DOI.
 * **Reference Publication:** All versions permanently indexed under Zenodo Concept DOI 10.5281/zenodo.22838473.
 
 **Publication Strategy:** Claim-style technical disclosure; not a patent application and not an assertion that any particular claim is patentable.

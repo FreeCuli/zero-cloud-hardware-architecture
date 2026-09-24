@@ -3,7 +3,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.0-black.svg)]()
+[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.1-black.svg)]()
 
 This document outlines the formal governance model, versioning semantics, and amendment processes for the ZC-CORE Universal Zero-Cloud Hardware Methodology.
 
@@ -31,7 +31,7 @@ To ensure the integrity of the methodology, FreeCuli enforces a strict Release F
 1. **Release Candidate** & Technical Review
 2. **Normative Freeze:** No further changes to requirements.
 3. **SHA-256 Manifest Generation:** Creating the verifiable `ZERO-CLOUD-RELEASE-MANIFEST.md`.
-4. **Git Tag:** Annotated and cryptographically signed tag creation (e.g., GPG or SSH signed, `v3.2.0`).
+4. **Git Tag:** Annotated and cryptographically signed tag creation (e.g., GPG or SSH signed, `v3.2.1`).
 5. **Zenodo Publication:** Archival and DOI assignment.
 
 > **Integrity Rule:** Once a release is frozen and tagged, normative files SHALL NOT change without a new release identifier. The final Zenodo artifact package SHA-256 MUST be traceable back to the corresponding Git commit.

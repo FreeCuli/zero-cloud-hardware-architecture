@@ -13,22 +13,22 @@ This manifest records the cryptographic identity, publication metadata, and file
 * **Release Artifact SHA-256:** *(to be computed and recorded upon generation of the immutable Zenodo archival tarball/zip using `sha256sum <zenodo_archive>`. This placeholder preserves cryptographic distinction between the Git tree state and the post-publication distribution artifact)*
 
 ## Cryptographic Evidence (SHA-256 Hashes)
-The following hashes cover all canonical v3.2.0 normative and supporting documents listed in this manifest.
+The following hashes cover all canonical v3.2.1 normative and supporting documents listed in this manifest.
 
 ```text
 8CA6FBADE5B7F6ACA5C2D4C29F0A0C60BAC306D1696E46FF6CDB917748533A1F  README.md
 D2B25667917F4EAB9271FAC7B6DC2B472F86CCF5A8ECBA307B55D2C1D1EF7D42  ZC-CORE-CONFORMANCE-EVIDENCE-PACKAGE.md
-25CB027856FD0264E15630F410C9EC52A4D2E5365F0A467EB6C8EAD41B5F67D5  zero-cloud-core-attack-taxonomy.md
-35D168D75A30F8F6A39F11A218AFEC6E736A3F731F1C42D5E5B8080201109C6B  zero-cloud-core-brand-and-trademark-policy.md
-2E6C0315D64C229D179C5DE23082E63BAF68DCFFC372BC2D60B3E986D022A79B  zero-cloud-core-conformance-evidence-matrix.md
-84A9239D91F1DA5EA00190FFB7676B0936CFAB9E90DB72B451ED0FE690F3F0CA  zero-cloud-core-conformance-test-specification.md
-23B001EAB5C02E40BA0A1B83CB1DB2F7F855CE780B0C752D5A654ABD20EB15B6  zero-cloud-core-defensive-publication.md
-EB23C90731F5744D33AB50655568D7A934CC1FC9BF9C45C2D50CBB1FDE221804  zero-cloud-core-implementation-coverage.md
-BA0B1A4D24F02CB85E66EFB8B3049913CC9334A9ADFA6E180B55E80CB714731F  zero-cloud-core-methodology-invariants.md
-F599AEA3FD0BF02FEDE423750E92152E4D314683DF1F2C76BDE20F8B4CFD5760  zero-cloud-core-scope-boundary.md
-1ADE1677A47BB1973BA35C676F182DED22B596EED0FD7EE93BC0595422FC9035  zero-cloud-core-versioning-and-governance.md
-A4E12452D2CED07BDDD8A2DD7BDEE460E53BB7F2F2F687D0678C2DE30261AD8E  zero-cloud-dual-licensing.md
-C430BBEBF620AC5C1107CDEBE7AE926CB49D645D66FC42B18E997DCFE6E543C0  zero-cloud-hardware-reference-architecture.md
+310F0F67C3BACD0F3BE6195361F3AFF97E84B0FC996AA7AC4F7214734E7F85DA  zero-cloud-core-attack-taxonomy.md
+71A153BECE35BF0277FD2E736F401220F79912584795CDC1FCAF206CA1FFC7FE  zero-cloud-core-brand-and-trademark-policy.md
+390380B9ABF6AA3D8DDB4CF31CCFB5275AD9840AAD0459691CE09A4AB106805F  zero-cloud-core-conformance-evidence-matrix.md
+4090507D881D478ECC9675B1927EF74CB1CADAAD3C814A001FCC2FF900F66A5B  zero-cloud-core-conformance-test-specification.md
+9D1E0F03A55383E215675B5EA934F9874C8C91D0A892F51A21CE0178C8DE6023  zero-cloud-core-defensive-publication.md
+D540AFC4D4FF4279CFD8313E6FB2937EA8C54779193EFF55B0B119C94C2318E2  zero-cloud-core-implementation-coverage.md
+976AAD5A86787A1D5033347D99A0E7EA6EB4E4A776326C42DC21806CC28BB8EF  zero-cloud-core-methodology-invariants.md
+28CC5103265E38AA47E08DED132AD27D0D9015D36653AD4881CFC9DB3549EF3B  zero-cloud-core-scope-boundary.md
+48A8BB8FFE4F44A6ACBE1F6E5A70F63EC2587407A900F13705E444A8578A21C2  zero-cloud-core-versioning-and-governance.md
+361D9558CB51610C0CF8F15AE0B5486D530716433218D7DC7696D42B8D9806E4  zero-cloud-dual-licensing.md
+63C5407A0C7583CF6502D86E3AE9A8ED712E776FFAE184C1EE82B3A46A64FB57  zero-cloud-hardware-reference-architecture.md
 ```
 
 ## Release Hash-Chain Integrity
