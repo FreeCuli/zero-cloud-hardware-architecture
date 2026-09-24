@@ -9,6 +9,16 @@ ZC-CORE is an open methodology. However, the FreeCuli brand, trademarks, and ass
 
 Open-source adoption of the ZC-CORE methodology does NOT automatically grant the right to use the "FreeCuli Certified" trademark.
 
+
+## ZC-CORE Target Assurance Profiles (C1-C3)
+
+To facilitate adoption across diverse industries, FreeCuli defines three normative assurance profiles. A manufacturer MUST state their target profile when claiming conformance.
+
+*   **ZC-CORE-C1 (Core Consumer Conformance):** Applies to Smart Home appliances and consumer electronics. Requires strict adherence to M1-M10 and standard measurement parameters (e.g., TVLA minimum 100,000 traces).
+*   **ZC-CORE-C2 (Enhanced Industrial Conformance):** Applies to Medical IoT and Industrial Automation. Includes C1 requirements PLUS mandatory Side-Channel mitigation, supply-chain cryptographic evidence, and extended memory zeroization checks.
+*   **ZC-CORE-C3 (High-Assurance / Defense Conformance):** Applies to Defense, Aerospace, and Critical Infrastructure. Includes C2 requirements PLUS invasive physical decapping testing, fault injection mitigation, TVLA minimum 5,000,000 traces, and independent multi-lab validation.
+
+
 ## Conformance Claim Levels
 
 To prevent false marketing and establish a clear governance hierarchy, ZC-CORE recognizes four distinct levels of methodology conformance:

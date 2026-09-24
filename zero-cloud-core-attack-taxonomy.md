@@ -10,6 +10,25 @@ This normative annex defines the standardized taxonomy of adversarial attack vec
 ## Terminology (RFC 2119)
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
 
+
+## Advanced Threat Model Matrix (T-Series Expansion)
+
+In addition to direct physical vectors (AT-Series), ZC-CORE mitigates a broad spectrum of advanced systemic and side-channel threats.
+
+| Threat ID | Description | ZC-CORE Scope | Primary Mitigation (FC-ZC) |
+| :--- | :--- | :--- | :--- |
+| **T1** | Remote network compromise (Wi-Fi SoC hack) | In-Scope | Physical Air-Gap (FC-ZC-002) |
+| **T2** | Malicious firmware payload | In-Scope | Trusted Execution Artifact Chain (FC-ZC-005) |
+| **T3** | Supply-chain compromised component | In-Scope | Hardware Interface Manifest (FC-ZC-013) |
+| **T4** | Physical invasive attack (Decapping) | Partial | Covered under C3 High-Assurance Profile |
+| **T5** | Fault injection (Glitching) | Partial | Covered under C3 High-Assurance Profile |
+| **T6** | Clock/power glitching via Main MCU | In-Scope | Control-Plane Isolation (FC-ZC-008) |
+| **T7** | EM / Power side-channel extraction | In-Scope | Formal TVLA Assessment (FC-ZC-009) |
+| **T8** | Malicious OTA update | In-Scope | Secure Update & Revocation (FC-ZC-007) |
+| **T9** | Undocumented secondary microphone | In-Scope | Undocumented Interface Penalty (FC-ZC-014) |
+| **T10** | Cold-boot latent RAM extraction | In-Scope | 10ms Cryptographic Zeroization (FC-ZC-004) |
+
+
 ## Attack Classes (AT-000 Series)
 
 ### AT-001: Direct Memory Read
