@@ -22,13 +22,13 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## ğŸ”¬ TEST PROTOCOLS AND LABORATORY METHODOLOGY
+## TEST PROTOCOLS AND LABORATORY METHODOLOGY
 
 ### FC-ZC-001: Threat Model (Network SoC Exploitation & DMA Isolation)
 **Objective:** Prove that even in the event of a total compromise of the network processor (Wi-Fi/Bluetooth SoC), sensor data cannot be exfiltrated from the isolated domain via ANY path.
 * **Attack Model:** Operating with Kernel privileges on the network chip, active read attempts are executed via CPU load/store, DMA (Direct Memory Access), bus master overrides, peripheral bridges (I2C/SPI), shared-memory apertures, cache coherency paths, and debug/trace interfaces.
 * **Pass/Fail Threshold:** 
-    * **PASS:** No query can read a single bit from the NPU memory. "Network Domain â†’ Trusted Domain" must have strictly NO read-capable path across any subsystem.
+    * **PASS:** No query can read a single bit from the NPU memory. "Network Domain -> Trusted Domain" must have strictly NO read-capable path across any subsystem.
     * **FAIL:** The network processor successfully gains "Read" access via CPU, DMA, or any side-band peripheral path.
 
 ---
@@ -61,7 +61,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ### FC-ZC-005: Trusted Execution Artifact Chain (Secure Boot & AI Model Integrity)
 **Objective:** Verify that the Edge NPU refuses to execute unauthorized firmware AND models, anchoring the *entire* boot chain in hardware.
-* **Attack Model:** Attempts to bypass the chain: ROM â†’ bootloader â†’ firmware â†’ OS/runtime â†’ AI model â†’ configuration parameters.
+* **Attack Model:** Attempts to bypass the chain: ROM -> bootloader -> firmware -> OS/runtime -> AI model -> configuration parameters.
 * **Pass/Fail Threshold:**
     * **PASS:** The Secure Boot ROM strictly verifies the signature of every single artifact in the chain, including the AI model weights. Signing keys are stored in hardware-protected key storage meeting the defined security property (e.g., OTP/eFuse, HSM, or Secure Enclave) with strict anti-rollback counters.
     * **FAIL:** The NPU boots modified firmware, accepts a rollback, executes unsigned AI models, or keys are recoverable from software-accessible flash.
@@ -100,7 +100,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## ğŸ”¬ DEFENSIVE PUBLICATION & EVIDENCE-BASED ALTERNATIVES
+## DEFENSIVE PUBLICATION & EVIDENCE-BASED ALTERNATIVES
 
 > [!NOTE]
 > The following tests apply to manufacturers implementing alternative ZC-CORE topologies (Zenodo DOI: 10.5281/zenodo.22838473). **Vendor datasheet claims are strictly insufficient. Physical laboratory evidence must be provided.**
@@ -131,7 +131,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## 🔬 MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
+## MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
 
 ### FC-ZC-013: Sensor Inventory Completeness Test
 **Objective:** Prevent manufacturers from routing auxiliary sensors (e.g., wake-word microphones) to untrusted domains.
@@ -147,7 +147,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## 🔬 HIGH-ASSURANCE (C3) EXTERNAL EVALUATIONS (FC-ZC-015+)
+## HIGH-ASSURANCE (C3) EXTERNAL EVALUATIONS (FC-ZC-015+)
 
 ### FC-ZC-015: Invasive Physical Assessment (Decapping)
 **Objective:** Verify resilience against invasive physical tampering (Ref: T4).
@@ -186,17 +186,17 @@ To maintain strict scientific falsifiability, the criterion **"Mutual Informatio
 Criterion: I(X;Y) < MI_upper_bound
 
 where MI_upper_bound defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
-* **Statistical Confidence Level:** Minimum α = 0.05 (95% confidence interval). Confidence intervals SHALL be estimated using a bootstrap procedure with a minimum of 10,000 resamples, computing a two-sided 95% CI from the empirical distribution of the MI estimator.
+* **Statistical Confidence Level:** Minimum alpha = 0.05 (95% confidence interval). Confidence intervals SHALL be estimated using a bootstrap procedure with a minimum of 10,000 resamples, computing a two-sided 95% CI from the empirical distribution of the MI estimator.
 * **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions. The i.i.d. requirement SHALL be operationally met via randomized acquisition order, environmental temperature control, and stable power-supply calibration.
 * **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, MI_upper_bound is fixed at 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
-* **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stögbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
-* **Pass/Fail Calculation:** If the computed empirical mutual information estimator exceeds MI_upper_bound under the defined confidence interval, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
+* **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stoegbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
+* **Pass/Fail Calculation:** If the upper bound of the computed 95% confidence interval for the MI estimator exceeds `MI_upper_bound`, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
 
 ### 3. Normative TVLA (Test Vector Leakage Assessment) Execution Protocol (Ref: FC-ZC-009)
 The phrase "strict threshold" regarding TVLA is operationally defined under the following cryptographic evaluation framework:
 
 * **Methodology:** Fixed-vs-Random t-testing utilizing Welch's t-test algorithm to detect non-profiled leakage across the entire time-domain trace.
-* **Trace Alignment:** Laboratories MUST implement dynamic time warping (DTW) or elastic alignment algorithms to eliminate clock jitter artifacts before computing statistical variance.
+* **Trace Alignment:** Laboratories MUST implement a validated trace-alignment procedure (e.g., dynamic time warping - DTW) to eliminate clock jitter artifacts before computing statistical variance. The alignment procedure MUST be documented, the alignment parameters recorded, and reproducibility demonstrated by retaining the raw traces and script SHAs.
 * **Sample Count:**
     * **C1 (Consumer):** Minimum **100,000** traces.
     * **C2 (Enhanced Industrial):** Minimum **1,000,000** traces.
@@ -217,7 +217,7 @@ To prevent manufacturer obfuscation regarding the volatile memory zeroization th
 
 R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
 
-> **Normative Note on "Successfully Reconstructed":** A bit is considered "successfully reconstructed" if any extraction methodology (including exact recovery, statistical inference, correlation, or partial classification) can determine the bit's original state with a statistical accuracy greater than random guessing (p < 0.05 vs. 50% baseline).
+> **Normative Note on "Successfully Reconstructed":** A bit is considered "successfully reconstructed" if any extraction methodology (including exact recovery, statistical inference, correlation, or partial classification) can determine the bit's original state with a statistically significant improvement over a random guessing baseline (`p < 0.05` after multiple-hypothesis correction for the number of bits evaluated). The assumed attacker capability includes full knowledge of the classifier structure and unlimited access to training baselines on identical counterpart devices.
 
 * **Timing Parameters (two distinct requirements):**
     * **Destruction-Trigger Latency (`t_latency`):** Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM VCC SHALL drop to 0V within `t_latency < 10 ms`.
@@ -237,6 +237,8 @@ To guarantee measurement reproducibility, the Evidence Package MUST include the 
 ## Annex C: ZC-CORE Assurance Profile Matrix (C1/C2/C3)
 
 To ensure absolute traceability for certification, manufacturers MUST declare their target assurance profile, which dictates the mandatory subset of tests and stringency levels:
+
+> **Note on Profile Semantics:** C2-specific assurance requirements are expressed through profile-specific parameters, evidence requirements, and acceptance criteria; they do not necessarily require additional FC-ZC test identifiers compared to C1. C3 requires both tightened parameters and additional invasive test identifiers.
 
 | Assurance Profile | Required CTS Test IDs | Profile-Specific Normative Parameters |
 | :--- | :--- | :--- |

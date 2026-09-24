@@ -45,6 +45,11 @@ Manufacturers utilizing FreeCuli's proprietary reference hardware designs (PCB s
 
 ## Certification Lifecycle & Material Change Policy
 To maintain the integrity of the FreeCuli Certified status, the following lifecycle policies apply:
-1. **Certification Procedure:** Application → Target Profile (C1/C2/C3) Selection → Laboratory Report Review → Evidence Matrix Audit → Non-Conformity Review → Certification Decision → Trademark License Issuance → Public Certificate Registry Entry.
-2. **Material Change Rule:** Any modification to the certified device's PCB layout, Edge NPU, Bootloader/Secure Enclave firmware, or the addition of new privacy-sensitive sensors SHALL trigger a mandatory re-evaluation. Cosmetic changes or unrelated application-layer software updates do not require re-evaluation.
+1. **Certification Procedure:** Application -> Target Profile (C1/C2/C3) Selection -> Laboratory Report Review -> Evidence Matrix Audit -> Non-Conformity Review -> Certification Decision -> Trademark License Issuance -> Public Certificate Registry Entry.
+2. **Material Change Rule:** To maintain strict adherence, any modification to a certified device is governed by the following decision tree based on the Device Evaluation Identity:
+    * **No Impact:** Cosmetic case changes or network-layer software updates -> No re-evaluation.
+    * **Minor Change:** Non-privacy sensor additions (e.g., temperature) -> Minor documentation update.
+    * **Major Change / Re-evaluation Required:** If an AI model update, NPU firmware update, Bootloader/Secure Boot update, PCB trace modification, or BOM substitution changes any hash in the Device Evaluation Identity, it SHALL be evaluated under the Material Change procedure.
+    * **Full Re-certification:** Addition of new privacy-sensitive sensors or replacing the core Edge NPU -> Full re-certification.
+    * **Governance Threshold:** Any vendor update that alters a device's compliance with a normative PASS/FAIL criterion cannot be released as a PATCH; it forces a mandatory loss of certification until re-evaluated.
 3. **Evidence Retention & Chain-of-Custody:** Accredited laboratories MUST retain the raw measurement traces, signed firmware hashes, BOMs, and full calibration metadata for a minimum of five (5) years following the certification decision. The evaluation must be bound to a strictly defined Device Evaluation Identity (hardware revision, PCB revision, BOM hash, firmware hash, model hash, and serial number range).
