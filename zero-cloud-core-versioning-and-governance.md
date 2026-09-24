@@ -10,7 +10,7 @@ This document outlines the formal governance model, versioning semantics, and am
 ## 1. Version Numbering
 ZC-CORE follows Semantic Versioning (`MAJOR.MINOR.PATCH`).
 *   **MAJOR:** Normative changes to the Core Invariants (M1-M10) or architectural pillars that break backward compatibility.
-*   **MINOR:** Informative additions, new Attack Taxonomies (AT-Series), or new CTS tests that do not alter the fundamental Invariants.
+*   **MINOR:** Informative additions, new Attack Taxonomies (AT-Series), or new CTS tests that do not alter the fundamental Invariants. **A new CTS test that introduces a new mandatory conformance obligation SHALL NOT be classified as purely informative. If it changes the compliance surface of existing implementations, the release SHALL be versioned as MINOR or MAJOR according to the compatibility rules above.**
 *   **PATCH:** Typographical fixes, clarifications, or document structure updates that do not affect conformance outcomes.
 
 > **Normative Threshold Rule:** Any change to an existing mandatory PASS/FAIL criterion, measurement threshold (e.g., MI_upper_bound, TVLA t-value, R_rate), required evidence class, or test procedure that can alter conformance outcomes SHALL NOT be released as a PATCH. Such changes MUST be versioned as MINOR or MAJOR depending on whether they alter a Core Invariant.

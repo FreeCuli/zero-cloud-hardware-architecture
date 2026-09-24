@@ -122,6 +122,17 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ### FC-ZC-011: Secure Enclave Alternative (Covert Channel Blocking)
 **Objective:** Verify TrustZone/PMP alternatives achieve physical-equivalent isolation.
+* **M2 Equivalence Criteria:** A secure-enclave implementation MAY satisfy M2 only if the implementation provides independently verifiable equivalent isolation against all of the following attack classes. Software permissioning alone SHALL NOT constitute physical-equivalent isolation.
+    1. Shared-memory reads from the non-secure world to secure sensor data.
+    2. DMA access into secure sensor data regions.
+    3. Peripheral bridge access into the Trusted Domain.
+    4. Debug access from any non-secure domain.
+    5. Reset manipulation of the Trusted Domain from outside.
+    6. Clock manipulation capable of causing timing/data errors.
+    7. Power manipulation capable of inducing fault injection.
+    8. Interrupt/control-plane manipulation of the Trusted Domain.
+    9. Cache/timing covert channels that could infer raw sensor data.
+    10. Reverse information flow through any shared side-channel.
 * **Pass/Fail Threshold:**
     * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL strictly use the FC-ZC-009 TVLA protocol for timing leakage assessment to block covert channel data exfiltration from shared buffers.
     * **FAIL:** Any timing, cache, or shared-memory side-channel allows the non-secure world to infer raw sensor data.
@@ -130,6 +141,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ### FC-ZC-012: Cryptographic Zeroization & Memory Surface Completeness
 **Objective:** Verify software-triggered active overwrite achieves power-cut equivalency.
+> **Normative Dependency:** FC-ZC-004 establishes the destruction event, timing and remanence outcome. FC-ZC-012 establishes completeness of the destruction/invalidation surface across all storage locations. A device claiming a cryptographic/equivalent destruction mechanism SHALL pass both FC-ZC-004 and FC-ZC-012.
 * **Pass/Fail Threshold:**
     * **PASS:** Zeroization overwrites ALL copies of sensor data (CPU registers, cache, DMA buffers, scratchpad, temporary tensors) with cryptographically random bytes in < 10ms. The overwrite must be strictly protected via memory barriers/volatile keywords to prevent compiler optimization removal.
     * **FAIL:** Forensics recover structured data from *any* caching layer, zeroization takes > 10ms, or the compiler optimized away the overwrite.
@@ -183,6 +195,13 @@ To establish a rigorous laboratory standard, the test report MUST define the Mea
 * **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm ± 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
 * **RF Environment:** All measurements MUST occur inside an ISO 17025 accredited fully anechoic chamber (FAC) with an ambient electromagnetic noise floor calibrated strictly below -110 dBm.
 * **Sampling Parameters:** Minimum sampling rate of 10 GS/s with a hardware bandwidth limit set exactly matching the maximum clock frequency of the isolated NPU domain plus its 5th harmonic.
+* **Measurement Device Roles:** To prevent instrument role ambiguity across laboratory reports, each piece of equipment SHALL be used exclusively for its designated function:
+    * **VNA (Vector Network Analyzer):** Coupling/impedance characterization and S-parameter measurements.
+    * **TDR (Time-Domain Reflectometer):** Transmission/reflection/path characterization.
+    * **PCB X-Ray:** Physical topology verification of layer stackup and conductive path routing.
+    * **Spectrum/Signal Analyzer:** RF/EM leakage power measurement against the `< -80 dBm` threshold.
+    * **Oscilloscope:** Time-domain and mVpp reverse-injection measurements (FC-ZC-003).
+    * **Logic Analyzer:** Digital control-plane and destruction-timing measurements (FC-ZC-004, FC-ZC-012).
 
 ### 2. Operational Statistical Criterion for Information Leakage
 Real-world physical channels possess inherent thermal and environmental noise. Consequently, demonstrating an absolute mathematical zero for mutual information (I(X;Y) = 0) over a finite sample size is physically impossible and constitutes an untestable claim. 
@@ -196,6 +215,15 @@ where MI_upper_bound defines the upper bound of permissible leaked mutual inform
 * **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions. The i.i.d. requirement SHALL be operationally met via randomized acquisition order, environmental temperature control, stable power-supply calibration, rigorous batch structure analysis, autocorrelation checks, and session separation to ensure trace independence.
 * **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, MI_upper_bound is fixed at 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
 * **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stoegbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). To ensure reproducibility across laboratories, the exact trace window definition, time alignment procedure, feature extraction/dimensionality reduction policy, and raw sample representation MUST be explicitly documented. No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
+* **MI Estimator Reproducibility Parameters (Mandatory):** To ensure deterministic, inter-laboratory reproducibility, the following parameters MUST be reported in the Evidence Package:
+    * **k value** (number of nearest neighbours).
+    * **Distance metric** (e.g., Chebyshev, Euclidean).
+    * **Tie-breaking and boundary correction method**.
+    * **Dimensionality reduction algorithm and version** (if any).
+    * **Random seed** (for any stochastic preprocessing step).
+    * **Software library name and version** (e.g., Python `sklearn`, `pyinform`).
+    * **Floating-point precision** (e.g., float64).
+    * **Confidence interval implementation and bootstrap randomization method**.
 * **Pass/Fail Calculation:** If the upper bound of the computed 95% confidence interval for the MI estimator exceeds `MI_upper_bound`, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
 
 ### 3. Normative TVLA (Test Vector Leakage Assessment) Execution Protocol (Ref: FC-ZC-009)
@@ -210,6 +238,7 @@ The phrase "strict threshold" regarding TVLA is operationally defined under the 
 * **Leakage Threshold (t-value):**
     * **PASS:** No evaluated temporal hypothesis has `p_i < alpha_adjusted`. The value `|t| > 4.5` is retained solely as a screening indicator.
     * **FAIL:** Any single temporal sample point in the processed trace matrix exhibiting `p_i < alpha_adjusted` constitutes a verifiable side-channel leakage event, resulting in an immediate conformance failure.
+* **TVLA Reproducibility Metadata (Mandatory):** To ensure inter-laboratory determinism, the Evidence Package MUST document: raw trace length, post-alignment trace length, downsampling policy, window selection method, total number of hypotheses (m), feature extraction method, and any preprocessing applied.
 * **Multiple-Comparison Correction (Bonferroni Method):** For `m` simultaneous temporal hypotheses (where `m` equals the total number of evaluated temporal sample points in the post-alignment trace window, including any pre-processed or dimensionality-reduced vectors), laboratories SHALL apply the following normative procedure:
 
     1. For each temporal point `i`, compute the Welch t-statistic `t_i` and its two-sided p-value `p_i`.
@@ -224,11 +253,17 @@ To prevent manufacturer obfuscation regarding the volatile memory zeroization th
 R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
 
 > **Normative Note on "Successfully Reconstructed":** A bit is considered "successfully reconstructed" if any extraction methodology (including exact recovery, statistical inference, correlation, or partial classification) can determine the bit's original state with a statistically significant improvement over a random guessing baseline (`p < 0.01` after multiple-hypothesis correction for the number of bits evaluated). The assumed attacker capability includes full knowledge of the classifier structure and unlimited access to training baselines on identical counterpart devices.
+>
+> **Normative Metric Disambiguation:** To prevent conflation of classification-level leakage with bit-level reconstruction, laboratories SHALL additionally report two sub-metrics alongside R_rate:
+> * **R_exact** = (exactly reconstructed raw bits / total raw bits). This measures only hard, bit-accurate reconstruction.
+> * **A_advantage** = (observed reconstruction performance − random guessing baseline). This measures the statistical advantage of any inference method above random.
+>
+> A device MUST satisfy R_rate ≤ 0.01% on the primary R_rate metric. The R_exact and A_advantage sub-metrics are mandatory for audit traceability. Classification-level accuracy alone SHALL NOT be substituted for the R_rate pass/fail determination.
 
-* **Timing Parameters (two distinct requirements):**
-    * **Destruction-Trigger Latency (`t_latency`):** Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM VCC SHALL drop to 0V within `t_latency < 10 ms`.
-    * **Minimum Power-Off Duration (`t_off`):** Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25°C before the forensic extraction attempt.
-* **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all storage locations capable of retaining raw-sensor information (including registers, cache, DMA buffers, and scratchpads) MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
+* **Timing Parameters (mechanism-specific requirements):**
+    * For **power-cut implementations**: Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM/volatile-memory VCC SHALL drop to 0V within `t_latency < 10 ms`. Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25°C before the forensic extraction attempt. *The VCC = 0V requirement applies only to power-cut implementations.*
+    * For **cryptographic or equivalent implementations**: The declared destruction/invalidation mechanism SHALL complete its normative destruction/invalidation transition within `t_latency < 10 ms` from the inference-complete interrupt and SHALL satisfy the FC-ZC-012 memory-surface completeness criteria. The mechanism itself constitutes the forensic-irrecoverability event; `t_off` does not apply.
+* **Pass/Fail Condition:** Following the destruction/invalidation event, the residual charge state or state-reconstruction success rate across all storage locations capable of retaining raw-sensor information (including registers, cache, DMA buffers, and scratchpads) MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
 
 ---
 
