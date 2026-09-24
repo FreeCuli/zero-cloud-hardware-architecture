@@ -1,27 +1,56 @@
-This file is a license notice and pointer. The governing license texts and structural rules are defined in zero-cloud-dual-licensing.md.
-
-FREECULI ZC-CORE METHODOLOGY
-DUAL-LICENSING FRAMEWORK
-
-The FreeCuli ZC-CORE Architecture and the underlying AIoT/Edge AI methodology operate under a strict Dual-Licensing Model.
+SPDX-License-Identifier: CERN-OHL-S-2.0 OR AGPL-3.0-or-later
 
 ======================================================================
-1. HARDWARE LICENSE (CERN-OHL-S v2.0)
+FREECULI ZC-CORE ARCHITECTURAL SPECIFICATION & METHODOLOGY
+DUAL-LICENSING FRAMEWORK & CANONICAL LICENSE NOTICE
 ======================================================================
-All hardware designs, PCB schematics, and physical isolation architectures are licensed under the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S v2.0).
-
-Anyone combining or distributing these hardware designs MUST share their derivative hardware schematics openly under the same license, UNLESS a Commercial Exemption License is acquired.
-
-======================================================================
-2. SOFTWARE LICENSE (AGPL-3.0)
-======================================================================
-All associated software, controllers, and firmware logic are licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
-
-======================================================================
-COMMERCIAL EXEMPTION (B2B)
-======================================================================
-Manufacturers wishing to integrate the ZC-CORE methodology without open-sourcing their proprietary designs must obtain a Commercial Exemption License.
-
-For full legal definitions, patent retaliation clauses, and trademark usage policies, refer strictly to the official zero-cloud-dual-licensing.md document within this repository.
 
 Copyright (c) 2026 Oytun Ciba (FreeCuli Consortium)
+All rights reserved.
+
+This repository operates under a strict Dual-Licensing Model, separating
+open-source community rights from commercial exemptions.
+
+----------------------------------------------------------------------
+1. SCOPE & ARTIFACT CLASSIFICATION MAPPING
+----------------------------------------------------------------------
+
+A. HARDWARE DESIGNS & SCHEMATICS (SPDX: CERN-OHL-S-2.0)
+   - Scope: Reference PCB layouts, component placement, electrical schematics,
+     Gerber files, and hardware data diode interconnect topologies.
+   - Obligation: Strongly reciprocal copyleft. Any distribution of matching or
+     derivative physical designs requires publishing complete Corresponding
+     Source under CERN-OHL-S v2.0, unless covered by a Commercial Exemption.
+
+B. CONTROLLER SOFTWARE, FIRMWARE & SCRIPTS (SPDX: AGPL-3.0-or-later)
+   - Scope: All reference firmware drivers, NPU lifecycle hooks, evaluation scripts,
+     and CI validation tools provided by FreeCuli.
+   - Obligation: Strongly reciprocal copyleft across networks under GNU AGPL v3.0.
+
+C. NORMATIVE METHODOLOGY & SPECIFICATION DOCUMENTS (Open Standard / Prior Art)
+   - Scope: The RFC 2119 normative specifications (M1-M10 invariants, CTS,
+     Evidence Matrix, Defensive Publication, Attack Taxonomy).
+   - Standard Usage: Free for implementation verification and conformance evaluation.
+   - Conformance != Code Ownership: Implementing the standard grants FreeCuli
+     NO intellectual property rights over a manufacturer's proprietary design.
+
+----------------------------------------------------------------------
+2. COMMERCIAL EXEMPTION (B2B LICENSE)
+----------------------------------------------------------------------
+Manufacturers seeking to build compliant Zero-Cloud appliances without
+releasing proprietary trade secrets, firmware, or silicon designs MUST
+execute a Commercial Exemption Agreement with FreeCuli prior to commercial distribution.
+
+Commercial exemptions provide:
+  - Exemption from CERN-OHL-S v2.0 and AGPL-3.0 copyleft source-code release obligations.
+  - Authorized, licensed usage of official "FreeCuli Certified" trademarks.
+  - Verification & listing in the official FreeCuli Certificate Registry.
+
+----------------------------------------------------------------------
+3. GOVERNING LEGAL DOCUMENTATION & CONTACT
+----------------------------------------------------------------------
+For full definitions, patent retaliation terms, and trademark policies, see:
+  - zero-cloud-dual-licensing.md
+  - zero-cloud-core-brand-and-trademark-policy.md
+
+Inquiries: info@freeculi.com

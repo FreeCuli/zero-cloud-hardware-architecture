@@ -40,37 +40,61 @@ jobs:
           done
           if [ "$MISSING" -ne 0 ]; then exit 1; fi
 
-      - name: Verify SHA-256 hashes against manifest
+      - name: Verify SHA-256 hashes against manifest (Bidirectional)
         run: |
-          echo "Verifying SHA-256 hashes..."
+          echo "Verifying SHA-256 hashes bidirectionally..."
           FAIL=0
           EXCLUDE="DUAL-LICENSING.md|Zero-Cloud-Smart-Home-Edge-AI-Architecture.md|Zero-Cloud-Defensive-Publication.md|FC-ZC-Conformance-Test-Specification.md|ZERO-CLOUD-RELEASE-MANIFEST.md|ZC-CORE-METHODOLOGY-INVARIANTS.md|SECURITY.md|CONTRIBUTING.md|CITATION.cff"
           MANIFEST=$(cat ZERO-CLOUD-RELEASE-MANIFEST.md)
+          
+          # 1. File -> Manifest check
           for f in *.md; do
             if echo "$f" | grep -qE "$EXCLUDE"; then
               continue
             fi
             ACTUAL=$(sha256sum "$f" | awk '{print toupper($1)}')
             if echo "$MANIFEST" | grep -qi "$ACTUAL"; then
-              echo "[PASS] $f — $ACTUAL"
+              echo "[PASS] $f — $ACTUAL matches manifest"
             else
               echo "[FAIL] $f — hash mismatch. Actual: $ACTUAL"
               FAIL=1
             fi
           done
+
+          # 2. Manifest -> File check (every listed file must exist and match)
+          grep -E "^[A-F0-9]{64}  " ZERO-CLOUD-RELEASE-MANIFEST.md | while read -r EXPECTED_HASH FILE_NAME; do
+            if [ ! -f "$FILE_NAME" ]; then
+              echo "[FAIL] Manifest references non-existent file: $FILE_NAME"
+              exit 1
+            fi
+            CURRENT_HASH=$(sha256sum "$FILE_NAME" | awk '{print toupper($1)}')
+            if [ "$CURRENT_HASH" != "$EXPECTED_HASH" ]; then
+              echo "[FAIL] $FILE_NAME hash in manifest ($EXPECTED_HASH) != disk ($CURRENT_HASH)"
+              exit 1
+            fi
+          done
+
           if [ "$FAIL" -ne 0 ]; then
             echo ""
-            echo "RELEASE BLOCKED: One or more SHA-256 hashes do not match the manifest."
+            echo "RELEASE BLOCKED: Bidirectional hash verification failed."
             exit 1
           fi
-          echo "All SHA-256 hashes verified successfully."
+          echo "Bidirectional SHA-256 hash verification passed."
 
-      - name: Verify manifest contains Git provenance
+      - name: Verify Git tag provenance resolution
         run: |
-          if grep -q "Git Commit Resolution" ZERO-CLOUD-RELEASE-MANIFEST.md; then
-            echo "[PASS] Git Commit Resolution present in manifest."
+          echo "Verifying Git provenance and tag resolution..."
+          if grep -q "Git Tag: v3.2.0" ZERO-CLOUD-RELEASE-MANIFEST.md; then
+            echo "[PASS] Git Tag v3.2.0 declared in manifest."
           else
-            echo "[FAIL] Git Commit Resolution missing from manifest."
+            echo "[FAIL] Git Tag declaration missing in manifest."
+            exit 1
+          fi
+
+          if grep -q "Git Commit Resolution" ZERO-CLOUD-RELEASE-MANIFEST.md; then
+            echo "[PASS] Git Commit Resolution declared in manifest."
+          else
+            echo "[FAIL] Git Commit Resolution declaration missing in manifest."
             exit 1
           fi
 
