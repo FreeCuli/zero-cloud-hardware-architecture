@@ -142,3 +142,46 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 * **Pass/Fail Threshold:**
     * **PASS:** All physical and logical connections entering/leaving the Trusted Domain exactly match the submitted ZC-CORE Interface Inventory.
     * **FAIL:** Discovery of any undocumented connection, debug pad, or shared memory aperture results in an immediate and total failure of ZC-CORE compliance.
+
+## Annex B: Normative Laboratory Measurement Protocols & Statistical Calibration
+
+To satisfy the strict validation requirements of the EU Cyber Resilience Act (CRA) and to ensure multi-lab reproducibility, all physical leakage thresholds specified in this document MUST be evaluated under the exact calibration, equipment, and statistical parameters defined below. 
+
+### 1. Electromagnetic & Power Signal Leakage Calibration (Ref: FC-ZC-002 / FC-ZC-003)
+Any manufacturer claim regarding RF/EM thresholds (e.g., < -80 dBm) or power plane ripple (e.g., < 5 mVpp) SHALL NOT be verified via generic ambient measurements. The testing laboratory MUST execute the following setup:
+
+* **Equipment Standard:** Rohde & Schwarz FSW / Keysight N9040B Signal Analyzer or equivalent, with a minimum real-time bandwidth (RTBW) of 1 GHz.
+* **Probe Specification:** Near-field EM probes (Langer EMV-Technik LF-B 3 / RF-R 400 or equivalent) calibrated down to 20 dB gain via an external low-noise pre-amplifier.
+* **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm ± 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
+* **RF Environment:** All measurements MUST occur inside an ISO 17025 accredited fully anechoic chamber (FAC) with an ambient electromagnetic noise floor calibrated strictly below -110 dBm.
+* **Sampling Parameters:** Minimum sampling rate of 10 GS/s with a hardware bandwidth limit set exactly matching the maximum clock frequency of the isolated NPU domain plus its 5th harmonic.
+
+### 2. Operational Statistical Criterion for Information Leakage
+Real-world physical channels possess inherent thermal and environmental noise. Consequently, demonstrating an absolute mathematical zero for mutual information (I(X;Y) = 0) over a finite sample size is physically impossible and constitutes an untestable claim. 
+
+To maintain strict scientific falsifiability, the criterion **"Mutual Information = 0"** is hereby structurally replaced with an operational statistical bound:
+
+Criterion: I(X;Y) < ?
+
+Where ? defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
+* **Statistical Confidence Level:** Minimum ? = 0.05 (95% confidence interval).
+* **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions.
+* **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, ? is fixed at ? = 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, ? = 10^-6 bits.
+* **Pass/Fail Calculation:** If the computed empirical mutual information estimator exceeds ? under the defined confidence interval, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
+
+### 3. Normative TVLA (Test Vector Leakage Assessment) Execution Protocol (Ref: FC-ZC-009)
+The phrase "strict threshold" regarding TVLA is operationally defined under the following cryptographic evaluation framework:
+
+* **Methodology:** Fixed-vs-Random t-testing utilizing Welch's t-test algorithm to detect non-profiled leakage across the entire time-domain trace.
+* **Trace Alignment:** Laboratories MUST implement dynamic time warping (DTW) or elastic alignment algorithms to eliminate clock jitter artifacts before computing statistical variance.
+* **Sample Count:** Minimum 100,000 traces for core consumer appliances (C1); minimum 5,000,000 traces for high-assurance hardware (C3).
+* **Leakage Threshold (t-value):** The strict pass/fail threshold is bounded at |t| > 4.5. Any single temporal point in the processed trace matrix exhibiting a t-value exceeding 4.5 constitutes a verifiable side-channel leakage, resulting in conformance failure.
+* **Multiple-Comparison Correction:** Laboratories MUST apply the Bonferroni correction method to the significance threshold to suppress false-positive leakage indications across large trace lengths.
+
+### 4. Mathematical Definition of "0.01% Remanence" (Ref: FC-ZC-004)
+To prevent manufacturer obfuscation regarding the volatile memory zeroization threshold (< 0.01%), the **Remanence Recovery Rate (R_rate)** is mathematically defined and evaluated via the following formula:
+
+R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
+
+* **Evaluation Protocol:** The testing lab MUST drop power to the isolated volatile memory domain for exactly ?t = 10 ms at an ambient temperature calibrated to 25°C.
+* **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate ? 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.

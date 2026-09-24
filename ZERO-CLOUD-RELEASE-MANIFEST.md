@@ -3,8 +3,8 @@
 This cryptographic manifest legally binds the ZC-CORE universal methodology documentation to a verifiable timestamp, establishing incontestable Prior-Art against third-party patenting of equivalent physical privacy concepts.
 
 ## Publication Metadata
-* **Release Version:** ZC-CORE v3.1.0 (ISO/IETF-Grade Standardization Upgrade)
-* **Date (UTC):** 2026-09-23
+* **Release Version:** ZC-CORE v3.2.0 (Laboratory Normative Upgrade)
+* **Date (UTC):** 2026-09-24
 * **Reference Concept DOI (Zenodo):** 10.5281/zenodo.22838473
 * **Standardization Level:** RFC 2119 Normative Stricture
 
@@ -16,7 +16,7 @@ The following hashes guarantee that the technical and legal claims within these 
 7EE37071BE5BBD3044ACE3DEA20F0E0DDDE0A82F570995F81C0C68DDA64517C1  zero-cloud-core-attack-taxonomy.md
 F1B049A7669B76F9CFCD577C4A7F3F851ABE3F2A721C633F8B80D875834F271D  zero-cloud-core-brand-and-trademark-policy.md
 D8FFFC04CA97C01EE00D6D66C3685D6068130E69850E6FD6245D2C05FA6FEACE  zero-cloud-core-conformance-evidence-matrix.md
-82BC7CEDB810AFBF135A6D2AAA8242F0699F2930FA6A6DB41C2994CF12374B97  zero-cloud-core-conformance-test-specification.md
+29CA2CBC3BF80DB98BA93A050C77AC74BCC7708CA1EEC553952D64470EBC4C4E  zero-cloud-core-conformance-test-specification.md
 D7B7352696221A96950567FE837889B9F5E7B23DCB12265F48E20CE47EA89B5F  zero-cloud-core-defensive-publication.md
 2E8B7CDB8876C4DBF241CD758CA68AA43127189AFD28A474523FD6E5321F2D9C  zero-cloud-core-implementation-coverage.md
 2AD89D9DEF84A6B09BD09810A3320EB97BD779E063F6C918983FD9203FAAFF87  zero-cloud-core-methodology-invariants.md
@@ -27,4 +27,4 @@ D161D13361A515E3437E7B6D1E3CEB66BBBD8DDF5EEF3F36FF11058DA8A6F3EE  zero-cloud-cor
 `
 
 ## Governance Note
-Any future release (e.g., v3.2.0) MUST compute the SHA-256 hash of this ZERO-CLOUD-RELEASE-MANIFEST.md document and include it in its own manifest, creating an unbreakable cryptographic chain of methodology evolution.
+Any future release MUST compute the SHA-256 hash of this ZERO-CLOUD-RELEASE-MANIFEST.md document and include it in its own manifest, creating an unbreakable cryptographic chain of methodology evolution.
