@@ -6,7 +6,7 @@
 [![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.0-black.svg)]()
 
 > [!NOTE]
-> **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE v3.1.0 standard** for all privacy-critical, server-independent autonomous AIoT and Edge AI hardware (Smart Home, Medical, Industrial, Defense).
+> **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE v3.2.0 standard** for all privacy-critical, server-independent autonomous AIoT and Edge AI hardware (Smart Home, Medical, Industrial, Defense).
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: Separation of Technical Standard and Legal Licensing**
@@ -22,7 +22,7 @@ The core axiom of Zero-Cloud AIoT is that **sensitive raw sensor data SHALL NOT 
 A mechanism SHALL remain subject to the applicable ZC-CORE security invariant where it performs substantially equivalent data acquisition, storage, processing, buffering, communication, control, or information-transfer functions, regardless of the implementation technology or architectural nomenclature used. 
 This provision is strictly technology-neutral and non-exhaustive. Any specific technological examples provided in this architecture (e.g., "SRAM", "Optocoupler") are **informative and illustrative**, and DO NOT limit the scope of the invariant.
 
-## 2. The Indestructible Fortress: Mandatory Hardware Locks (v3.1.0)
+## 2. The Indestructible Fortress: Mandatory Hardware Locks (v3.2.0)
 
 Any manufacturer wishing to produce a ZC-CORE compliant AIoT device SHALL physically implement the following hardware rules. Software-based isolations (VLANs, Firewalls) are STRICTLY UNACCEPTABLE as primary barriers. Manufacturer compliance is verified via the Conformance Test Specification (CTS), requiring physical evidence (BOMs, PCB schematics, and lab measurements).
 

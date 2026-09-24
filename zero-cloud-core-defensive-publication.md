@@ -1,4 +1,4 @@
-# ZC-CORE Defensive Publication (Prior Art for AIoT & Edge AI)
+ï»¿# ZC-CORE Defensive Publication (Prior Art for AIoT & Edge AI)
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -30,9 +30,9 @@ Known elements such as physical data diodes, optical isolation, volatile memory,
 
 ---
 
-# 2. Core Architecture ÔÇö Claim Family ZC-CORE-001
+# 2. Core Architecture Ã”Ã‡Ã¶ Claim Family ZC-CORE-001
 
-## ZC-CORE-001 ÔÇö Server-Independent Physical Trust Boundary
+## ZC-CORE-001 Ã”Ã‡Ã¶ Server-Independent Physical Trust Boundary
 
 A server-independent AIoT / Edge AI apparatus comprising:
 
@@ -50,14 +50,14 @@ A server-independent AIoT / Edge AI apparatus comprising:
 
 The architecture is not merely a collection of independent security components.
 The components cooperate such that:
-**sensor acquisition ÔåÆ trusted local inference ÔåÆ controlled command release ÔåÆ absolute raw-data destruction ÔåÆ AIoT actuator/network operation**
+**sensor acquisition Ã”Ã¥Ã† trusted local inference Ã”Ã¥Ã† controlled command release Ã”Ã¥Ã† absolute raw-data destruction Ã”Ã¥Ã† AIoT actuator/network operation**
 occurs without requiring the network domain to obtain read access to the raw sensory domain.
 
 ---
 
-# 3. Sensor / Network Physical Separation ÔÇö Claim Family ZC-CORE-002
+# 3. Sensor / Network Physical Separation Ã”Ã‡Ã¶ Claim Family ZC-CORE-002
 
-## ZC-CORE-002 ÔÇö Sensor-Exclusive Trusted Domain
+## ZC-CORE-002 Ã”Ã‡Ã¶ Sensor-Exclusive Trusted Domain
 
 A device according to ZC-CORE-001 wherein:
 
@@ -69,9 +69,9 @@ A device according to ZC-CORE-001 wherein:
 
 ---
 
-# 4. Hardware One-Way Inference Channel ÔÇö Claim Family ZC-CORE-003
+# 4. Hardware One-Way Inference Channel Ã”Ã‡Ã¶ Claim Family ZC-CORE-003
 
-## ZC-CORE-003 ÔÇö Physically Unidirectional Inference Transfer
+## ZC-CORE-003 Ã”Ã‡Ã¶ Physically Unidirectional Inference Transfer
 
 A device according to ZC-CORE-001 wherein:
 
@@ -83,9 +83,9 @@ A device according to ZC-CORE-001 wherein:
 
 ---
 
-# 5. Reverse-Channel Impossibility ÔÇö Claim Family ZC-CORE-004
+# 5. Reverse-Channel Impossibility Ã”Ã‡Ã¶ Claim Family ZC-CORE-004
 
-## ZC-CORE-004 ÔÇö Hardware-Enforced Reverse Read Prohibition
+## ZC-CORE-004 Ã”Ã‡Ã¶ Hardware-Enforced Reverse Read Prohibition
 
 A physical communication boundary wherein:
 
@@ -99,9 +99,9 @@ A physical communication boundary wherein:
 
 ---
 
-# 6. Lethal Volatile Buffer & Zeroization ÔÇö Claim Family ZC-CORE-005
+# 6. Lethal Volatile Buffer & Zeroization Ã”Ã‡Ã¶ Claim Family ZC-CORE-005
 
-## ZC-CORE-005 ÔÇö Post-Inference Absolute Data Destruction
+## ZC-CORE-005 Ã”Ã‡Ã¶ Post-Inference Absolute Data Destruction
 
 A device comprising:
 
@@ -115,7 +115,7 @@ A device comprising:
 
 ---
 
-# 7. Hardware-Controlled Data Destruction Variants ÔÇö Claim Family ZC-CORE-007
+# 7. Hardware-Controlled Data Destruction Variants Ã”Ã‡Ã¶ Claim Family ZC-CORE-007
 
 The disclosed data destruction mechanism may comprise any of the following:
 
