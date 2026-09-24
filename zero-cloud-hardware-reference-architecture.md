@@ -65,7 +65,7 @@ A data diode only protects the data line. The manufacturer must formally documen
 
 ## 3. ZC-CORE Hardware Data Flow Schematic
 
-The schematic below illustrates the absolute data flow directions and isolation barriers of a ZC-CORE compliant AIoT device. This schematic is the **Mandatory Reference Architecture**.
+The schematic below illustrates the absolute data flow directions and isolation barriers of a ZC-CORE compliant AIoT device. This schematic is an **Illustrative reference topology — not the only compliant implementation**, though it represents the Mandatory Reference Architecture principles.
 
 ```mermaid
 graph TD
@@ -78,7 +78,7 @@ graph TD
     subgraph EDGE_AI [FreeCuli Edge NPU Layer - ISOLATED]
         VOL_RAM[(Volatile Buffer / SRAM)]
         AI_CHIP{Edge NPU / AI Model}
-        HW_KILL[Hardware Power Switch / Zeroizer]
+        HW_DESTRUCTION_OR_ZEROIZER[Hardware Power Switch / Zeroizer]
     end
 
     subgraph ISOLATION [Physical Isolation Barrier]
@@ -98,8 +98,8 @@ graph TD
     VOL_RAM -->|Read Only| AI_CHIP
     
     %% After AI Inference completes
-    AI_CHIP -.->|Trigger: Processing Complete| HW_KILL
-    HW_KILL -.->|"Cut Power (Data Destruction)"| VOL_RAM
+    AI_CHIP -.->|Trigger: Processing Complete| HW_DESTRUCTION_OR_ZEROIZER
+    HW_DESTRUCTION_OR_ZEROIZER -.->|"Destruction / Zeroization"| VOL_RAM
     
     %% Output
     AI_CHIP ==>|"TX ONLY: Processed Command <br/>e.g., 'Set Temp 200'"| OPTO

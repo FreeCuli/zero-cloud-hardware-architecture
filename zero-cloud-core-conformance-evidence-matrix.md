@@ -20,7 +20,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | **M3, M4** | AT-001, AT-008 | FC-ZC-003 | Oscilloscope injection logs showing 0 bits of reverse data transmission. |
 | **M5** | AT-007 | FC-ZC-008 | Trusted-Domain Control Surface Inventory proving network SoC cannot halt/reset NPU. |
 | **M6** | AT-005 | FC-ZC-005, FC-ZC-006, FC-ZC-007 | Fused JTAG/SWD physical verification; Signed bootloader hashes. |
-| **M7, M8** | AT-003 | FC-ZC-004, FC-ZC-012 | High-speed logic analyzer traces of SRAM/Cache zeroization occurring within <10ms. |
+| **M7, M8** | AT-003, AT-004 | FC-ZC-004, FC-ZC-012 | High-speed logic analyzer traces of destruction sequence (<10ms) and forensic recovery analysis proving R_rate <= 0.01%. |
 | **M10** | All | FC-ZC-001–016 as applicable | Independent laboratory evidence mapping to verifiable report provenance. |
 | **C3-Specific** | T4, T5 | FC-ZC-015, FC-ZC-016 | Multi-lab ISO/IEC 17025 testing reports (under applicable ISO/IEC 17065 scheme) for invasive decapping and fault injection. |
 

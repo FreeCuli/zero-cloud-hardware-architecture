@@ -26,7 +26,7 @@ In addition to direct physical vectors (AT-Series), ZC-CORE mitigates a broad sp
 | **T7** | EM / Power side-channel extraction | In-Scope | Formal TVLA Assessment (FC-ZC-009) |
 | **T8** | Malicious OTA update | In-Scope | Secure Update & Revocation (FC-ZC-007) |
 | **T9** | Undocumented secondary microphone | In-Scope | Undocumented Interface Penalty (FC-ZC-014) |
-| **T10** | Cold-boot latent RAM extraction | In-Scope | 10ms Cryptographic Zeroization (FC-ZC-004) |
+| **T10** | Cold-boot latent RAM extraction | In-Scope | 10ms Raw-Data Destruction / Zeroization (FC-ZC-004) |
 
 
 ## Attack Classes (AT-000 Series)
