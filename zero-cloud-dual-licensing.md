@@ -3,7 +3,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.1-black.svg)]()
+[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.1-black.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.2.1)
 
 The FreeCuli ZC-CORE Architecture and the underlying AIoT/Edge AI methodology are guarded by strict Open Source licenses (CERN-OHL-S v2.0 for hardware, AGPL-3.0 for software) designed to protect the integrity of on-device inference and absolute privacy. 
 
