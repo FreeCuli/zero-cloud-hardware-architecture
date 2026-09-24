@@ -1,4 +1,4 @@
-# Conformance Evidence Matrix
+﻿# Conformance Evidence Matrix
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -15,7 +15,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 | Invariant | Attack Class | CTS Test ID | Required Physical Evidence (Normative) |
 | :--- | :--- | :--- | :--- |
 | **M1, M9** | AT-009 | FC-ZC-013 | Signed BOM and PCB Schematic proving exclusive sensor routing to Trusted Domain. |
-| **M2** | AT-004 | FC-ZC-002, FC-ZC-011 | PCB X-Ray, Vector Network Analyzer (VNA) demonstrating <-80 dBm coupling. |
+| **M2** | AT-004 | FC-ZC-002, FC-ZC-009, FC-ZC-011 | PCB X-Ray, Vector Network Analyzer (VNA) demonstrating <-80 dBm coupling. |
 | **M3, M4** | AT-001, AT-008 | FC-ZC-003 | Oscilloscope injection logs showing 0 bits of reverse data transmission. |
 | **M5** | AT-007 | FC-ZC-008 | Trusted-Domain Control Surface Inventory proving network SoC cannot halt/reset NPU. |
 | **M6** | AT-005 | FC-ZC-005, FC-ZC-006 | Fused JTAG/SWD physical verification; Signed bootloader hashes. |
@@ -30,7 +30,7 @@ This matrix establishes absolute traceability for independent auditors, mapping 
 | Invariant | Attack Class | CTS Test ID | Required Evidence | Pass/Fail Criteria |
 | :--- | :--- | :--- | :--- | :--- |
 | **M1 (Trusted Acquisition)** | AT-001, AT-009 | FC-ZC-013, FC-ZC-014 | Hardware Interface Manifest (HIM), Signed BOM | Zero undocumented sensory paths. |
-| **M2 (Physical Boundary)** | AT-004 | FC-ZC-002, FC-ZC-011 | VNA, TDR, PCB X-Ray | Leakage < -80 dBm. |
+| **M2 (Physical Boundary)** | AT-004 | FC-ZC-002, FC-ZC-009, FC-ZC-011 | VNA, TDR, PCB X-Ray | Leakage < -80 dBm. |
 | **M3 (One-Way Flow)** | AT-008 | FC-ZC-003, FC-ZC-010 | Oscilloscope, Signal Generator | Mutual Info bound I(X;Y) < ?. |
 | **M4 (Reverse-Read Block)** | AT-001, AT-008 | FC-ZC-003 | Oscilloscope injection logs | Strictly < 5mVpp upon reverse probe. |
 | **M5 (Control-Plane Isolate)**| AT-007 | FC-ZC-008 | Trusted-Domain Control Surface Inventory | Zero indirect NPU reset/clock overrides. |

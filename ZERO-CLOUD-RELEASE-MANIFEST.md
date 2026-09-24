@@ -1,4 +1,4 @@
-# Cryptographic Release Manifest
+﻿# Cryptographic Release Manifest
 
 This cryptographic manifest legally binds the ZC-CORE universal methodology documentation to a verifiable, cryptographically sealed Prior-Art timestamp against third-party patenting of equivalent physical privacy concepts.
 
@@ -15,8 +15,8 @@ The following hashes guarantee that the technical and legal claims within these 
 45AA1404872028D2E9FB86E9191C627FB0E0A21EB941F5AB1866119620A05847  README.md
 C082A23D1CEB7DCD0155B0FE0ABE21A026DD531497EA98E3400AC2A77BC6999A  zero-cloud-core-attack-taxonomy.md
 236DA97C96669D97032D8955FC553A352F280D526FCCA588299B8B87A07348FC  zero-cloud-core-brand-and-trademark-policy.md
-DE5FE6BBD234C7BC3A9C05B2E49B79842DB5644F052128C9BEBBE96E1AB94F4D  zero-cloud-core-conformance-evidence-matrix.md
-C5F4A4CE19EE3BE489A66E6CD611C32731EE0F95575B49DE0C8AE8299C4D61F5  zero-cloud-core-conformance-test-specification.md
+0818571BC1BB3E2256F8EA95AE43ED97855D00882A6D14B9AE8C8A3DB055AAB4  zero-cloud-core-conformance-evidence-matrix.md
+97D6A255240733160D718A3DD84CBECB8990B0D0A1EDFEF0C1B7B21DFDE7A5D4  zero-cloud-core-conformance-test-specification.md
 FD41B3D36D695633F6A4D229F9A098A25881972BF095118AADBBEECBA9220E0C  zero-cloud-core-defensive-publication.md
 1AAFEC1987041399D923F270492DBCF02BDD43CD3ED9AB8E8A650AC440FFCC19  zero-cloud-core-implementation-coverage.md
 8FD67AD0CC3BA12BF4D860FE70C9E20DE56327B613A40C80B2B082BEBA1E82CB  zero-cloud-core-methodology-invariants.md

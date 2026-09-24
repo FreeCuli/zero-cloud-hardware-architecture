@@ -1,4 +1,4 @@
-# Conformance Test Specification (CTS)
+﻿# Conformance Test Specification (CTS)
 
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
@@ -8,8 +8,7 @@
 **Evidence-Based Methodology for Verifiable Physical Privacy in AIoT and Edge AI**
 
 **Version History:**
-* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < ?).
-* **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
+* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < MI_upper_bound **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
 * **v2.1.0:** Original feature-based physical isolation constraints.
 
 > [!IMPORTANT]
@@ -22,13 +21,13 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## 🔬 TEST PROTOCOLS AND LABORATORY METHODOLOGY
+## ğŸ”¬ TEST PROTOCOLS AND LABORATORY METHODOLOGY
 
 ### FC-ZC-001: Threat Model (Network SoC Exploitation & DMA Isolation)
 **Objective:** Prove that even in the event of a total compromise of the network processor (Wi-Fi/Bluetooth SoC), sensor data cannot be exfiltrated from the isolated domain via ANY path.
 * **Attack Model:** Operating with Kernel privileges on the network chip, active read attempts are executed via CPU load/store, DMA (Direct Memory Access), bus master overrides, peripheral bridges (I2C/SPI), shared-memory apertures, cache coherency paths, and debug/trace interfaces.
 * **Pass/Fail Threshold:** 
-    * **PASS:** No query can read a single bit from the NPU memory. "Network Domain → Trusted Domain" must have strictly NO read-capable path across any subsystem.
+    * **PASS:** No query can read a single bit from the NPU memory. "Network Domain â†’ Trusted Domain" must have strictly NO read-capable path across any subsystem.
     * **FAIL:** The network processor successfully gains "Read" access via CPU, DMA, or any side-band peripheral path.
 
 ---
@@ -61,7 +60,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ### FC-ZC-005: Trusted Execution Artifact Chain (Secure Boot & AI Model Integrity)
 **Objective:** Verify that the Edge NPU refuses to execute unauthorized firmware AND models, anchoring the *entire* boot chain in hardware.
-* **Attack Model:** Attempts to bypass the chain: ROM → bootloader → firmware → OS/runtime → AI model → configuration parameters.
+* **Attack Model:** Attempts to bypass the chain: ROM â†’ bootloader â†’ firmware â†’ OS/runtime â†’ AI model â†’ configuration parameters.
 * **Pass/Fail Threshold:**
     * **PASS:** The Secure Boot ROM strictly verifies the signature of every single artifact in the chain, including the AI model weights. Signing keys are stored in OTP/eFuse or Hardware Security Modules with strict anti-rollback counters.
     * **FAIL:** The NPU boots modified firmware, accepts a rollback, executes unsigned AI models, or keys are recoverable from software-accessible flash.
@@ -100,7 +99,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## 🔬 DEFENSIVE PUBLICATION & EVIDENCE-BASED ALTERNATIVES
+## ğŸ”¬ DEFENSIVE PUBLICATION & EVIDENCE-BASED ALTERNATIVES
 
 > [!NOTE]
 > The following tests apply to manufacturers implementing alternative ZC-CORE topologies (Zenodo DOI: 10.5281/zenodo.22838473). **Vendor datasheet claims are strictly insufficient. Physical laboratory evidence must be provided.**
@@ -110,7 +109,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-010: Alternative Isolation & Manufacturer Evidence
 **Objective:** Verify capacitive/magnetic/galvanic isolators achieve optocoupler-equivalent one-way constraints.
 * **Mandatory Evidence:** Manufacturer must provide Schematic Revisions, BOM (Bill of Materials), PCB Layout Evidence, and independent Lab Measurement Results.
-* **Forbidden Bypass:** Any diagnostic/loopback mode or bidirectional override—even if disabled—is an automatic **FAIL**.
+* **Forbidden Bypass:** Any diagnostic/loopback mode or bidirectional overrideâ€”even if disabledâ€”is an automatic **FAIL**.
 
 ---
 
@@ -130,7 +129,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 
 ---
 
-## 🔬 MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
+## ğŸ”¬ MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
 
 ### FC-ZC-013: Sensor Inventory Completeness Test
 **Objective:** Prevent manufacturers from routing auxiliary sensors (e.g., wake-word microphones) to untrusted domains.
@@ -153,7 +152,7 @@ Any manufacturer claim regarding RF/EM thresholds (e.g., < -80 dBm) or power pla
 
 * **Equipment Standard:** Rohde & Schwarz FSW / Keysight N9040B Signal Analyzer or equivalent, with a minimum real-time bandwidth (RTBW) of 1 GHz.
 * **Probe Specification:** Near-field EM probes (Langer EMV-Technik LF-B 3 / RF-R 400 or equivalent) calibrated down to 20 dB gain via an external low-noise pre-amplifier.
-* **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm � 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
+* **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm ± 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
 * **RF Environment:** All measurements MUST occur inside an ISO 17025 accredited fully anechoic chamber (FAC) with an ambient electromagnetic noise floor calibrated strictly below -110 dBm.
 * **Sampling Parameters:** Minimum sampling rate of 10 GS/s with a hardware bandwidth limit set exactly matching the maximum clock frequency of the isolated NPU domain plus its 5th harmonic.
 
@@ -162,13 +161,11 @@ Real-world physical channels possess inherent thermal and environmental noise. C
 
 To maintain strict scientific falsifiability, the criterion **"Mutual Information = 0"** is hereby structurally replaced with an operational statistical bound:
 
-Criterion: I(X;Y) < ?
-
-Where ? defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
-* **Statistical Confidence Level:** Minimum ? = 0.05 (95% confidence interval).
+Criterion: I(X;Y) < MI_upper_bound ? defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
+* **Statistical Confidence Level:** Minimum α = 0.05 (95% confidence interval).
 * **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions.
-* **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, ? is fixed at ? = 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, ? = 10^-6 bits.
-* **Pass/Fail Calculation:** If the computed empirical mutual information estimator exceeds ? under the defined confidence interval, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
+* **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, ? is fixed at MI_upper_bound = 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
+* **Pass/Fail Calculation:** If the computed empirical mutual information estimator exceeds MI_upper_bound under the defined confidence interval, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
 
 ### 3. Normative TVLA (Test Vector Leakage Assessment) Execution Protocol (Ref: FC-ZC-009)
 The phrase "strict threshold" regarding TVLA is operationally defined under the following cryptographic evaluation framework:
@@ -184,5 +181,5 @@ To prevent manufacturer obfuscation regarding the volatile memory zeroization th
 
 R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 100
 
-* **Evaluation Protocol:** The testing lab MUST drop power to the isolated volatile memory domain for exactly ?t = 10 ms at an ambient temperature calibrated to 25�C.
+* **Evaluation Protocol:** The testing lab MUST drop power to the isolated volatile memory domain for exactly ?t = 10 ms at an ambient temperature calibrated to 25°C.
 * **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate ? 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
