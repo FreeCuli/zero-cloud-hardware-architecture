@@ -10,7 +10,7 @@ This manifest records the cryptographic identity, publication metadata, and file
 * **Repository:** FreeCuli/zero-cloud-hardware-architecture
 * **Git Tag:** v3.2.0
 * **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v3.2.0`
-* **Release Artifact SHA-256:** *(to be computed from Zenodo-generated archive after publication)*
+* **Release Artifact SHA-256:** *(to be computed and recorded upon generation of the immutable Zenodo archival tarball/zip using `sha256sum <zenodo_archive>`. This placeholder preserves cryptographic distinction between the Git tree state and the post-publication distribution artifact)*
 
 ## Cryptographic Evidence (SHA-256 Hashes)
 The following hashes cover all canonical v3.2.0 normative and supporting documents listed in this manifest.

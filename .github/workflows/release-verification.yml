@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Verify all canonical documents exist
         run: |
@@ -96,6 +99,22 @@ jobs:
           else
             echo "[FAIL] Git Commit Resolution declaration missing in manifest."
             exit 1
+          fi
+
+          # Deep git tag provenance check: ensure the tag points to the current checkout commit
+          if git rev-parse --verify refs/tags/v3.2.0 >/dev/null 2>&1; then
+            TAG_COMMIT=$(git rev-list -n 1 refs/tags/v3.2.0)
+            HEAD_COMMIT=$(git rev-parse HEAD)
+            echo "Tag resolved commit:  $TAG_COMMIT"
+            echo "Current HEAD commit: $HEAD_COMMIT"
+            if [ "$TAG_COMMIT" = "$HEAD_COMMIT" ]; then
+              echo "[PASS] refs/tags/v3.2.0 strictly resolves to current release HEAD commit ($HEAD_COMMIT)."
+            else
+              echo "[FAIL] Provenance mismatch: refs/tags/v3.2.0 ($TAG_COMMIT) does not match HEAD ($HEAD_COMMIT)."
+              exit 1
+            fi
+          else
+            echo "[INFO] Running on untagged branch push/workflow_dispatch, verifying local tag resolution capability..."
           fi
 
       - name: Verify no legacy normative content
