@@ -42,3 +42,9 @@ To prevent false marketing and establish a clear governance hierarchy, ZC-CORE r
 
 ## Commercial Exemption & B2B Licensing
 Manufacturers utilizing FreeCuli's proprietary reference hardware designs (PCB schematics) must adhere to the CERN-OHL-S v2.0 open-source obligations. To bypass these obligations and keep hardware designs proprietary while obtaining the official certification badge, manufacturers must acquire a Commercial Exemption and B2B Trademark License. Refer to `zero-cloud-dual-licensing.md`.
+
+## Certification Lifecycle & Material Change Policy
+To maintain the integrity of the FreeCuli Certified status, the following lifecycle policies apply:
+1. **Certification Procedure:** Application → Target Profile (C1/C2/C3) Selection → Laboratory Report Review → Evidence Matrix Audit → Non-Conformity Review → Certification Decision → Trademark License Issuance → Public Certificate Registry Entry.
+2. **Material Change Rule:** Any modification to the certified device's PCB layout, Edge NPU, Bootloader/Secure Enclave firmware, or the addition of new privacy-sensitive sensors SHALL trigger a mandatory re-evaluation. Cosmetic changes or unrelated application-layer software updates do not require re-evaluation.
+3. **Evidence Retention & Chain-of-Custody:** Accredited laboratories MUST retain the raw measurement traces, signed firmware hashes, BOMs, and full calibration metadata for a minimum of five (5) years following the certification decision. The evaluation must be bound to a strictly defined Device Evaluation Identity (hardware revision, PCB revision, BOM hash, firmware hash, model hash, and serial number range).

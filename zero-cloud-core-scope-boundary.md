@@ -9,7 +9,15 @@ To prevent misinterpretation of the methodology's capabilities and to strictly d
 
 ## 1. What ZC-CORE Standardizes (In-Scope)
 *   **Hardware-Enforced Local Privacy:** The physical containment of raw sensor data (audio, video, biometrics) strictly within the local device's Trusted Domain.
-*   **Irreversible Data Destruction:** The mandate that all local raw data is destroyed or mathematically zeroized immediately after inference.
+*   **Data Taxonomy Definitions:** To ensure strict boundaries, ZC-CORE formally categorizes data into four normative classes:
+    * **Raw Sensor Data:** The uncompressed, unmodified analog or digital output directly from a privacy-sensitive sensor.
+    * **Derived Sensor Representation:** Intermediate features (e.g., embeddings, Mel-spectrograms) that might indirectly allow reconstruction of raw data. Must be treated with the exact same containment rules as Raw Sensor Data.
+    * **Semantic Result:** The irreversible, abstracted text or low-bandwidth state (e.g., "Person recognized", "Turn on light") that cannot be reversed to raw data.
+    * **Actuator Command:** The final control signal sent outside the Trusted Domain.
+*   **Operational Taxonomy:** 
+    * **Server-Independent Core Function:** The device possesses the full capability to acquire raw data, perform inference, and execute the final semantic Actuator Command without any network connectivity.
+    * **Zero-Cloud Telemetry / OTA:** The device may connect to a server for non-inference tasks (e.g., OTA updates, encrypted semantic state syncing), provided such channels are cryptographically bound and strictly comply with M3 (Unidirectional Flow) ensuring no raw sensor data is ever transmitted.
+*   **Irreversible Data Destruction:** The mandate that all local raw data (and derived representations) is destroyed or mathematically zeroized immediately after inference.
 *   **Unidirectional Information Flow:** The physical requirement that data flows only outwards from the Trusted Domain, preventing reverse-read commands.
 *   **Physical Verification:** Laboratory-grade physical evidence (oscilloscope, X-Ray, logic analyzer) to prove compliance.
 

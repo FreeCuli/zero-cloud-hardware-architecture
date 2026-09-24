@@ -25,7 +25,7 @@ This document intentionally describes, in claim-style and implementation-specifi
 
 The purpose is defensive publication.
 
-The disclosed subject matter establishes publicly accessible technical prior art for the disclosed combinations and their reasonably foreseeable implementations, including implementations created independently or through clean-room engineering.
+The disclosed subject matter establishes publicly accessible technical prior art for the disclosed combinations and the implementations and functional equivalents expressly disclosed herein, including implementations created independently or through clean-room engineering.
 
 Known elements such as physical data diodes, optical isolation, volatile memory, secure boot, hardware debug isolation, and secure update mechanisms may individually be known technologies. The relevant disclosure focuses particularly on their architectural relationships, functional constraints, security boundaries, timing dependencies, zeroization methodologies, alternative physical implementations, and combinations within a server-independent AIoT / Edge AI device.
 

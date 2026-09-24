@@ -95,8 +95,8 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-009: Formal Side-Channel Leakage Assessment
 **Objective:** Verify that in-home activities cannot be inferred through electromagnetic emissions (Tempest) or power fluctuations.
 * **Pass/Fail Threshold:**
-    * **PASS:** For every evaluated temporal sample point, the Welch t-statistic satisfies |t| ≤ 4.5 after the required multiple-comparison correction (See Annex B).
-    * **FAIL:** Any single temporal sample point exhibiting a corrected |t| > 4.5 constitutes a verifiable side-channel leakage event and results in immediate conformance failure.
+    * **PASS:** No evaluated temporal hypothesis has `p_i < 0.05/m`. The value `|t| > 4.5` is retained solely as a screening indicator.
+    * **FAIL:** Any single temporal sample point exhibiting `p_i < 0.05/m` constitutes a verifiable side-channel leakage event and results in immediate conformance failure.
 
 ---
 
@@ -153,13 +153,13 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 **Objective:** Verify resilience against invasive physical tampering (Ref: T4).
 * **Pass/Fail Threshold:**
     * **PASS:** Device is evaluated to pass the defined invasive physical assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
-    * **FAIL:** Device fails the invasive decapping and probing assessment or lacks multi-lab certification.
+    * **FAIL:** Device fails the invasive decapping and probing assessment or lacks required multi-laboratory evaluation evidence.
 
 ### FC-ZC-016: Fault Injection Assessment (Glitching)
 **Objective:** Verify resilience against voltage/clock fault injection (Ref: T5).
 * **Pass/Fail Threshold:**
     * **PASS:** Device is evaluated to pass the defined fault injection assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
-    * **FAIL:** Device fails the fault injection assessment or lacks multi-lab certification.
+    * **FAIL:** Device fails the fault injection assessment or lacks required multi-laboratory evaluation evidence.
 
 ## Annex B: Normative Laboratory Measurement Protocols & Statistical Calibration
 
@@ -168,8 +168,12 @@ To provide evidence relevant to selected cybersecurity considerations (it does n
 ### 1. Electromagnetic & Power Signal Leakage Calibration (Ref: FC-ZC-002 / FC-ZC-003)
 Any manufacturer claim regarding RF/EM thresholds (e.g., < -80 dBm) or power plane ripple (e.g., < 5 mVpp) SHALL NOT be verified via generic ambient measurements. The testing laboratory MUST execute the following setup:
 
-* **Equipment Standard:** Rohde & Schwarz FSW / Keysight N9040B Signal Analyzer or equivalent, with a minimum real-time bandwidth (RTBW) of 1 GHz.
+* **Equipment Standard:** Rohde & Schwarz FSW / Keysight N9040B Signal Analyzer or equivalent. Any "equivalent" instrument MUST possess a minimum real-time bandwidth (RTBW) of 1 GHz, sampling rate ≥ 5 GSa/s, and a characterized noise floor ≤ -150 dBm/Hz.
 * **Probe Specification:** Near-field EM probes (Langer EMV-Technik LF-B 3 / RF-R 400 or equivalent) calibrated down to 20 dB gain via an external low-noise pre-amplifier.
+
+### 2. Measurement Uncertainty & Decision Rule
+To establish a rigorous laboratory standard, the test report MUST define the Measurement Uncertainty Budget. 
+* **Decision Rule:** For any leakage threshold (e.g., `< -80 dBm`), if the measured value plus the calculated expanded measurement uncertainty (with a 95% confidence level, k=2) overlaps the threshold, it is considered a **FAIL**. Guard bands MUST be strictly applied to prevent false compliance due to instrumentation noise.
 * **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm ± 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
 * **RF Environment:** All measurements MUST occur inside an ISO 17025 accredited fully anechoic chamber (FAC) with an ambient electromagnetic noise floor calibrated strictly below -110 dBm.
 * **Sampling Parameters:** Minimum sampling rate of 10 GS/s with a hardware bandwidth limit set exactly matching the maximum clock frequency of the isolated NPU domain plus its 5th harmonic.
@@ -198,8 +202,8 @@ The phrase "strict threshold" regarding TVLA is operationally defined under the 
     * **C2 (Enhanced Industrial):** Minimum **1,000,000** traces.
     * **C3 (High-Assurance):** Minimum **5,000,000** traces.
 * **Leakage Threshold (t-value):**
-    * **PASS:** For every evaluated temporal sample point, the Welch t-statistic satisfies |t| ≤ 4.5 after the required multiple-comparison correction.
-    * **FAIL:** Any single temporal sample point in the processed trace matrix exhibiting a corrected |t| > 4.5 constitutes a verifiable side-channel leakage event, resulting in an immediate conformance failure.
+    * **PASS:** No evaluated temporal hypothesis has `p_i < alpha_adjusted`. The value `|t| > 4.5` is retained solely as a screening indicator.
+    * **FAIL:** Any single temporal sample point in the processed trace matrix exhibiting `p_i < alpha_adjusted` constitutes a verifiable side-channel leakage event, resulting in an immediate conformance failure.
 * **Multiple-Comparison Correction (Bonferroni Method):** For `m` simultaneous temporal hypotheses (where `m` equals the total number of evaluated temporal sample points in the trace), laboratories SHALL apply the following normative procedure:
 
     1. For each temporal point `i`, compute the Welch t-statistic `t_i` and its two-sided p-value `p_i`.
@@ -219,6 +223,14 @@ R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 1
     * **Destruction-Trigger Latency (`t_latency`):** Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM VCC SHALL drop to 0V within `t_latency < 10 ms`.
     * **Minimum Power-Off Duration (`t_off`):** Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25°C before the forensic extraction attempt.
 * **Pass/Fail Condition:** Following power restoration, the residual charge state or state-reconstruction success rate across all allocated sensor data registers MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
+
+---
+
+### 4. Reproducibility & Traceability Metadata
+To guarantee measurement reproducibility, the Evidence Package MUST include the following metadata for all statistical analyses:
+* **Dataset Identifiers:** Unique ID, randomized acquisition seed, and timestamps.
+* **Environmental Log:** Exact temperature and voltage baseline during acquisition.
+* **Analysis Software Identity:** Tool name, version, source revision, and the SHA-256 hash of the specific analysis script executed (e.g., Python TVLA script).
 
 ---
 

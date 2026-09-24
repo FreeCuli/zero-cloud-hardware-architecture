@@ -20,8 +20,8 @@ In addition to direct physical vectors (AT-Series), ZC-CORE mitigates a broad sp
 | **T1** | Remote network compromise (Wi-Fi SoC hack) | In-Scope | Physical Air-Gap (FC-ZC-002) + Network-Domain Read Isolation (FC-ZC-001) |
 | **T2** | Malicious firmware payload | In-Scope | Trusted Execution Artifact Chain (FC-ZC-005) |
 | **T3** | Supply-chain compromised component | In-Scope | Hardware Interface Manifest (FC-ZC-013) |
-| **T4** | Physical invasive attack (Decapping) | Partial — C3 only | Covered under C3 High-Assurance Profile. C3 evaluators SHALL follow ISO/IEC 17065-accredited invasive physical security evaluation procedures (e.g., Common Criteria AVA_VAN.5 or equivalent). |
-| **T5** | Fault injection (Glitching) | Partial — C3 only | Covered under C3 High-Assurance Profile. C3 evaluators SHALL follow ISO/IEC 17065-accredited fault injection evaluation procedures (e.g., Common Criteria ATE_DPT or equivalent). |
+| **T4** | Physical invasive attack (Decapping) | Partial — C3 only | Covered under C3 High-Assurance Profile. C3 evaluators SHALL follow ISO/IEC 17025-accredited invasive physical security testing procedures (with assessment under an applicable ISO/IEC 17065 scheme where required). |
+| **T5** | Fault injection (Glitching) | Partial — C3 only | Covered under C3 High-Assurance Profile. C3 evaluators SHALL follow ISO/IEC 17025-accredited fault injection testing procedures (with assessment under an applicable ISO/IEC 17065 scheme where required). |
 | **T6** | Clock/power glitching via Main MCU | In-Scope | Control-Plane Isolation (FC-ZC-008) |
 | **T7** | EM / Power side-channel extraction | In-Scope | Formal TVLA Assessment (FC-ZC-009) |
 | **T8** | Malicious OTA update | In-Scope | Secure Update & Revocation (FC-ZC-007) |
