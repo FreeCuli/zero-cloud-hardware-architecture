@@ -1,6 +1,3 @@
-> ?? **[OBSOLETED / SUPERSEDED]**
-> *This document has been superseded.*
-> *As of ZC-CORE v3.1.0, the FreeCuli standard filenames have been unified for SEO and brand consistency.*
-> 
-> ?? **Please click here for the current, active standard document:** [zero-cloud-core-defensive-publication.md](zero-cloud-core-defensive-publication.md)
+[OBSOLETED / SUPERSEDED]
 
+This file is obsolete. Please refer to the canonical zero-cloud-core documents in this repository for the v3.2.0 active methodology.
