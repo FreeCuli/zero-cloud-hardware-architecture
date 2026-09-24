@@ -7,7 +7,7 @@ The Hardware-Enforced, privacy-first hardware reference methodology for Server-I
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 
 ## Overview
-This repository contains the official, strictly falsifiable **ZC-CORE v3.2.0 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
+This repository contains the official, strictly falsifiable **ZC-CORE v3.2.1 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
 
 By enforcing Physical Data Diodes, Trust Boundaries, and Hardware-Enforced Raw-Data Destruction / Invalidation (including power-cut, cryptographic zeroization, or independently validated equivalent mechanisms), this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It is designed to mitigate remote network-based raw-sensor extraction, including attacks originating from compromised network infrastructure, and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
 
@@ -54,7 +54,7 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
     * The 4-tier certification hierarchy (Self-Declared to FreeCuli Certified™) and trademark usage rights.
 11. **[ZC-CORE Versioning and Governance Policy](zero-cloud-core-versioning-and-governance.md)**
     * The rigid rules governing how the standard evolves, deprecates old methods, and manages change control.
-12. **[ZC-CORE Release Manifest (v3.2.0)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
+12. **[ZC-CORE Release Manifest (v3.2.1)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
     * The cryptographic SHA-256 seal of this release, binding all documents to a verifiable timeline.
 
 ## Commercial Certification

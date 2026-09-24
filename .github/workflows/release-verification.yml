@@ -84,8 +84,8 @@ jobs:
       - name: Verify Git tag provenance resolution
         run: |
           echo "Verifying Git provenance and tag resolution..."
-          if grep -q "Git Tag: v3.2.0" ZERO-CLOUD-RELEASE-MANIFEST.md; then
-            echo "[PASS] Git Tag v3.2.0 declared in manifest."
+          if grep -q "Git Tag: v3.2.1" ZERO-CLOUD-RELEASE-MANIFEST.md; then
+            echo "[PASS] Git Tag v3.2.1 declared in manifest."
           else
             echo "[FAIL] Git Tag declaration missing in manifest."
             exit 1
@@ -100,29 +100,29 @@ jobs:
 
           # Deep git tag provenance check: ensure the tag points to the current checkout commit
           git fetch --tags --force
-          TAG_COMMIT=$(git rev-list -n 1 v3.2.0 2>/dev/null || true)
+          TAG_COMMIT=$(git rev-list -n 1 v3.2.1 2>/dev/null || true)
           HEAD_COMMIT=$(git rev-parse HEAD)
           echo "Tag resolved commit:  $TAG_COMMIT"
           echo "Current HEAD commit: $HEAD_COMMIT"
           if [ -n "$TAG_COMMIT" ]; then
             if [ "$TAG_COMMIT" = "$HEAD_COMMIT" ]; then
-              echo "[PASS] refs/tags/v3.2.0 strictly resolves to current release HEAD commit ($HEAD_COMMIT)."
+              echo "[PASS] refs/tags/v3.2.1 strictly resolves to current release HEAD commit ($HEAD_COMMIT)."
             else
-              echo "[FAIL] Provenance mismatch: refs/tags/v3.2.0 resolves to ($TAG_COMMIT) but HEAD is ($HEAD_COMMIT)."
+              echo "[FAIL] Provenance mismatch: refs/tags/v3.2.1 resolves to ($TAG_COMMIT) but HEAD is ($HEAD_COMMIT)."
               exit 1
             fi
           else
-            echo "[FAIL] Required release tag v3.2.0 could not be resolved."
+            echo "[FAIL] Required release tag v3.2.1 could not be resolved."
             exit 1
           fi
 
       - name: Verify Git tag signature
         run: |
           echo "Verifying if release tag is cryptographically signed..."
-          if git cat-file -p refs/tags/v3.2.0 | grep -qiE "PGP SIGNATURE|SSH SIGNATURE"; then
-            echo "[PASS] Git Tag v3.2.0 is cryptographically signed."
+          if git cat-file -p refs/tags/v3.2.1 | grep -qiE "PGP SIGNATURE|SSH SIGNATURE"; then
+            echo "[PASS] Git Tag v3.2.1 is cryptographically signed."
           else
-            echo "[FAIL] Git Tag v3.2.0 is NOT signed! Governance requires an annotated and signed tag."
+            echo "[FAIL] Git Tag v3.2.1 is NOT signed! Governance requires an annotated and signed tag."
             exit 1
           fi
 
