@@ -1,0 +1,38 @@
+name: Release Verification
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  verify-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify SHA-256 Hashes
+        shell: pwsh
+        run: |
+          $excludePattern = 'DUAL-LICENSING\.md|Zero-Cloud-Smart-Home-Edge-AI-Architecture\.md|Zero-Cloud-Defensive-Publication\.md|FC-ZC-Conformance-Test-Specification\.md|ZERO-CLOUD-RELEASE-MANIFEST\.md|ZC-CORE-METHODOLOGY-INVARIANTS\.md|LICENSE\.md|LICENSE|SECURITY\.md|CONTRIBUTING\.md'
+          $hashes = Get-ChildItem *.md | Where-Object { $_.Name -notmatch $excludePattern } | Get-FileHash -Algorithm SHA256
+          $manifestContent = Get-Content ZERO-CLOUD-RELEASE-MANIFEST.md -Raw
+          $allMatched = $true
+          
+          foreach ($h in $hashes) {
+              $fileName = Split-Path $h.Path -Leaf
+              $expectedHash = $h.Hash
+              
+              if ($manifestContent -match "$expectedHash\s+$fileName") {
+                  Write-Host "[PASS] $fileName"
+              } else {
+                  Write-Host "[FAIL] $fileName (Hash mismatch or missing in manifest)"
+                  $allMatched = $false
+              }
+          }
+          
+          if (-not $allMatched) {
+              Write-Error "One or more files did not match the manifest hashes."
+              exit 1
+          }
+          Write-Host "All hashes successfully verified against the manifest."

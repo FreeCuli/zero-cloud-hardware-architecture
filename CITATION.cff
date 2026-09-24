@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this methodology or reference architecture, please cite it as below."
+title: "ZC-CORE: Hardware-enforced, server-independent Zero-Cloud architecture methodology for privacy-critical Edge AI and AIoT"
+version: 3.2.0
+date-released: "2026-09-24"
+authors:
+  - name: "FreeCuli / ZC-CORE Contributors"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22838473
+repository-code: "https://github.com/FreeCuli/zero-cloud-hardware-architecture"
+license: "CERN-OHL-S-2.0 AND AGPL-3.0"
