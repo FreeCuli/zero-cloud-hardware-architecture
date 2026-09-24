@@ -42,7 +42,7 @@ This matrix establishes absolute traceability for independent auditors, mapping 
 | **M8 (Data Destruction)** | AT-003, AT-004 | FC-ZC-004, FC-ZC-012 | Forensic recovery analysis | Remanence Rate R_rate <= 0.01%. |
 | **M9 (Complete Inventory)** | AT-009, AT-006 | FC-ZC-013, FC-ZC-014 | Complete BOM, Peripheral accounting | Zero bypass channels exist. |
 | **M10 (Independent Evidence)**| All | FC-ZC-014 | Third-party (ISO 17025) lab reports | Empirical compliance vs vendor claims. |
-| **C3 High-Assurance Profile** | T4 (Decapping), T5 (Glitching) | FC-ZC-015, FC-ZC-016 | ISO/IEC 17065 Certification | Multi-lab verified resilience. |
+| **C3 High-Assurance Profile** | T4 (Decapping), T5 (Glitching) | FC-ZC-015, FC-ZC-016 | ISO/IEC 17065 Scheme / 17025 Testing | Multi-lab verified resilience. |
 
 ## Interpretation
 Manufacturers claiming ZC-CORE compliance SHALL provide the specific physical evidence listed in this matrix. Software assertions or documentation-only claims are strictly insufficient for M-Invariant validation.

@@ -22,14 +22,14 @@ If you are a commercial AIoT manufacturer (e.g., Bosch, Samsung, Aselsan, Siemen
 You **MUST** obtain a **Commercial Exemption License** from the FreeCuli Consortium Legal & Engineering Team before production.
 
 ### Commercial License Benefits:
-1. **License Contamination Shield:** The commercial license acts as a waiver, removing the copyleft obligations of CERN-OHL-S v2.0 and AGPL-3.0 from your proprietary components. Your trade secrets stay secret.
+1. **Commercial Intellectual Property Exemption:** The commercial agreement grants permissions expressly defined by FreeCuli for the FreeCuli-controlled materials, exempting them from the standard copyleft obligations of CERN-OHL-S v2.0 and AGPL-3.0. Your proprietary components and trade secrets stay secret.
 2. **Certification & Trademark Use:** While the technical architecture is open under CERN-OHL-S v2.0, the `FreeCuli` and `ZC-CORE` trademarks are fiercely protected. The open-source license does NOT grant trademark usage rights. Only a commercial B2B agreement grants you the right to brand your product with the official `FreeCuli Certified: ZC-CORE` badges.
 3. **Ecosystem Integration:** Your devices become officially verified nodes within the respective AIoT ecosystem (e.g., APSNY for Smart Kitchens).
 
 ## 3. Patent Retaliation Clause (Legal Protection)
 To protect open innovation, the licensing of the ZC-CORE methodology includes a strict **Patent Retaliation Clause**. 
 
-If any corporate entity, technology giant, or patent troll initiates patent infringement litigation against FreeCuli or any other compliant manufacturer utilizing this standard (claiming that the implementation of data diodes, volatile memory zeroization, or physical air-gaps as defined in the ZC-CORE standard infringes upon their patents), that entity's right to use the CERN-OHL-S v2.0 / ZC-CORE license is **immediately subject to strict worldwide revocation under applicable license terms**. 
+If any corporate entity, technology giant, or patent troll initiates patent infringement litigation against FreeCuli or any other compliant manufacturer utilizing this standard (claiming that the implementation of data diodes, volatile memory zeroization, or physical air-gaps as defined in the ZC-CORE standard infringes upon their patents), that entity's right to use the CERN-OHL-S v2.0 / ZC-CORE license is **subject to worldwide revocation under applicable license terms** (Subject to valid legal claims, applicable law, and specifically applying to FreeCuli-controlled IP). 
 
 Furthermore, as an official **Open Invention Network (OIN)** member, FreeCuli leverages cross-licensing and patent non-aggression agreements to protect the Linux System environment and embedded Edge AI spaces.
 

@@ -63,7 +63,7 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 **Objective:** Verify that the Edge NPU refuses to execute unauthorized firmware AND models, anchoring the *entire* boot chain in hardware.
 * **Attack Model:** Attempts to bypass the chain: ROM â†’ bootloader â†’ firmware â†’ OS/runtime â†’ AI model â†’ configuration parameters.
 * **Pass/Fail Threshold:**
-    * **PASS:** The Secure Boot ROM strictly verifies the signature of every single artifact in the chain, including the AI model weights. Signing keys are stored in OTP/eFuse or Hardware Security Modules with strict anti-rollback counters.
+    * **PASS:** The Secure Boot ROM strictly verifies the signature of every single artifact in the chain, including the AI model weights. Signing keys are stored in hardware-protected key storage meeting the defined security property (e.g., OTP/eFuse, HSM, or Secure Enclave) with strict anti-rollback counters.
     * **FAIL:** The NPU boots modified firmware, accepts a rollback, executes unsigned AI models, or keys are recoverable from software-accessible flash.
 
 ---
@@ -110,7 +110,8 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-010: Alternative Isolation & Manufacturer Evidence
 **Objective:** Verify capacitive/magnetic/galvanic isolators achieve optocoupler-equivalent one-way constraints.
 * **Mandatory Evidence:** Manufacturer must provide Schematic Revisions, BOM (Bill of Materials), PCB Layout Evidence, and independent Lab Measurement Results.
-* **Forbidden Bypass:** Any diagnostic/loopback mode or bidirectional overrideâ€”even if disabledâ€”is an automatic **FAIL**.
+* **Execution:** This test MUST explicitly invoke the Annex B Mutual Information (MI) protocol (defined in FC-ZC-003) to empirically prove the required MI_upper_bound.
+* **Forbidden Bypass:** Any diagnostic/loopback mode or bidirectional override-even if disabled-is an automatic **FAIL**.
 
 ---
 
@@ -151,18 +152,18 @@ This specification defines the **falsifiable and reproducible** adversarial atta
 ### FC-ZC-015: Invasive Physical Assessment (Decapping)
 **Objective:** Verify resilience against invasive physical tampering (Ref: T4).
 * **Pass/Fail Threshold:**
-    * **PASS:** Device is certified to withstand invasive physical attacks following ISO/IEC 17065-accredited procedures (e.g., Common Criteria AVA_VAN.5) by at least two independent accredited laboratories.
+    * **PASS:** Device is evaluated to pass the defined invasive physical assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
     * **FAIL:** Device fails the invasive decapping and probing assessment or lacks multi-lab certification.
 
 ### FC-ZC-016: Fault Injection Assessment (Glitching)
 **Objective:** Verify resilience against voltage/clock fault injection (Ref: T5).
 * **Pass/Fail Threshold:**
-    * **PASS:** Device is certified to mitigate fault injection attempts following ISO/IEC 17065-accredited procedures (e.g., Common Criteria ATE_DPT) by at least two independent accredited laboratories.
+    * **PASS:** Device is evaluated to pass the defined fault injection assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
     * **FAIL:** Device fails the fault injection assessment or lacks multi-lab certification.
 
 ## Annex B: Normative Laboratory Measurement Protocols & Statistical Calibration
 
-To provide evidence relevant to selected cybersecurity requirements under the EU Cyber Resilience Act (CRA) and to ensure multi-lab reproducibility, all physical leakage thresholds specified in this document MUST be evaluated under the exact calibration, equipment, and statistical parameters defined below. 
+To provide evidence relevant to selected cybersecurity considerations (it does not constitute formal EU Cyber Resilience Act (CRA) conformity assessment or legal compliance) and to ensure multi-lab reproducibility, all physical leakage thresholds specified in this document MUST be evaluated under the exact calibration, equipment, and statistical parameters defined below. 
 
 ### 1. Electromagnetic & Power Signal Leakage Calibration (Ref: FC-ZC-002 / FC-ZC-003)
 Any manufacturer claim regarding RF/EM thresholds (e.g., < -80 dBm) or power plane ripple (e.g., < 5 mVpp) SHALL NOT be verified via generic ambient measurements. The testing laboratory MUST execute the following setup:
@@ -182,7 +183,7 @@ Criterion: I(X;Y) < MI_upper_bound
 
 where MI_upper_bound defines the upper bound of permissible leaked mutual information under the following mandatory evaluation strictures:
 * **Statistical Confidence Level:** Minimum α = 0.05 (95% confidence interval). Confidence intervals SHALL be estimated using a bootstrap procedure with a minimum of 10,000 resamples, computing a two-sided 95% CI from the empirical distribution of the MI estimator.
-* **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions.
+* **Sample Size (N):** The measurement MUST pool a minimum of N = 1,000,000 independent, identically distributed (i.i.d.) Edge AI inference executions. The i.i.d. requirement SHALL be operationally met via randomized acquisition order, environmental temperature control, and stable power-supply calibration.
 * **Operational Bound Value:** For ZC-CORE-C1/C2 profiles, MI_upper_bound is fixed at 10^-4 bits. For ZC-CORE-C3 high-assurance profiles, MI_upper_bound = 10^-6 bits.
 * **MI Estimator Specification:** The laboratory SHALL use a **k-nearest-neighbor (k-NN) mutual information estimator** (e.g., Kraskov-Stögbauer-Grassberger estimator). The MI unit SHALL be **bits** (base-2 logarithm). `X` is defined as the raw sensor input value (e.g., audio sample amplitude) and `Y` is the corresponding electromagnetic side-channel measurement (e.g., power trace sample at the same inference cycle). No preprocessing or normalization that could reduce measured MI is permitted unless explicitly justified in the lab report.
 * **Pass/Fail Calculation:** If the computed empirical mutual information estimator exceeds MI_upper_bound under the defined confidence interval, the device SHALL be issued an immediate **TOTAL FAILURE** verdict.
