@@ -1,182 +1,93 @@
-# Conformance Test Specification (CTS)
+# ZC-CORE: Conformance Test Specification (CTS)
 
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
-[![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
-[![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.1-black.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.2.1)
+**Version:** v3.2.1
+**License:** CERN-OHL-S v2.0
+**Status:** Laboratory Normative Upgrade & Measurement Methodology Rev. 1
 
-**Evidence-Based Methodology for Verifiable Physical Privacy in AIoT and Edge AI**
+## 1. Introduction and Vendor-Neutral Conformance Principle
 
-**Version History:**
-* **v3.2.0:** Normative Laboratory Upgrade; Introduced Annex B defining strict calibration thresholds, Welch t-test (TVLA), and operational Mutual Information limits (I(X;Y) < MI_upper_bound).
-* **v3.1.0:** Transitioned to Evidence-Based Conformance; Added FC-ZC-013 (Sensor Inventory) and FC-ZC-014 (Undocumented Interface Penalty); Explicit DMA and Cache zeroization mandates.
-* **v2.1.0:** Original feature-based physical isolation constraints.
+ZC-CORE does not require a single reference semiconductor, SoC, FPGA, PCB topology, or vendor implementation. It defines a vendor-neutral set of security properties, observable physical behaviors, measurement procedures, acceptance criteria, and evidence requirements by which an implementation can be independently falsified or verified.
 
-> [!IMPORTANT]
-> **Technical Compliance Verifiers (NOT IP Detectors)**
-> The laboratory tests defined in this specification (oscilloscope leakage tests, cold-boot extraction tests) are NOT Intellectual Property (IP) infringement detectors. They are independent **Technical Compliance Verifiers** designed solely to audit whether a manufacturer's AIoT device strictly adheres to the **ZC-CORE v3.2.1** hardware constraints.
+The absence of a mandatory reference schematic does not mean the absence of hardware evidence. It means that the implementation is evaluated against measurable security properties rather than architectural resemblance to a FreeCuli reference design.
 
-> **"FreeCuli does not require you to trust FreeCuli. It requires you to reproduce the test and provide physical evidence."**
+Conformance SHALL be determined by satisfaction of the applicable normative security properties and their associated evidence requirements. A valid measurement does not, by itself, establish that the normative acceptance threshold is scientifically sufficient. Therefore, all physical thresholds in this specification are marked with their **Validation Status**.
 
-This specification defines the **falsifiable and reproducible** adversarial attack scenarios and laboratory testing methodologies that any hardware appliance (smart home, medical, industrial, defense, AIoT) must pass to comply with the **ZC-CORE v3.2.1 Edge AI standard**.
+## 2. Metrology and Measurement Foundation
 
----
+Every normative security claim must be strictly falsifiable. To ensure inter-laboratory reproducibility (ISO/IEC 17025 conformity), all tests MUST comply with the following foundation:
 
-## TEST PROTOCOLS AND LABORATORY METHODOLOGY
+### 2.1 Measurement Access Points (MAP)
+ZC-CORE MUST NOT require a permanent externally accessible test point (TP) unless explicitly required by the applicable implementation profile. Measurement Access Points (e.g., MAP-TD-01 for Trusted Domain, MAP-ISO-01 for Isolation Boundary) MAY be permanent, temporary, or fixture-based. They must provide sufficient physical/electrical observation without introducing new production attack surfaces.
 
-### FC-ZC-001: Threat Model (Network SoC Exploitation & DMA Isolation)
-**Objective:** Prove that even in the event of a total compromise of the network processor (Wi-Fi/Bluetooth SoC), sensor data cannot be exfiltrated from the isolated domain via ANY path.
-* **Attack Model:** Operating with Kernel privileges on the network chip, active read attempts are executed via CPU load/store, DMA (Direct Memory Access), bus master overrides, peripheral bridges (I2C/SPI), shared-memory apertures, cache coherency paths, and debug/trace interfaces.
-* **Pass/Fail Threshold:** 
-    * **PASS:** No query can read a single bit from the NPU memory. "Network Domain -> Trusted Domain" must have strictly NO read-capable path across any subsystem.
-    * **FAIL:** The network processor successfully gains "Read" access via CPU, DMA, or any side-band peripheral path.
+### 2.2 Measurement Capability & Uncertainty
+Every physical measurement MUST declare its instrument configuration. The laboratory MUST report:
+* Instrument calibration state and bandwidth
+* Sampling rate and probe type
+* Reference impedance (e.g., 50 Ω) and reference plane
+* Instrument noise floor and detection limit
+* Measurement uncertainty (e.g., ±X mV or ±Y dBm)
 
----
+### 2.3 Falsifiability Chain
+Every test follows a strict falsification path:
+Security Claim -> Threat Condition -> Observable -> Measurement Method -> Acceptance Criterion -> Falsifier -> Evidence.
 
-### FC-ZC-002: Sensor / Network Domain Separation (Electrical Air-Gap)
-**Objective:** Prove the absence of physical, electrical, or parasitic (cross-talk) data paths between the network chip and sensors.
-* **Measuring Device:** Vector Network Analyzer (VNA), Time-Domain Reflectometer (TDR), PCB X-Ray.
-* **Pass/Fail Threshold:**
-    * **PASS:** Open-circuit criterion under specified measurement configuration. Capacitive/inductive signal leakage must remain strictly < -80 dBm across a 1MHz to 5GHz bandwidth measured with a 50-ohm probe.
-    * **FAIL:** Signal coupling exceeds the -80 dBm threshold under standard confidence intervals.
+### 2.4 INCONCLUSIVE Semantics
+Test results MUST be classified as PASS, FAIL, INCONCLUSIVE, NOT APPLICABLE, or NOT TESTED.
+* **INCONCLUSIVE** SHALL be reported when the measurement system cannot establish the applicable acceptance condition with sufficient detection capability or measurement confidence (e.g., if the measured signal is below the laboratory's noise floor).
 
 ---
 
-### FC-ZC-003: Unidirectional Data Flow & Information Leakage
-**Objective:** Verify that only processed commands can travel from the NPU to the Main MCU, and absolutely no data or *information* can leak backwards.
-* **Measuring Device:** Multi-channel Oscilloscope (Min. **5 GHz** bandwidth), High-speed Signal Generator.
-* **Pass/Fail Threshold:**
-    * **PASS:** Data injected backwards results in strictly < 5mV peak-to-peak (mVpp) on the NPU side, AND formal Mutual Information assessment yields strictly I\(X;Y\) < MI_upper_bound (See Annex B) (no statistical correlation or data-carrying capacity).
-    * **FAIL:** Signals injected in reverse cause readable logical fluctuations, or timing/amplitude variations carry recoverable side-channel data.
-* **Semantic Output Leakage Assessment (Ref: AT-010):**
-    * In addition to reverse-flow limits, the forward semantic output (diagnostic logs, payload, metadata, timing metadata, confidence values, repeated semantic responses) MUST be evaluated to ensure it does not provide a practical, statistically significant reconstruction channel for the protected raw-sensor state under the declared threat model.
+## 3. Normative Conformance Tests (Phase 1 Revision)
+
+### FC-ZC-003: Physical Data Diode Isolation
+
+The data diode isolation boundary (M1-M4) is evaluated across three distinct evidence layers.
+
+#### FC-ZC-003A: Functional Reverse-Path Test
+* **Security Claim:** The Network Domain cannot functionally read or request raw information from the Trusted Domain.
+* **Observable:** Memory/bus transaction results on MAP-ND-01.
+* **Acceptance Criterion:** No functional reverse information transfer SHALL be observable under the declared test conditions.
+* **Validation Status:** Normative Requirement.
+* **Result Mapping:** PASS / FAIL / INCONCLUSIVE
+
+#### FC-ZC-003B: Electrical Coupling Test
+* **Security Claim:** No measurable electrical coupling exists across the isolation boundary.
+* **Observable:** Reverse leakage voltage / coupling amplitude on MAP-ISO-01.
+* **Acceptance Criterion:** The measured reverse-coupled signal SHALL remain below the applicable normative threshold (<5 mVpp or <-80 dBm).
+* **Evidence Required:** Raw waveform + instrument configuration + uncertainty budget.
+* **Validation Status:** **Pending Independent Validation** (The 5 mVpp / -80 dBm thresholds are existing criteria subject to ongoing experimental metrology validation).
+
+#### FC-ZC-003C: Statistical Information Leakage Test
+* **Security Claim:** There is no statistically significant relationship between the measured physical signal and the protected raw data.
+* **Observable:** Mutual Information (MI) or Test Vector Leakage Assessment (TVLA) metrics (See Annex B).
+* **Acceptance Criterion:** MI < MI_upper_bound.
+* **Validation Status:** **Pending Independent Validation**.
 
 ---
 
-### FC-ZC-004: Volatile Data Destruction & Remanence Assessment
-**Objective:** Verify that local raw-sensor data is irretrievably destroyed immediately after inference.
-* **Applicability:** The applicable test path depends on the declared destruction mechanism.
-* **Pass/Fail Threshold:**
-    * **PASS:** The declared destruction/invalidation mechanism SHALL render all raw-sensor data irrecoverable within the specified timing and remanence limits.
-        * For **power-cut implementations**, SRAM/volatile-memory VCC SHALL fall to 0V within `t_latency < 10 ms` from the inference-complete hardware interrupt.
-        * For **cryptographic or other equivalent implementations**, the destruction/invalidation procedure SHALL commence immediately at the inference-complete interrupt and MUST meet the applicable FC-ZC-012 timing and recovery criteria.
-    * **FAIL:** Destruction is delayed beyond the normative timing limits, or structural characteristics of the sensor data can be partially recovered (Remanence Recovery Rate > 0.01%, see Annex B).
+### FC-ZC-004: Volatile Memory Zeroization & Data Remanence (M7/M8)
+
+Data destruction evaluation is separated into **Temporal Evidence** and **Recovery Evidence**.
+
+* **Security Claim:** Raw data becomes irreversibly unrecoverable after the required inference window or boundary breach.
+* **Temporal Observable:** The time from the boundary-breach trigger to the verified completion of raw-data invalidation (T_INV). Measured via Logic Analyzer on MAP-TRG-01.
+* **Recovery Observable:** Post-event memory extraction and residual-data analysis.
+* **Acceptance Criterion:** 
+  1. T_INV <= T_PROFILE (Currently specified as <10 ms).
+  2. Residual recovery rate R_rate <= 0.01%.
+* **Validation Status:** **Pending Independent Validation** (Profile-based timing limits and remanence thresholds require experimental laboratory validation across differing SRAM/DRAM topologies and RC time constants).
 
 ---
 
-### FC-ZC-005: Trusted Execution Artifact Chain (Secure Boot & AI Model Integrity)
-**Objective:** Verify that the Edge NPU refuses to execute unauthorized firmware AND models, anchoring the *entire* boot chain in hardware.
-* **Attack Model:** Attempts to bypass the chain: ROM -> bootloader -> firmware -> OS/runtime -> AI model -> configuration parameters.
-* **Pass/Fail Threshold:**
-    * **PASS:** The Secure Boot ROM strictly verifies the signature of every single artifact in the chain, including the AI model weights. Signing keys are stored in hardware-protected key storage meeting the defined security property (e.g., OTP/eFuse, HSM, or Secure Enclave) with strict anti-rollback counters.
-    * **FAIL:** The NPU boots modified firmware, accepts a rollback, executes unsigned AI models, or keys are recoverable from software-accessible flash.
+### FC-ZC-008: Debug Interface Lifecycle and Attack Surface (M9)
+
+* **Security Claim:** Production debug interfaces cannot be used to bypass the trust boundary or extract raw data.
+* **Lifecycle Constraint:** JTAG/SWD MUST NOT be used as the sole evidence mechanism for proving irreversible raw-data destruction. JTAG/SWD is evaluated under a lifecycle model: Engineering DUT -> Instrumentation -> Security Test -> Production Lock -> Accessibility Verification.
+* **Acceptance Criterion:** Production accessibility verification MUST confirm debug closure (e.g., fused or cryptographically locked).
+* **Validation Status:** Normative Requirement.
 
 ---
 
-### FC-ZC-006: Debug Port Isolation (Hardware Lockout)
-**Objective:** Verify that physical debug interfaces routing into the Trusted Domain are completely unusable.
-* **Pass/Fail Threshold:**
-    * **PASS:** All production debug and maintenance interfaces (including JTAG, SWD, UART, test pads, boot straps, and equivalent service interfaces) SHALL be permanently physically disabled (e.g., traces cut, eFuses blown) OR rendered cryptographically inaccessible under the declared security property and independently verified.
-    * **FAIL:** The debugger successfully connects, halts the CPU, or reads memory addresses via any service interface.
-
----
-
-### FC-ZC-007: Secure Update Mechanism & Key Revocation
-**Objective:** Ensure firmware updates are strictly verified and handle compromised keys correctly.
-* **Pass/Fail Threshold:**
-    * **PASS:** The NPU rejects unsigned updates AND rejects validly signed malicious updates if the signing key has been formally revoked or rollback counters detect a downgrade.
-    * **FAIL:** The NPU accepts unsigned updates, or accepts a rollback attack using an older but validly signed artifact.
-
----
-
-### FC-ZC-008: Trusted-Domain Control Surface Isolation
-**Objective:** Verify that the Main MCU cannot manipulate the NPU via indirect hardware control signals.
-* **Pass/Fail Threshold:**
-    * **PASS:** The manufacturer must provide a complete "Trusted-Domain Control Surface Inventory" documenting Reset, Clock, DMA, Power, Watchdog, Interrupt, Debug, and Boot-mode. None of these surfaces can be leveraged by the Main MCU to freeze, delay, or bypass the volatile destruction sequence.
-    * **FAIL:** Any undocumented control path exists, or an external reset/clock manipulation halts the power-cut sequence.
-
----
-
-### FC-ZC-009: Formal Side-Channel Leakage Assessment
-**Objective:** Verify that in-home activities cannot be inferred through electromagnetic emissions (Tempest) or power fluctuations.
-* **Pass/Fail Threshold:**
-    * **PASS:** No evaluated temporal hypothesis has `p_i < alpha_adjusted` (as defined in Annex B). The value `|t| > 4.5` is retained solely as a screening indicator.
-    * **FAIL:** Any single temporal sample point exhibiting `p_i < alpha_adjusted` constitutes a verifiable side-channel leakage event and results in immediate conformance failure.
-
----
-
-## DEFENSIVE PUBLICATION & EVIDENCE-BASED ALTERNATIVES
-
-> [!NOTE]
-> The following tests apply to manufacturers implementing alternative ZC-CORE topologies (Zenodo DOI: 10.5281/zenodo.22838473). **Vendor datasheet claims are strictly insufficient. Physical laboratory evidence must be provided.**
-
----
-
-### FC-ZC-010: Alternative Isolation & Manufacturer Evidence
-**Objective:** Verify capacitive/magnetic/galvanic isolators achieve optocoupler-equivalent one-way constraints.
-* **Mandatory Evidence:** Manufacturer must provide Schematic Revisions, BOM (Bill of Materials), PCB Layout Evidence, and independent Lab Measurement Results.
-* **Execution:** This test MUST explicitly invoke the Annex B Mutual Information (MI) protocol (defined in FC-ZC-003) to empirically prove the required MI_upper_bound.
-* **Forbidden Bypass:** Any diagnostic/loopback mode or bidirectional override-even if disabled-is an automatic **FAIL**.
-
----
-
-### FC-ZC-011: Secure Enclave Alternative (Covert Channel Blocking)
-**Objective:** Verify TrustZone/PMP alternatives achieve physical-equivalent isolation.
-* **M2 Equivalence Criteria:** A secure-enclave implementation MAY satisfy M2 only if the implementation provides independently verifiable equivalent isolation against all of the following attack classes. Software permissioning alone SHALL NOT constitute physical-equivalent isolation.
-    1. Shared-memory reads from the non-secure world to secure sensor data.
-    2. DMA access into secure sensor data regions.
-    3. Peripheral bridge access into the Trusted Domain.
-    4. Debug access from any non-secure domain.
-    5. Reset manipulation of the Trusted Domain from outside.
-    6. Clock manipulation capable of causing timing/data errors.
-    7. Power manipulation capable of inducing fault injection.
-    8. Interrupt/control-plane manipulation of the Trusted Domain.
-    9. Cache/timing covert channels that could infer raw sensor data.
-    10. Reverse information flow through any shared side-channel.
-* **Pass/Fail Threshold:**
-    * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL strictly use the FC-ZC-009 TVLA protocol for timing leakage assessment to block covert channel data exfiltration from shared buffers.
-    * **FAIL:** Any timing, cache, or shared-memory side-channel allows the non-secure world to infer raw sensor data.
-
----
-
-### FC-ZC-012: Cryptographic Zeroization & Memory Surface Completeness
-**Objective:** Verify software-triggered active overwrite achieves power-cut equivalency.
-> **Normative Dependency:** FC-ZC-004 establishes the destruction event, timing and remanence outcome. FC-ZC-012 establishes completeness of the destruction/invalidation surface across all storage locations. A device claiming a cryptographic/equivalent destruction mechanism SHALL pass both FC-ZC-004 and FC-ZC-012.
-* **Pass/Fail Threshold:**
-    * **PASS:** Zeroization overwrites ALL copies of sensor data (CPU registers, cache, DMA buffers, scratchpad, temporary tensors) with cryptographically random bytes in < 10ms. The overwrite must be strictly protected via memory barriers/volatile keywords to prevent compiler optimization removal.
-    * **FAIL:** Forensics recover structured data from *any* caching layer, zeroization takes > 10ms, or the compiler optimized away the overwrite.
-
----
-
-## MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
-
-### FC-ZC-013: Sensor Inventory Completeness Test
-**Objective:** Prevent manufacturers from routing auxiliary sensors (e.g., wake-word microphones) to untrusted domains.
-* **Pass/Fail Threshold:**
-    * **PASS:** Manufacturer provides signed BOM and PCB schematics proving that ALL microphones, cameras, biometric, acoustic, and auxiliary sensors on the device route exclusively and definitively to the Trusted NPU Domain.
-    * **FAIL:** Any undocumented sensor or auxiliary wake-word microphone routes directly to the Wi-Fi/Network SoC.
-
-### FC-ZC-014: Undocumented Interface Penalty
-**Objective:** Enforce absolute transparency of the Trusted Domain boundary.
-* **Pass/Fail Threshold:**
-    * **PASS:** All physical and logical connections entering/leaving the Trusted Domain exactly match the submitted ZC-CORE Interface Inventory.
-    * **FAIL:** Discovery of any undocumented connection, debug pad, or shared memory aperture results in an immediate and total failure of ZC-CORE compliance.
-
----
-
-## HIGH-ASSURANCE (C3) EXTERNAL EVALUATIONS (FC-ZC-015+)
-
-### FC-ZC-015: Invasive Physical Assessment (Decapping)
-**Objective:** Verify resilience against invasive physical tampering (Ref: T4).
-* **Pass/Fail Threshold:**
-    * **PASS:** Device is evaluated to pass the defined invasive physical assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
-    * **FAIL:** Device fails the invasive decapping and probing assessment or lacks required multi-laboratory evaluation evidence.
-
-### FC-ZC-016: Fault Injection Assessment (Glitching)
-**Objective:** Verify resilience against voltage/clock fault injection (Ref: T5).
-* **Pass/Fail Threshold:**
-    * **PASS:** Device is evaluated to pass the defined fault injection assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
-    * **FAIL:** Device fails the fault injection assessment or lacks required multi-laboratory evaluation evidence.
 
 ## Annex B: Normative Laboratory Measurement Protocols & Statistical Calibration
 
