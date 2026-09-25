@@ -7,7 +7,7 @@
 
 ## Claim-Style Prior-Art Matrix & Technical Disclosure
 
-**Project:** FreeCuli ZC-CORE v3.2.1
+**Project:** FreeCuli ZC-CORE v3.3.0-rc1 (Pending Experimental Validation)
 **Purpose:** Defensive Publication / Prior-Art Establishment for Universal AIoT and Edge AI
 **Version History & Publication Lineage:**
 * **Original Defensive Publication (v2.1.0):** Established core Prior-Art. 

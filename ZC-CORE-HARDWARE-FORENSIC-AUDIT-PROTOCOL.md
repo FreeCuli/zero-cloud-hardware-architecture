@@ -1,6 +1,6 @@
 # ZC-CORE-HARDWARE-FORENSIC-AUDIT-PROTOCOL
 
-**Version:** Draft v3.3.0-rc1
+**Version:** v3.3.0-rc1 (Pending Experimental Validation)
 **License:** CERN-OHL-S v2.0
 **Scope:** Evidence Acquisition, Preservation, Chain of Custody, and Independent Review
 

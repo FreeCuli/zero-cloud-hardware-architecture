@@ -1,6 +1,6 @@
 # ZC-CORE: Conformance Test Specification (CTS)
 
-**Version:** v3.3.0-rc1
+**Version:** v3.3.0-rc1 (Pending Experimental Validation)
 **License:** CERN-OHL-S v2.0
 **Status:** Laboratory Normative Upgrade & Measurement Methodology Rev. 1
 
