@@ -3,7 +3,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v3.3.0--rc1-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.3.0-rc1)
+[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v3.3.0--rc2-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.3.0-rc2)
 
 This document provides a normative mapping between ZC-CORE security invariant properties (M1-M10) and their representative implementation families. 
 

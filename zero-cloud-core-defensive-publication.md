@@ -3,11 +3,11 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v3.3.0--rc1-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.3.0-rc1)
+[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v3.3.0--rc2-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.3.0-rc2)
 
 ## Claim-Style Prior-Art Matrix & Technical Disclosure
 
-**Project:** FreeCuli ZC-CORE v3.3.0-rc1 (Pending Experimental Validation)
+**Project:** FreeCuli ZC-CORE v3.3.0-rc2 (Pending Experimental Validation)
 **Purpose:** Defensive Publication / Prior-Art Establishment for Universal AIoT and Edge AI
 **Version History & Publication Lineage:**
 * **Original Defensive Publication (v2.1.0):** Established core Prior-Art. 

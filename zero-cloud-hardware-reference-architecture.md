@@ -3,10 +3,10 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v3.3.0--rc1-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.3.0-rc1)
+[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v3.3.0--rc2-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.3.0-rc2)
 
 > [!NOTE]
-> **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE v3.3.0-rc1 Release Candidate (Pending Experimental Validation)** for all privacy-critical, server-independent autonomous AIoT and Edge AI hardware (Smart Home, Medical, Industrial, Defense).
+> **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE v3.3.0-rc2 Release Candidate (Pending Experimental Validation)** for all privacy-critical, server-independent autonomous AIoT and Edge AI hardware (Smart Home, Medical, Industrial, Defense).
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: Separation of Technical Standard and Legal Licensing**
