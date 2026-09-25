@@ -56,9 +56,9 @@ jobs:
             fi
             ACTUAL=$(sha256sum "$f" | awk '{print toupper($1)}')
             if echo "$MANIFEST" | grep -qiE "^${ACTUAL}\s+${f}$"; then
-              echo "[PASS] $f — $ACTUAL matches exact manifest entry"
+              echo "[PASS] $f -> $ACTUAL matches exact manifest entry"
             else
-              echo "[FAIL] $f — hash mismatch or missing exact entry in manifest. Actual: $ACTUAL"
+              echo "[FAIL] $f -> hash mismatch or missing exact entry in manifest. Actual: $ACTUAL"
               exit 1
             fi
           done
@@ -122,7 +122,10 @@ jobs:
           git config gpg.ssh.allowedSignersFile .github/allowed_signers
           if git tag -v v3.3.0-rc2; then
             echo "[PASS] Git Tag v3.3.0-rc2 signature is VALID and belongs to a trusted signer."
-          # else\n          #   echo "[FAIL] Git Tag v3.3.0-rc2 signature verification failed!"\n          #   exit 1\n          # fi
+          else
+            echo "[FAIL] Git Tag v3.3.0-rc2 signature verification failed!"
+            exit 1
+          fi
 
       - name: Verify no legacy normative content
         run: |
