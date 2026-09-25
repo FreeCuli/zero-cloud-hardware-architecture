@@ -40,6 +40,24 @@ Before applying INCONCLUSIVE, the laboratory must evaluate **Measurement Adequac
 
 ## 3. Normative Conformance Tests
 
+### FC-ZC-001: Threat Model (Network SoC Exploitation & DMA Isolation)
+**Objective:** Prove that even in the event of a total compromise of the network processor (Wi-Fi/Bluetooth SoC), sensor data cannot be exfiltrated from the isolated domain via ANY path.
+* **Attack Model:** Operating with Kernel privileges on the network chip, active read attempts are executed via CPU load/store, DMA (Direct Memory Access), bus master overrides, peripheral bridges (I2C/SPI), shared-memory apertures, cache coherency paths, and debug/trace interfaces.
+* **Pass/Fail Threshold:** 
+    * **PASS:** No query can read a single bit from the NPU memory. "Network Domain -> Trusted Domain" must have strictly NO read-capable path across any subsystem.
+    * **FAIL:** The network processor successfully gains "Read" access via CPU, DMA, or any side-band peripheral path.
+
+---
+
+### FC-ZC-002: Sensor / Network Domain Separation (Electrical Air-Gap)
+**Objective:** Prove the absence of physical, electrical, or parasitic (cross-talk) data paths between the network chip and sensors.
+* **Measuring Device:** Vector Network Analyzer (VNA), Time-Domain Reflectometer (TDR), PCB X-Ray.
+* **Pass/Fail Threshold:**
+    * **PASS:** Open-circuit criterion under specified measurement configuration. Capacitive/inductive signal leakage must remain strictly < -80 dBm across a 1MHz to 5GHz bandwidth measured with a 50-ohm probe.
+    * **FAIL:** Signal coupling exceeds the -80 dBm threshold under standard confidence intervals.
+
+---
+
 ### FC-ZC-003: Physical Data Diode Isolation
 
 The data diode isolation boundary (M1-M4) is evaluated across three distinct evidence layers.
@@ -71,7 +89,32 @@ Data destruction evaluation is separated into three distinct phases to decouple 
 * **Acceptance Criterion:** 
   1. T_INV <= T_PROFILE (Currently specified as <10 ms).
   2. Residual recovery rate R_rate <= 0.01%.
-* **Validation Status:** **Existing Threshold — Pending Independent Experimental Validation**. 
+* **Validation Status:** **Existing Threshold — Pending Independent Experimental Validation**.
+
+---
+
+### FC-ZC-005: Trusted Execution Artifact Chain (Secure Boot & AI Model Integrity)
+**Objective:** Verify that the Edge NPU refuses to execute unauthorized firmware AND models, anchoring the *entire* boot chain in hardware.
+* **Attack Model:** Attempts to bypass the chain: ROM -> bootloader -> firmware -> OS/runtime -> AI model -> configuration parameters.
+* **Pass/Fail Threshold:**
+    * **PASS:** The Secure Boot ROM strictly verifies the signature of every single artifact in the chain, including the AI model weights. Signing keys are stored in hardware-protected key storage meeting the defined security property (e.g., OTP/eFuse, HSM, or Secure Enclave) with strict anti-rollback counters.
+    * **FAIL:** The NPU boots modified firmware, accepts a rollback, executes unsigned AI models, or keys are recoverable from software-accessible flash.
+
+---
+
+### FC-ZC-006: Debug Port Isolation (Hardware Lockout)
+**Objective:** Verify that physical debug interfaces routing into the Trusted Domain are completely unusable.
+* **Pass/Fail Threshold:**
+    * **PASS:** All production debug and maintenance interfaces (including JTAG, SWD, UART, test pads, boot straps, and equivalent service interfaces) SHALL be permanently physically disabled (e.g., traces cut, eFuses blown) OR rendered cryptographically inaccessible under the declared security property and independently verified.
+    * **FAIL:** The debugger successfully connects, halts the CPU, or reads memory addresses via any service interface.
+
+---
+
+### FC-ZC-007: Secure Update Mechanism & Key Revocation
+**Objective:** Ensure firmware updates are strictly verified and handle compromised keys correctly.
+* **Pass/Fail Threshold:**
+    * **PASS:** The NPU rejects unsigned updates AND rejects validly signed malicious updates if the signing key has been formally revoked or rollback counters detect a downgrade.
+    * **FAIL:** The NPU accepts unsigned updates, or accepts a rollback attack using an older but validly signed artifact.
 
 ---
 
@@ -83,6 +126,86 @@ Data destruction evaluation is separated into three distinct phases to decouple 
 
 ---
 
+### FC-ZC-009: Formal Side-Channel Leakage Assessment
+**Objective:** Verify that in-home activities cannot be inferred through electromagnetic emissions (Tempest) or power fluctuations.
+* **Pass/Fail Threshold:**
+    * **PASS:** No evaluated temporal hypothesis has `p_i < alpha_adjusted` (as defined in Annex B). The value `|t| > 4.5` is retained solely as a screening indicator.
+    * **FAIL:** Any single temporal sample point exhibiting `p_i < alpha_adjusted` constitutes a verifiable side-channel leakage event and results in immediate conformance failure.
+
+---
+
+## DEFENSIVE PUBLICATION & EVIDENCE-BASED ALTERNATIVES
+
+> [!NOTE]
+> The following tests apply to manufacturers implementing alternative ZC-CORE topologies (Zenodo DOI: 10.5281/zenodo.22838473). **Vendor datasheet claims are strictly insufficient. Physical laboratory evidence must be provided.**
+
+---
+
+### FC-ZC-010: Alternative Isolation & Manufacturer Evidence
+**Objective:** Verify capacitive/magnetic/galvanic isolators achieve optocoupler-equivalent one-way constraints.
+* **Mandatory Evidence:** Manufacturer must provide Schematic Revisions, BOM (Bill of Materials), PCB Layout Evidence, and independent Lab Measurement Results.
+* **Execution:** This test MUST explicitly invoke the Annex B Mutual Information (MI) protocol (defined in FC-ZC-003) to empirically prove the required MI_upper_bound.
+* **Forbidden Bypass:** Any diagnostic/loopback mode or bidirectional override-even if disabled-is an automatic **FAIL**.
+
+---
+
+### FC-ZC-011: Secure Enclave Alternative (Covert Channel Blocking)
+**Objective:** Verify TrustZone/PMP alternatives achieve physical-equivalent isolation.
+* **M2 Equivalence Criteria:** A secure-enclave implementation MAY satisfy M2 only if the implementation provides independently verifiable equivalent isolation against all of the following attack classes. Software permissioning alone SHALL NOT constitute physical-equivalent isolation.
+    1. Shared-memory reads from the non-secure world to secure sensor data.
+    2. DMA access into secure sensor data regions.
+    3. Peripheral bridge access into the Trusted Domain.
+    4. Debug access from any non-secure domain.
+    5. Reset manipulation of the Trusted Domain from outside.
+    6. Clock manipulation capable of causing timing/data errors.
+    7. Power manipulation capable of inducing fault injection.
+    8. Interrupt/control-plane manipulation of the Trusted Domain.
+    9. Cache/timing covert channels that could infer raw sensor data.
+    10. Reverse information flow through any shared side-channel.
+* **Pass/Fail Threshold:**
+    * **PASS:** Zero bytes readable from non-secure to secure memory. Evaluation SHALL strictly use the FC-ZC-009 TVLA protocol for timing leakage assessment to block covert channel data exfiltration from shared buffers.
+    * **FAIL:** Any timing, cache, or shared-memory side-channel allows the non-secure world to infer raw sensor data.
+
+---
+
+### FC-ZC-012: Cryptographic Zeroization & Memory Surface Completeness
+**Objective:** Verify software-triggered active overwrite achieves power-cut equivalency.
+> **Normative Dependency:** FC-ZC-004 establishes the destruction event, timing and remanence outcome. FC-ZC-012 establishes completeness of the destruction/invalidation surface across all storage locations. A device claiming a cryptographic/equivalent destruction mechanism SHALL pass both FC-ZC-004 and FC-ZC-012.
+* **Pass/Fail Threshold:**
+    * **PASS:** Zeroization overwrites ALL copies of sensor data (CPU registers, cache, DMA buffers, scratchpad, temporary tensors) with cryptographically random bytes in < 10ms. The overwrite must be strictly protected via memory barriers/volatile keywords to prevent compiler optimization removal.
+    * **FAIL:** Forensics recover structured data from *any* caching layer, zeroization takes > 10ms, or the compiler optimized away the overwrite.
+
+---
+
+## MANDATORY COMPLIANCE INVENTORIES (FC-ZC-013+)
+
+### FC-ZC-013: Sensor Inventory Completeness Test
+**Objective:** Prevent manufacturers from routing auxiliary sensors (e.g., wake-word microphones) to untrusted domains.
+* **Pass/Fail Threshold:**
+    * **PASS:** Manufacturer provides signed BOM and PCB schematics proving that ALL microphones, cameras, biometric, acoustic, and auxiliary sensors on the device route exclusively and definitively to the Trusted NPU Domain.
+    * **FAIL:** Any undocumented sensor or auxiliary wake-word microphone routes directly to the Wi-Fi/Network SoC.
+
+### FC-ZC-014: Undocumented Interface Penalty
+**Objective:** Enforce absolute transparency of the Trusted Domain boundary.
+* **Pass/Fail Threshold:**
+    * **PASS:** All physical and logical connections entering/leaving the Trusted Domain exactly match the submitted ZC-CORE Interface Inventory.
+    * **FAIL:** Discovery of any undocumented connection, debug pad, or shared memory aperture results in an immediate and total failure of ZC-CORE compliance.
+
+---
+
+## HIGH-ASSURANCE (C3) EXTERNAL EVALUATIONS (FC-ZC-015+)
+
+### FC-ZC-015: Invasive Physical Assessment (Decapping)
+**Objective:** Verify resilience against invasive physical tampering (Ref: T4).
+* **Pass/Fail Threshold:**
+    * **PASS:** Device is evaluated to pass the defined invasive physical assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
+    * **FAIL:** Device fails the invasive decapping and probing assessment or lacks required multi-laboratory evaluation evidence.
+
+### FC-ZC-016: Fault Injection Assessment (Glitching)
+**Objective:** Verify resilience against voltage/clock fault injection (Ref: T5).
+* **Pass/Fail Threshold:**
+    * **PASS:** Device is evaluated to pass the defined fault injection assessment under the declared attack capability and evaluation scope following ISO/IEC 17025-accredited testing procedures (with certification/conformity assessment performed under an applicable ISO/IEC 17065 scheme where required) by at least two independent accredited laboratories.
+    * **FAIL:** Device fails the fault injection assessment or lacks required multi-laboratory evaluation evidence.
 
 ## Annex B: Normative Laboratory Measurement Protocols & Statistical Calibration
 
@@ -91,14 +214,14 @@ To provide evidence relevant to selected cybersecurity considerations (it does n
 ### 1. Electromagnetic & Power Signal Leakage Calibration (Ref: FC-ZC-002 / FC-ZC-003)
 Any manufacturer claim regarding RF/EM thresholds (e.g., < -80 dBm) or power plane ripple (e.g., < 5 mVpp) SHALL NOT be verified via generic ambient measurements. The testing laboratory MUST execute the following setup:
 
-* **Equipment Standard:** Rohde & Schwarz FSW / Keysight N9040B Signal Analyzer or equivalent. Any "equivalent" instrument MUST possess a minimum real-time bandwidth (RTBW) of 1 GHz, sampling rate ≥ 5 GSa/s, and a characterized noise floor ≤ -150 dBm/Hz.
+* **Equipment Standard:** Rohde & Schwarz FSW / Keysight N9040B Signal Analyzer or equivalent. Any "equivalent" instrument MUST possess a minimum real-time bandwidth (RTBW) of 1 GHz, sampling rate ÔëÑ 5 GSa/s, and a characterized noise floor Ôëñ -150 dBm/Hz.
 * **Probe Specification:** Near-field EM probes (Langer EMV-Technik LF-B 3 / RF-R 400 or equivalent) calibrated down to 20 dB gain via an external low-noise pre-amplifier.
 
 ### 2. Measurement Uncertainty & Decision Rule
 To establish a rigorous laboratory standard, the test report MUST define the Measurement Uncertainty Budget. 
 * **Decision Rule:** For any leakage threshold (e.g., `< -80 dBm`), if the measured value plus the calculated expanded measurement uncertainty (with a 95% confidence level, k=2) overlaps the threshold, it is considered a **FAIL**. Guard bands MUST be strictly applied to prevent false compliance due to instrumentation noise.
 * **Measurement Configuration:** Unless explicitly overridden by a specific test, all continuous wave (CW) or broadband leakage limit tests (e.g., `< -80 dBm`) SHALL be evaluated using a Resolution Bandwidth (RBW) of 1 MHz, an RMS detector, and a 50-ohm reference impedance.
-* **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm ± 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
+* **Probe Placement:** Fixed mechanically at a maximum distance of 2.0 mm ┬▒ 0.1 mm above the silicon die encapsulation or the designated physical trust boundary trace.
 * **RF Environment:** All measurements MUST occur inside an ISO 17025 accredited fully anechoic chamber (FAC) with an ambient electromagnetic noise floor calibrated strictly below -110 dBm.
 * **Sampling Parameters:** Minimum sampling rate of 10 GS/s with a hardware bandwidth limit set exactly matching the maximum clock frequency of the isolated NPU domain plus its 5th harmonic.
 * **Measurement Device Roles:** To prevent instrument role ambiguity across laboratory reports, each piece of equipment SHALL be used exclusively for its designated function:
@@ -162,12 +285,12 @@ R_rate = (Successfully Reconstructed Raw Data Bits / Original Raw Data Bits) * 1
 >
 > **Normative Metric Disambiguation:** To prevent conflation of classification-level leakage with bit-level reconstruction, laboratories SHALL additionally report two sub-metrics alongside R_rate:
 > * **R_exact** = (exactly reconstructed raw bits / total raw bits). This measures only hard, bit-accurate reconstruction.
-> * **A_advantage** = (observed reconstruction performance − random guessing baseline). This measures the statistical advantage of any inference method above random.
+> * **A_advantage** = (observed reconstruction performance ÔêÆ random guessing baseline). This measures the statistical advantage of any inference method above random.
 >
-> A device MUST satisfy R_rate ≤ 0.01% on the primary R_rate metric. The R_exact and A_advantage sub-metrics are mandatory for audit traceability. Classification-level accuracy alone SHALL NOT be substituted for the R_rate pass/fail determination.
+> A device MUST satisfy R_rate Ôëñ 0.01% on the primary R_rate metric. The R_exact and A_advantage sub-metrics are mandatory for audit traceability. Classification-level accuracy alone SHALL NOT be substituted for the R_rate pass/fail determination.
 
 * **Timing Parameters (mechanism-specific requirements):**
-    * For **power-cut implementations**: Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM/volatile-memory VCC SHALL drop to 0V within `t_latency < 10 ms`. Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25°C before the forensic extraction attempt. *The VCC = 0V requirement applies only to power-cut implementations.*
+    * For **power-cut implementations**: Following the inference-completion event, the hardware power-cut mechanism SHALL initiate and SRAM/volatile-memory VCC SHALL drop to 0V within `t_latency < 10 ms`. Power SHALL remain removed for a minimum of `t_off = 10 ms` at ambient temperature calibrated to 25┬░C before the forensic extraction attempt. *The VCC = 0V requirement applies only to power-cut implementations.*
     * For **cryptographic or equivalent implementations**: The declared destruction/invalidation mechanism SHALL complete its normative destruction/invalidation transition within `t_latency < 10 ms` from the inference-complete interrupt and SHALL satisfy the FC-ZC-012 memory-surface completeness criteria. The mechanism itself constitutes the forensic-irrecoverability event; `t_off` does not apply.
 * **Pass/Fail Condition:** Following the destruction/invalidation event, the residual charge state or state-reconstruction success rate across all storage locations capable of retaining raw-sensor information (including registers, cache, DMA buffers, and scratchpads) MUST satisfy R_rate <= 0.01% with a statistical confidence interval of 99% (p < 0.01). Any classification accuracy or ad-hoc forensic reconstruction tool achieving a bit recovery rate higher than 0.01% over 10,000 test iterations SHALL trigger an automatic conformance failure.
 
