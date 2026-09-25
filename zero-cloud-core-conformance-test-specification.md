@@ -1,6 +1,6 @@
 # ZC-CORE: Conformance Test Specification (CTS)
 
-**Version:** v3.2.1
+**Version:** v3.3.0-rc1
 **License:** CERN-OHL-S v2.0
 **Status:** Laboratory Normative Upgrade & Measurement Methodology Rev. 1
 
@@ -10,80 +10,75 @@ ZC-CORE does not require a single reference semiconductor, SoC, FPGA, PCB topolo
 
 The absence of a mandatory reference schematic does not mean the absence of hardware evidence. It means that the implementation is evaluated against measurable security properties rather than architectural resemblance to a FreeCuli reference design.
 
-Conformance SHALL be determined by satisfaction of the applicable normative security properties and their associated evidence requirements. A valid measurement does not, by itself, establish that the normative acceptance threshold is scientifically sufficient. Therefore, all physical thresholds in this specification are marked with their **Validation Status**.
-
 ## 2. Metrology and Measurement Foundation
 
-Every normative security claim must be strictly falsifiable. To ensure inter-laboratory reproducibility (ISO/IEC 17025 conformity), all tests MUST comply with the following foundation:
+Every normative security claim must be strictly falsifiable. The metrology foundation separates validity into three distinct layers:
+1. **Measurement Validity:** Is the physical event measured correctly and reproducibly?
+2. **Threshold Validity:** Is the acceptance threshold scientifically sufficient for security?
+3. **Decision Validity:** How is the measurement uncertainty applied to the threshold (Decision Rule)?
 
 ### 2.1 Measurement Access Points (MAP)
-ZC-CORE MUST NOT require a permanent externally accessible test point (TP) unless explicitly required by the applicable implementation profile. Measurement Access Points (e.g., MAP-TD-01 for Trusted Domain, MAP-ISO-01 for Isolation Boundary) MAY be permanent, temporary, or fixture-based. They must provide sufficient physical/electrical observation without introducing new production attack surfaces.
+ZC-CORE MUST NOT require a permanent externally accessible test point (TP) unless explicitly required by the applicable implementation profile. Measurement Access Points (e.g., MAP-TD-01 for Trusted Domain, MAP-ISO-01 for Isolation Boundary) MAY be permanent, temporary, or fixture-based.
 
-### 2.2 Measurement Capability & Uncertainty
-Every physical measurement MUST declare its instrument configuration. The laboratory MUST report:
-* Instrument calibration state and bandwidth
-* Sampling rate and probe type
+### 2.2 Measurement Definition (Required Parameters)
+A physical threshold (e.g., -80 dBm or <5 mVpp) is not a complete specification. The laboratory MUST define and report:
 * Reference impedance (e.g., 50 Ω) and reference plane
-* Instrument noise floor and detection limit
-* Measurement uncertainty (e.g., ±X mV or ±Y dBm)
+* Measurement bandwidth and detection limit
+* Sampling rate, detector mode, and probe/coupling method
+* Instrument calibration state, noise floor, and expanded measurement uncertainty
 
-### 2.3 Falsifiability Chain
-Every test follows a strict falsification path:
-Security Claim -> Threat Condition -> Observable -> Measurement Method -> Acceptance Criterion -> Falsifier -> Evidence.
+### 2.3 Decision Rule (Guard-Banding)
+**Decision Rule: Pending Validation.**
+The application of measurement uncertainty to the PASS/FAIL decision (e.g., Strict Acceptance, Shared Risk) is pending independent validation. The laboratory MUST report the measured value, expanded uncertainty, and the decision rule applied.
 
-### 2.4 INCONCLUSIVE Semantics
+### 2.4 INCONCLUSIVE Semantics and Measurement Adequacy
 Test results MUST be classified as PASS, FAIL, INCONCLUSIVE, NOT APPLICABLE, or NOT TESTED.
-* **INCONCLUSIVE** SHALL be reported when the measurement system cannot establish the applicable acceptance condition with sufficient detection capability or measurement confidence (e.g., if the measured signal is below the laboratory's noise floor).
+Before applying INCONCLUSIVE, the laboratory must evaluate **Measurement Adequacy**. If fundamental calibration fails, the measurement is invalid. 
+* **INCONCLUSIVE** SHALL be reported when the measurement is valid, but the metrology system's capabilities (e.g., insufficient dynamic range, unresolved uncertainty, insufficient bandwidth, or noise floor limitations) prevent a definitive PASS/FAIL decision.
 
 ---
 
-## 3. Normative Conformance Tests (Phase 1 Revision)
+## 3. Normative Conformance Tests
 
 ### FC-ZC-003: Physical Data Diode Isolation
 
 The data diode isolation boundary (M1-M4) is evaluated across three distinct evidence layers.
 
 #### FC-ZC-003A: Functional Reverse-Path Test
-* **Security Claim:** The Network Domain cannot functionally read or request raw information from the Trusted Domain.
+* **Security Claim:** The Network Domain cannot functionally read raw information from the Trusted Domain.
 * **Observable:** Memory/bus transaction results on MAP-ND-01.
-* **Acceptance Criterion:** No functional reverse information transfer SHALL be observable under the declared test conditions.
 * **Validation Status:** Normative Requirement.
-* **Result Mapping:** PASS / FAIL / INCONCLUSIVE
 
 #### FC-ZC-003B: Electrical Coupling Test
 * **Security Claim:** No measurable electrical coupling exists across the isolation boundary.
-* **Observable:** Reverse leakage voltage / coupling amplitude on MAP-ISO-01.
 * **Acceptance Criterion:** The measured reverse-coupled signal SHALL remain below the applicable normative threshold (<5 mVpp or <-80 dBm).
-* **Evidence Required:** Raw waveform + instrument configuration + uncertainty budget.
-* **Validation Status:** **Pending Independent Validation** (The 5 mVpp / -80 dBm thresholds are existing criteria subject to ongoing experimental metrology validation).
+* **Validation Status:** **Threshold Pending Experimental Validation**. (Measurement definition parameters are required).
 
 #### FC-ZC-003C: Statistical Information Leakage Test
 * **Security Claim:** There is no statistically significant relationship between the measured physical signal and the protected raw data.
-* **Observable:** Mutual Information (MI) or Test Vector Leakage Assessment (TVLA) metrics (See Annex B).
-* **Acceptance Criterion:** MI < MI_upper_bound.
+* **Acceptance Criterion:** MI < MI_upper_bound (See Annex B).
 * **Validation Status:** **Pending Independent Validation**.
 
 ---
 
 ### FC-ZC-004: Volatile Memory Zeroization & Data Remanence (M7/M8)
 
-Data destruction evaluation is separated into **Temporal Evidence** and **Recovery Evidence**.
+Data destruction evaluation is separated into three distinct phases to decouple command issuance from physical inference risk:
+1. Zeroization command issued (Trigger)
+2. Physical state transition completed (T_INV)
+3. Residual information experimentally demonstrated to be unrecoverable (R_rate)
 
-* **Security Claim:** Raw data becomes irreversibly unrecoverable after the required inference window or boundary breach.
-* **Temporal Observable:** The time from the boundary-breach trigger to the verified completion of raw-data invalidation (T_INV). Measured via Logic Analyzer on MAP-TRG-01.
-* **Recovery Observable:** Post-event memory extraction and residual-data analysis.
 * **Acceptance Criterion:** 
   1. T_INV <= T_PROFILE (Currently specified as <10 ms).
   2. Residual recovery rate R_rate <= 0.01%.
-* **Validation Status:** **Pending Independent Validation** (Profile-based timing limits and remanence thresholds require experimental laboratory validation across differing SRAM/DRAM topologies and RC time constants).
+* **Validation Status:** **Existing Threshold — Pending Independent Experimental Validation**. 
 
 ---
 
 ### FC-ZC-008: Debug Interface Lifecycle and Attack Surface (M9)
 
 * **Security Claim:** Production debug interfaces cannot be used to bypass the trust boundary or extract raw data.
-* **Lifecycle Constraint:** JTAG/SWD MUST NOT be used as the sole evidence mechanism for proving irreversible raw-data destruction. JTAG/SWD is evaluated under a lifecycle model: Engineering DUT -> Instrumentation -> Security Test -> Production Lock -> Accessibility Verification.
-* **Acceptance Criterion:** Production accessibility verification MUST confirm debug closure (e.g., fused or cryptographically locked).
+* **Lifecycle Constraint:** JTAG/SWD is evaluated under a lifecycle model: Engineering DUT -> Instrumentation -> Security Test -> Production Lock -> Accessibility Verification.
 * **Validation Status:** Normative Requirement.
 
 ---
