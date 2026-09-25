@@ -5,10 +5,10 @@ The Hardware-Enforced, privacy-first hardware reference methodology for Server-I
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Standard](https://img.shields.io/badge/ZC--CORE-v3.2.1-black.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.2.1)
+[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v3.3.0--rc1-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v3.3.0-rc1)
 
 ## Overview
-This repository contains the official, strictly falsifiable **ZC-CORE v3.2.1 Methodology**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
+This repository contains the **ZC-CORE v3.3.0-rc1 Release Candidate (Pending Experimental Validation)**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
 
 By enforcing Physical Data Diodes, Trust Boundaries, and Hardware-Enforced Raw-Data Destruction / Invalidation (including power-cut, cryptographic zeroization, or independently validated equivalent mechanisms), this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It is designed to mitigate remote network-based raw-sensor extraction, including attacks originating from compromised network infrastructure, and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
 
@@ -55,7 +55,7 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
     * The 4-tier certification hierarchy (Self-Declared to FreeCuli Certified™) and trademark usage rights.
 11. **[ZC-CORE Versioning and Governance Policy](zero-cloud-core-versioning-and-governance.md)**
     * The rigid rules governing how the standard evolves, deprecates old methods, and manages change control.
-12. **[ZC-CORE Release Manifest (v3.2.1)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
+12. **[ZC-CORE Release Manifest (v3.3.0-rc1)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
     * The cryptographic SHA-256 seal of this release, binding all documents to a verifiable timeline.
 
 ## Commercial Certification
