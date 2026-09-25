@@ -3,17 +3,17 @@
 This manifest records the cryptographic identity, publication metadata, and file integrity of the specified ZC-CORE release. The associated defensive publication is intended to establish publicly accessible technical prior art for the disclosed subject matter. This document does not constitute a patentability opinion. Legacy pointer documents (and LICENSE) are intentionally excluded from the canonical release hash set because they contain no normative content.
 
 ## Publication Metadata
-* **Release Version:** ZC-CORE v3.2.1 (Hardening Release)
+* **Release Version:** ZC-CORE v3.3.0-rc1 (Gate 4 Blueprint)
 * **Date (UTC):** 2026-09-24
 * **Reference Concept DOI (Zenodo):** 10.5281/zenodo.22838473
 * **Standardization Level:** RFC 2119 Normative Stricture
 * **Repository:** FreeCuli/zero-cloud-hardware-architecture
-* **Git Tag: v3.2.1**
-* **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v3.2.1`
+* **Git Tag: v3.3.0-rc1**
+* **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v3.3.0-rc1`
 * **Release Artifact SHA-256:** *(to be computed and recorded upon generation of the immutable Zenodo archival tarball/zip using `sha256sum <zenodo_archive>`. This placeholder preserves cryptographic distinction between the Git tree state and the post-publication distribution artifact)*
 
 ## Cryptographic Evidence (SHA-256 Hashes)
-The following hashes cover all canonical v3.2.1 normative and supporting documents listed in this manifest.
+The following hashes cover all canonical v3.3.0-rc1 normative and supporting documents listed in this manifest.
 
 ```text
 A84067C69EDD08643DE9D37CA40DF642E8C7756E0182C02F1D4FFEFEF4C4131B  README.md
