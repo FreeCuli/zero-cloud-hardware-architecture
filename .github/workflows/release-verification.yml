@@ -120,8 +120,8 @@ jobs:
         run: |
           echo "Verifying if release tag is cryptographically signed and VALID..."
           git config gpg.ssh.allowedSignersFile .github/allowed_signers
-          # if git tag -v v3.3.0-rc2; then
-            # echo "[PASS] Git Tag v3.3.0-rc2 signature is VALID and belongs to a trusted signer."
+          if git tag -v v3.3.0-rc2; then
+            echo "[PASS] Git Tag v3.3.0-rc2 signature is VALID and belongs to a trusted signer."
           # else\n          #   echo "[FAIL] Git Tag v3.3.0-rc2 signature verification failed!"\n          #   exit 1\n          # fi
 
       - name: Verify no legacy normative content
