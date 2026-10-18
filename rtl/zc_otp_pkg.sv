@@ -56,35 +56,45 @@ package zc_otp_pkg;
   // Explicit (22,16) Hsiao parity generator p[5:0] from d[15:0] (Rev. 28 Section 1.1)
   function automatic logic [5:0] f_hsiao_parity6(input logic [15:0] d);
     logic [5:0] p;
-    p[0] = d[0] ^ d[1] ^ d[2] ^ d[4] ^ d[5] ^ d[7] ^ d[10] ^ d[11] ^ d[13]; // weight 9
-    p[1] = d[0] ^ d[1] ^ d[3] ^ d[4] ^ d[6] ^ d[8] ^ d[10] ^ d[12] ^ d[14]; // weight 9
-    p[2] = d[0] ^ d[2] ^ d[3] ^ d[5] ^ d[6] ^ d[9] ^ d[11] ^ d[12] ^ d[15]; // weight 9
-    p[3] = d[1] ^ d[2] ^ d[3] ^ d[7] ^ d[8] ^ d[9] ^ d[13] ^ d[14] ^ d[15]; // weight 9
-    p[4] = d[4] ^ d[5] ^ d[6] ^ d[7] ^ d[8] ^ d[9];                         // weight 6
-    p[5] = d[10] ^ d[11] ^ d[12] ^ d[13] ^ d[14] ^ d[15];                   // weight 6
-    return p;
+    begin
+      p[0] = d[0] ^ d[1] ^ d[2] ^ d[4] ^ d[5] ^ d[7] ^ d[10] ^ d[11] ^ d[13]; // weight 9
+      p[1] = d[0] ^ d[1] ^ d[3] ^ d[4] ^ d[6] ^ d[8] ^ d[10] ^ d[12] ^ d[14]; // weight 9
+      p[2] = d[0] ^ d[2] ^ d[3] ^ d[5] ^ d[6] ^ d[9] ^ d[11] ^ d[12] ^ d[15]; // weight 9
+      p[3] = d[1] ^ d[2] ^ d[3] ^ d[7] ^ d[8] ^ d[9] ^ d[13] ^ d[14] ^ d[15]; // weight 9
+      p[4] = d[4] ^ d[5] ^ d[6] ^ d[7] ^ d[8] ^ d[9];                         // weight 6
+      p[5] = d[10] ^ d[11] ^ d[12] ^ d[13] ^ d[14] ^ d[15];                   // weight 6
+      f_hsiao_parity6 = p;
+    end
   endfunction
 
   // Systematic 22-bit Hsiao codeword: codeword_22b[21:0] = {p[5:0], d[15:0]}
   function automatic logic [21:0] f_hsiao_encode22(input logic [15:0] d);
-    return {f_hsiao_parity6(d), d};
+    begin
+      f_hsiao_encode22 = {f_hsiao_parity6(d), d};
+    end
   endfunction
 
   // 6-bit syndrome calculator for SECDED verification
   function automatic logic [5:0] f_hsiao_syndrome6(input logic [21:0] cw);
-    return cw[21:16] ^ f_hsiao_parity6(cw[15:0]);
+    begin
+      f_hsiao_syndrome6 = cw[21:16] ^ f_hsiao_parity6(cw[15:0]);
+    end
   endfunction
 
   // Balanced 16-bit SVN data word: WORD_SVN(v) = {~v, v}
   function automatic logic [15:0] f_word_svn_16(input logic [7:0] v);
-    return {~v, v};
+    begin
+      f_word_svn_16 = {~v, v};
+    end
   endfunction
 
   // Rev. 28B affine slot mask A: M_A(k) = (17*k + 8'h5A) mod 256
   function automatic logic [7:0] f_mask_a(input logic [3:0] k);
     logic [7:0] prod;
-    prod = ({4'b0000, k} * 8'd17);
-    return prod + 8'h5A;
+    begin
+      prod = ({4'b0000, k} * 8'd17);
+      f_mask_a = prod + 8'h5A;
+    end
   endfunction
 
   // Rev. 28B affine slot mask B: M_B(k) = (29*k + 8'h3C) mod 256
@@ -92,22 +102,28 @@ package zc_otp_pkg;
   // zero collisions between WORD_COMMIT_A and WORD_COMMIT_B for all (k, v).
   function automatic logic [7:0] f_mask_b(input logic [3:0] k);
     logic [7:0] prod;
-    prod = ({4'b0000, k} * 8'd29);
-    return prod + 8'h3C;
+    begin
+      prod = ({4'b0000, k} * 8'd29);
+      f_mask_b = prod + 8'h3C;
+    end
   endfunction
 
   // Primary Commit Seal A: f_seal_a(k, v) = {~B_A, B_A}
   function automatic logic [15:0] f_seal_a(input logic [3:0] k, input logic [7:0] v);
     logic [7:0] b_a;
-    b_a = v ^ f_mask_a(k);
-    return {~b_a, b_a};
+    begin
+      b_a = v ^ f_mask_a(k);
+      f_seal_a = {~b_a, b_a};
+    end
   endfunction
 
   // Redundant Commit Seal B: f_seal_b(k, v) = {B_B, ~B_B}
   function automatic logic [15:0] f_seal_b(input logic [3:0] k, input logic [7:0] v);
     logic [7:0] b_b;
-    b_b = v ^ f_mask_b(k);
-    return {b_b, ~b_b};
+    begin
+      b_b = v ^ f_mask_b(k);
+      f_seal_b = {b_b, ~b_b};
+    end
   endfunction
 
   // Expected 22-bit raw Hsiao codeword selector for (slot k, SVN v, word_idx)
@@ -116,12 +132,14 @@ package zc_otp_pkg;
     input logic [7:0] v,
     input logic [1:0] word_idx
   );
-    case (word_idx)
-      OTP_WORD_SVN:      return f_hsiao_encode22(f_word_svn_16(v));
-      OTP_WORD_COMMIT_A: return f_hsiao_encode22(f_seal_a(k, v));
-      OTP_WORD_COMMIT_B: return f_hsiao_encode22(f_seal_b(k, v));
-      default:           return 22'h3F_FFFF;
-    endcase
+    begin
+      case (word_idx)
+        OTP_WORD_SVN:      f_expected_otp_codeword22 = f_hsiao_encode22(f_word_svn_16(v));
+        OTP_WORD_COMMIT_A: f_expected_otp_codeword22 = f_hsiao_encode22(f_seal_a(k, v));
+        OTP_WORD_COMMIT_B: f_expected_otp_codeword22 = f_hsiao_encode22(f_seal_b(k, v));
+        default:           f_expected_otp_codeword22 = 22'h3F_FFFF;
+      endcase
+    end
   endfunction
 
-endpackage : zc_otp_pkg
+endpackage

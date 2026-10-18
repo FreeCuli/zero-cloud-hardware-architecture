@@ -192,4 +192,4 @@ module zc_spi_flash_firewall (
   // Explicit sink for upper Bank-B sector index bits [22:16] and upper SR1 status bits [7:2]
   wire unused_ok_w = &{1'b0, target_addr_i[22:16], sr1_latched_byte_q[7:2], 1'b0};
 
-endmodule : zc_spi_flash_firewall
+endmodule

@@ -318,4 +318,4 @@ module zc_aon_post_auth_ctrl
     end
   end
 
-endmodule : zc_aon_post_auth_ctrl
+endmodule

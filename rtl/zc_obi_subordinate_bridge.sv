@@ -207,4 +207,4 @@ module zc_obi_subordinate_bridge (
   assign drain_wdog_cnt_o         = drain_wdog_cnt_q;
   assign bridge_state_o           = state_q;
 
-endmodule : zc_obi_subordinate_bridge
+endmodule

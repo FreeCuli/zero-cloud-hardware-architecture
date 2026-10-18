@@ -101,4 +101,4 @@ module zc_spi_formal_proof (
     end
   end
 
-endmodule : zc_spi_formal_proof
+endmodule

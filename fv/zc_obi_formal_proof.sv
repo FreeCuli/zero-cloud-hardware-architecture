@@ -138,4 +138,4 @@ module zc_obi_formal_proof (
     end
   end
 
-endmodule : zc_obi_formal_proof
+endmodule
