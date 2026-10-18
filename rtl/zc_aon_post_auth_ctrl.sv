@@ -76,10 +76,22 @@ module zc_aon_post_auth_ctrl
   logic [1:0]      expected_word_idx_q;
   logic [3:0]      expected_slot_q;
   logic [7:0]      expected_svn_q;
-  logic [21:0]     expected_codeword_q [0:2];
+  logic [21:0]     expected_cw0_q;
+  logic [21:0]     expected_cw1_q;
+  logic [21:0]     expected_cw2_q;
   logic [31:0]     active_session_id_q;
   logic            val_ctx_seal_b_only_q;
   logic            pending_b_exists_q;
+
+  logic [21:0]     expected_cw_cur_w;
+  always_comb begin
+    case (expected_word_idx_q)
+      OTP_WORD_SVN:      expected_cw_cur_w = expected_cw0_q;
+      OTP_WORD_COMMIT_A: expected_cw_cur_w = expected_cw1_q;
+      OTP_WORD_COMMIT_B: expected_cw_cur_w = expected_cw2_q;
+      default:           expected_cw_cur_w = 22'h3F_FFFF;
+    endcase
+  end
 
   // -------------------------------------------------------------------------
   // 4-Phase Atomic Handshake Signals (Rev. 28C Section 1.1 & 1.2)
@@ -96,7 +108,7 @@ module zc_aon_post_auth_ctrl
   assign otp_auth_svn_o         = expected_svn_q;
   assign otp_auth_word_sel_o    = expected_word_idx_q;
   assign otp_auth_word_mask_o   = write_authorized_w ? (3'b001 << expected_word_idx_q) : 3'b000;
-  assign otp_auth_expected_cw_o = expected_codeword_q[expected_word_idx_q];
+  assign otp_auth_expected_cw_o = expected_cw_cur_w;
 
   // Phase 2 (dai_write_accepted): Single-cycle handshake consuming the word grant
   wire dai_write_accepted_w = write_authorized_w &&
@@ -124,7 +136,7 @@ module zc_aon_post_auth_ctrl
                              (dai_rb_session_id_i == active_session_id_q) &&
                              (dai_rb_slot_idx_i   == expected_slot_q) &&
                              (dai_rb_word_sel_i   == expected_word_idx_q) &&
-                             (dai_rb_raw_data_i   == expected_codeword_q[expected_word_idx_q]);
+                             (dai_rb_raw_data_i   == expected_cw_cur_w);
 
   // Explicit completion conditions for Normal (0->1->2) and Recovery (only 2) commit modes
   wire normal_commit_done_ok_w   = readback_verified_w && !val_ctx_seal_b_only_q && (expected_word_idx_q == OTP_WORD_COMMIT_B);
@@ -146,9 +158,9 @@ module zc_aon_post_auth_ctrl
       expected_word_idx_q    <= OTP_WORD_SVN;
       expected_slot_q        <= 4'd0;
       expected_svn_q         <= 8'd0;
-      expected_codeword_q[0] <= 22'h0;
-      expected_codeword_q[1] <= 22'h0;
-      expected_codeword_q[2] <= 22'h0;
+      expected_cw0_q         <= 22'h0;
+      expected_cw1_q         <= 22'h0;
+      expected_cw2_q         <= 22'h0;
       active_session_id_q    <= 32'h0;
       val_ctx_seal_b_only_q  <= 1'b0;
       pending_b_exists_q     <= 1'b0;
@@ -188,9 +200,9 @@ module zc_aon_post_auth_ctrl
                 (!req_seal_b_only_i || pending_b_exists_q)) begin
               expected_slot_q        <= req_target_slot_i;
               expected_svn_q         <= req_target_svn_i;
-              expected_codeword_q[0] <= f_expected_otp_codeword22(req_target_slot_i, req_target_svn_i, OTP_WORD_SVN);
-              expected_codeword_q[1] <= f_expected_otp_codeword22(req_target_slot_i, req_target_svn_i, OTP_WORD_COMMIT_A);
-              expected_codeword_q[2] <= f_expected_otp_codeword22(req_target_slot_i, req_target_svn_i, OTP_WORD_COMMIT_B);
+              expected_cw0_q         <= f_expected_otp_codeword22(req_target_slot_i, req_target_svn_i, OTP_WORD_SVN);
+              expected_cw1_q         <= f_expected_otp_codeword22(req_target_slot_i, req_target_svn_i, OTP_WORD_COMMIT_A);
+              expected_cw2_q         <= f_expected_otp_codeword22(req_target_slot_i, req_target_svn_i, OTP_WORD_COMMIT_B);
               val_ctx_seal_b_only_q  <= req_seal_b_only_i;
               expected_word_idx_q    <= req_seal_b_only_i ? OTP_WORD_COMMIT_B : OTP_WORD_SVN;
               word_grant_avail_q     <= 1'b1;

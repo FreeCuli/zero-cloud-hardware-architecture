@@ -12,9 +12,9 @@
 
 package zc_otp_pkg;
 
-  // Canonical (22,16) Hsiao parity submatrix H_data columns (weight-3 vectors in GF(2)^6)
+  // Canonical (22,16) Hsiao parity submatrix H_data columns (16 x 6-bit weight-3 vectors in GF(2)^6)
   /* verilator lint_off UNUSEDPARAM */
-  localparam logic [15:0][5:0] H_DATA = {
+  localparam logic [95:0] H_DATA = {
     6'h2C, 6'h2A, 6'h29, 6'h26,
     6'h25, 6'h23, 6'h1C, 6'h1A,
     6'h19, 6'h16, 6'h15, 6'h13,
