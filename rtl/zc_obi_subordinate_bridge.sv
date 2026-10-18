@@ -104,7 +104,9 @@ module zc_obi_subordinate_bridge (
   wire resp_timeout_expired_w = (state_q == ST_WAIT_RVALID) && (wait_cnt_q == 6'd63);
 
   always_ff @(posedge clk_i or negedge rst_por_ni) begin
-    if (!rst_por_ni || !rst_sys_ni) begin
+    if (!rst_por_ni) begin
+      wait_cnt_q <= 6'd0;
+    end else if (!rst_sys_ni) begin
       wait_cnt_q <= 6'd0;
     end else if (state_q == ST_WAIT_RVALID) begin
       if (periph_phys_rvalid_i || resp_timeout_expired_w)
@@ -118,7 +120,11 @@ module zc_obi_subordinate_bridge (
 
   // 5. Upper-Band OBI State Machine (with Rev. 28D ST_TRAP Synthetic Error Path)
   always_ff @(posedge clk_i or negedge rst_por_ni) begin
-    if (!rst_por_ni || !rst_sys_ni) begin
+    if (!rst_por_ni) begin
+      state_q              <= ST_IDLE;
+      pending_tx_q         <= 1'b0;
+      cpu_resp_delivered_q <= 1'b0;
+    end else if (!rst_sys_ni) begin
       state_q              <= ST_IDLE;
       pending_tx_q         <= 1'b0;
       cpu_resp_delivered_q <= 1'b0;
