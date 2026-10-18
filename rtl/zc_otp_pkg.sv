@@ -14,11 +14,11 @@ package zc_otp_pkg;
 
   // Canonical (22,16) Hsiao parity submatrix H_data columns (weight-3 vectors in GF(2)^6)
   /* verilator lint_off UNUSEDPARAM */
-  localparam logic [5:0] H_DATA [0:15] = '{
-    6'h07, 6'h0B, 6'h0D, 6'h0E,
-    6'h13, 6'h15, 6'h16, 6'h19,
-    6'h1A, 6'h1C, 6'h23, 6'h25,
-    6'h26, 6'h29, 6'h2A, 6'h2C
+  localparam logic [15:0][5:0] H_DATA = {
+    6'h2C, 6'h2A, 6'h29, 6'h26,
+    6'h25, 6'h23, 6'h1C, 6'h1A,
+    6'h19, 6'h16, 6'h15, 6'h13,
+    6'h0E, 6'h0D, 6'h0B, 6'h07
   };
   /* verilator lint_on UNUSEDPARAM */
 
@@ -83,7 +83,7 @@ package zc_otp_pkg;
   // Rev. 28B affine slot mask A: M_A(k) = (17*k + 8'h5A) mod 256
   function automatic logic [7:0] f_mask_a(input logic [3:0] k);
     logic [7:0] prod;
-    prod = 8'(unsigned'(k) * 8'd17);
+    prod = ({4'b0000, k} * 8'd17);
     return prod + 8'h5A;
   endfunction
 
@@ -92,7 +92,7 @@ package zc_otp_pkg;
   // zero collisions between WORD_COMMIT_A and WORD_COMMIT_B for all (k, v).
   function automatic logic [7:0] f_mask_b(input logic [3:0] k);
     logic [7:0] prod;
-    prod = 8'(unsigned'(k) * 8'd29);
+    prod = ({4'b0000, k} * 8'd29);
     return prod + 8'h3C;
   endfunction
 
