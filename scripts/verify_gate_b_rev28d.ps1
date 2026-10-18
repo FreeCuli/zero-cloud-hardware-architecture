@@ -155,6 +155,7 @@ Assert-Condition ($rtlSpi.Contains("wren_pri_frame_done_w") -and $rtlSpi.Contain
 Assert-Condition ($rtlObi.Contains("wire orphan_active_w     = orphan_drain_active_q || orphan_trigger_w;") -and $rtlObi.Contains("else if (orphan_active_w)")) "T3.5_RTL_OBI_UNIFIED_ORPHAN_WDOG" "rtl/zc_obi_subordinate_bridge.sv uses unified orphan_active_w watchdog progression (Rev. 28C R28B-03)"
 Assert-Condition ($rtlObi.Contains("state_q <= ST_TRAP;") -and $rtlObi.Contains("(subsys_dead_locked_q ||") -and $rtlObi.Contains("synth_err_rvalid_w")) "T3.6_RTL_OBI_ST_TRAP_SYNTH_ERR" "rtl/zc_obi_subordinate_bridge.sv preserves ST_TRAP synthetic error response when subsys_dead_locked_q == 1'b1 (Rev. 28D)"
 Assert-Condition ($svaOtp.Contains("bind zc_aon_post_auth_ctrl zc_otp_sva") -and $svaSpi.Contains("bind zc_spi_flash_firewall zc_spi_sva") -and $svaObi.Contains("bind zc_obi_subordinate_bridge zc_obi_sva")) "T3.7_SVA_CANONICAL_BIND_DECLARATIONS" "All module-bound SVA files (fv/zc_otp_sva.sv, fv/zc_spi_sva.sv, fv/zc_obi_sva.sv) contain canonical SystemVerilog bind declarations"
+Assert-Condition ($rtlObi.Contains("assign host_req_ready_o  = rst_sys_ni &&") -and $rtlObi.Contains("assign periph_phys_req_o = rst_sys_ni &&") -and $svaObi.Contains("a_obi_warm_reset_blocks_req_and_ready")) "T3.8_RTL_OBI_WARM_RESET_GATING_GCR01" "rtl/zc_obi_subordinate_bridge.sv and fv/zc_obi_sva.sv gate host_req_ready_o and periph_phys_req_o with rst_sys_ni (GCR-01)"
 
 # ----------------------------------------------------------------------
 # TEST 4: Cycle-Accurate Behavioral Trace Verification of RTL Contracts
@@ -223,15 +224,22 @@ for ($c = 0; $c -lt 1024; $c++) {
 }
 # Now release Warm Reset (rst_sys_n = 1) while subsys_dead_locked_q == 1 and issue CPU request (host_req_i = 1)
 $rst_sys_n = $true; $obi_state = "ST_IDLE"; $host_req = $true
-$host_req_ready = ($obi_state -eq "ST_IDLE") -and $dead_locked
-$periph_phys_req = ($obi_state -eq "ST_IDLE") -and $host_req -and (-not $dead_locked)
+$host_req_ready = $rst_sys_n -and ($obi_state -eq "ST_IDLE") -and $dead_locked
+$periph_phys_req = $rst_sys_n -and ($obi_state -eq "ST_IDLE") -and $host_req -and (-not $dead_locked)
 if ($host_req -and $host_req_ready -and $dead_locked) { $obi_state = "ST_TRAP"; $pending_tx = $true; $resp_deliv = $false }
-$trap_cycle_rvalid = $pending_tx -and (-not $resp_deliv) -and ($obi_state -eq "ST_TRAP")
+$trap_cycle_rvalid = $rst_sys_n -and $pending_tx -and (-not $resp_deliv) -and ($obi_state -eq "ST_TRAP")
 $trap_cycle_err    = $trap_cycle_rvalid
 $trap_cycle_rdata  = if ($trap_cycle_rvalid) { 0 } else { 0xDEAD }
 # Next cycle returns to ST_IDLE while keeping subsys_dead_locked_q == 1
 $obi_state_next = "ST_IDLE"
 Assert-Condition ($dead_locked -and ($wdog_cnt -eq 1023) -and $host_req_ready -and (-not $periph_phys_req) -and $trap_cycle_rvalid -and $trap_cycle_err -and ($trap_cycle_rdata -eq 0) -and ($obi_state_next -eq "ST_IDLE")) "T4.3_OBI_WDOG_1024_AND_ST_TRAP_SYNTH_ERR" "Orphan watchdog reaches 1023->subsys_dead_locked_q=1 under continuous !rst_sys_ni, and ST_TRAP returns 1-cycle synthetic error (rvalid=1, err=1, rdata=0) with periph_phys_req_o=0"
+
+# T4.4 (GCR-01): OBI Warm Reset (!rst_sys_ni == 0) blocks periph_phys_req_o and host_req_ready_o even when host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0
+$gcr01_rst_sys_n = $false; $gcr01_state = "ST_IDLE"; $gcr01_host_req = $true; $gcr01_phys_gnt = $true
+$gcr01_phys_active = $false; $gcr01_orphan_act = $false; $gcr01_dead_locked = $false
+$gcr01_host_ready = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and ($gcr01_dead_locked -or ((-not $gcr01_phys_active) -and (-not $gcr01_orphan_act) -and $gcr01_phys_gnt))
+$gcr01_phys_req   = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and $gcr01_host_req -and (-not $gcr01_phys_active) -and (-not $gcr01_orphan_act) -and (-not $gcr01_dead_locked)
+Assert-Condition ((-not $gcr01_host_ready) -and (-not $gcr01_phys_req)) "T4.4_OBI_GCR01_WARM_RESET_BLOCKS_PHYS_REQ" "Under rst_sys_ni=0, state_q=ST_IDLE, host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0 -> periph_phys_req_o=0 and host_req_ready_o=0"
 
 Write-Output "----------------------------------------------------------------------"
 Write-Output " SUMMARY: PASS=$PassCount, FAIL=$FailCount"
@@ -241,4 +249,5 @@ Write-Output "       is installed on this host."
 Write-Output "======================================================================"
 
 if ($FailCount -gt 0) { exit 1 }
+
 

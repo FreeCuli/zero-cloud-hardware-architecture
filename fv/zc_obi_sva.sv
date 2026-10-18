@@ -88,6 +88,15 @@ module zc_obi_sva (
       ##1 ((state_q == ST_IDLE) && subsys_dead_locked_q)
     );
 
+  // SVA-L0-14 (GCR-01 Closure): Warm Reset (!rst_sys_ni == 1'b0) strictly blocks new request
+  // acceptance (host_req_ready_o == 1'b0), physical peripheral requests (periph_phys_req_o == 1'b0),
+  // and CPU response strobes (host_rvalid_o == 1'b0), preventing any new phys_req_active_q latch.
+  a_obi_warm_reset_blocks_req_and_ready:
+    assert property (@(posedge clk_i) disable iff (!rst_por_ni)
+      !rst_sys_ni
+      |-> (!host_req_ready_o && !periph_phys_req_o && !host_rvalid_o)
+    );
+
 endmodule : zc_obi_sva
 
 // Canonical SystemVerilog bind into zc_obi_subordinate_bridge

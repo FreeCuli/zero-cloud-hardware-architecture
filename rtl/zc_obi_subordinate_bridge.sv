@@ -173,25 +173,29 @@ module zc_obi_subordinate_bridge (
     end
   end
 
-  // 6. Upper-Band & Lower-Band Output Assignments (Rev. 28D Section 1.2)
-  assign host_req_ready_o  = (state_q == ST_IDLE) &&
+  // 6. Upper-Band & Lower-Band Output Assignments (Rev. 28D Section 1.2 + GCR-01 Warm Reset Gate)
+  assign host_req_ready_o  = rst_sys_ni &&
+                             (state_q == ST_IDLE) &&
                              (subsys_dead_locked_q ||
                               (!phys_req_active_q && !drain_in_progress_w && periph_phys_gnt_i));
 
-  assign periph_phys_req_o = (state_q == ST_IDLE) &&
+  assign periph_phys_req_o = rst_sys_ni &&
+                             (state_q == ST_IDLE) &&
                              host_req_i &&
                              !phys_req_active_q &&
                              !orphan_active_w &&
                              !subsys_dead_locked_q;
 
-  wire normal_rvalid_ok_w  = pending_tx_q && !cpu_resp_delivered_q &&
+  wire normal_rvalid_ok_w  = rst_sys_ni &&
+                             pending_tx_q && !cpu_resp_delivered_q &&
                              (state_q == ST_WAIT_RVALID) &&
                              periph_phys_rvalid_i &&
                              phys_req_active_q &&
                              !orphan_active_w &&
                              !subsys_dead_locked_q;
 
-  wire synth_err_rvalid_w  = pending_tx_q && !cpu_resp_delivered_q &&
+  wire synth_err_rvalid_w  = rst_sys_ni &&
+                             pending_tx_q && !cpu_resp_delivered_q &&
                              ((state_q == ST_TIMEOUT_ERR) || (state_q == ST_TRAP));
 
   assign host_rvalid_o     = normal_rvalid_ok_w || synth_err_rvalid_w;
