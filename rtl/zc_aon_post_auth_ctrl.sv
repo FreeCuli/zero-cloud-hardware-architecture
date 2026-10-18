@@ -68,10 +68,63 @@ module zc_aon_post_auth_ctrl (
   output logic                  aon_fatal_locked_o
 );
 
+`ifndef YOSYS
   import zc_otp_pkg::*;
-
   aon_auth_state_e aon_auth_state_q;
   otp_wstep_e      wstep_q;
+`else
+  localparam logic [1:0] OTP_WORD_SVN      = 2'd0;
+  localparam logic [1:0] OTP_WORD_COMMIT_A = 2'd1;
+  localparam logic [1:0] OTP_WORD_COMMIT_B = 2'd2;
+  localparam logic [2:0] AUTH_RESET_IDLE   = 3'b000;
+  localparam logic [2:0] AUTH_WAIT_CHAL    = 3'b001;
+  localparam logic [2:0] AUTH_VALIDATE     = 3'b010;
+  localparam logic [2:0] AUTH_GRANT        = 3'b011;
+  localparam logic [2:0] AUTH_SESSION_DONE = 3'b100;
+  localparam logic [2:0] AUTH_LOCKED_FATAL = 3'b111;
+  localparam logic [1:0] WSTEP_IDLE           = 2'b00;
+  localparam logic [1:0] WSTEP_AUTH_READY     = 2'b01;
+  localparam logic [1:0] WSTEP_WAIT_PHYS_DONE = 2'b10;
+  localparam logic [1:0] WSTEP_WAIT_RB_VERIFY = 2'b11;
+  localparam logic [1:0] DAI_IDLE          = 2'b00;
+  logic [2:0] aon_auth_state_q;
+  logic [1:0] wstep_q;
+
+  function automatic logic [5:0] f_hsiao_parity6(input logic [15:0] d);
+    logic [5:0] p;
+    begin
+      p[0] = d[0] ^ d[1] ^ d[2] ^ d[4] ^ d[5] ^ d[7] ^ d[10] ^ d[11] ^ d[13];
+      p[1] = d[0] ^ d[1] ^ d[3] ^ d[4] ^ d[6] ^ d[8] ^ d[10] ^ d[12] ^ d[14];
+      p[2] = d[0] ^ d[2] ^ d[3] ^ d[5] ^ d[6] ^ d[9] ^ d[11] ^ d[12] ^ d[15];
+      p[3] = d[1] ^ d[2] ^ d[3] ^ d[7] ^ d[8] ^ d[9] ^ d[13] ^ d[14] ^ d[15];
+      p[4] = d[4] ^ d[5] ^ d[6] ^ d[7] ^ d[8] ^ d[9];
+      p[5] = d[10] ^ d[11] ^ d[12] ^ d[13] ^ d[14] ^ d[15];
+      f_hsiao_parity6 = p;
+    end
+  endfunction
+
+  function automatic logic [21:0] f_expected_otp_codeword22(
+    input logic [3:0] k,
+    input logic [7:0] v,
+    input logic [1:0] word_idx
+  );
+    logic [7:0] ma, mb, ba, bb;
+    logic [15:0] d;
+    begin
+      ma = ({4'b0000, k} * 8'd17) + 8'h5A;
+      mb = ({4'b0000, k} * 8'd29) + 8'h3C;
+      ba = v ^ ma;
+      bb = v ^ mb;
+      case (word_idx)
+        OTP_WORD_SVN:      d = {~v, v};
+        OTP_WORD_COMMIT_A: d = {~ba, ba};
+        OTP_WORD_COMMIT_B: d = {bb, ~bb};
+        default:           d = 16'hFFFF;
+      endcase
+      f_expected_otp_codeword22 = {f_hsiao_parity6(d), d};
+    end
+  endfunction
+`endif
   logic            word_grant_avail_q;
   logic [1:0]      expected_word_idx_q;
   logic [3:0]      expected_slot_q;

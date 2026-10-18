@@ -47,7 +47,18 @@ module zc_otp_formal_proof (
   input logic [21:0]           dai_rb_raw_data_i
 );
 
+`ifndef YOSYS
   import zc_otp_pkg::*;
+`else
+  localparam logic [1:0] OTP_WORD_COMMIT_B = 2'd2;
+  localparam logic [2:0] AUTH_GRANT        = 3'b011;
+  localparam logic [2:0] AUTH_SESSION_DONE = 3'b100;
+  localparam logic [2:0] AUTH_LOCKED_FATAL = 3'b111;
+  localparam logic [1:0] WSTEP_IDLE           = 2'b00;
+  localparam logic [1:0] WSTEP_AUTH_READY     = 2'b01;
+  localparam logic [1:0] WSTEP_WAIT_PHYS_DONE = 2'b10;
+  localparam logic [1:0] WSTEP_WAIT_RB_VERIFY = 2'b11;
+`endif
 
   logic                  otp_word_auth_valid_o;
   logic                  otp_dai_we_o;
