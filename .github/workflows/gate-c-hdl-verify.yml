@@ -71,33 +71,60 @@ jobs:
           iverilog -g2012 -o sim_otp_equiv_iv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_fn_equiv.sv && vvp sim_otp_equiv_iv
           iverilog -g2012 -DYOSYS -o sim_otp_equiv_yosys_iv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_fn_equiv.sv && vvp sim_otp_equiv_yosys_iv
 
-      - name: Step 3 - Formal Model Checking (Yosys + yosys-smtbmc + Z3 BMC & k-Induction)
+      - name: Step 3a - SPI Formal Proof (BMC & k-Induction)
         run: |
-          echo "=== [FORMAL-1] SPI 3-Layer Firewall & Reconciler Formal Proof (BMC + k-Induction, depth 20) ==="
-          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 spi_formal.smt2"
-          yosys-smtbmc --unroll -s z3 -t 20 spi_formal.smt2
-          yosys-smtbmc --unroll -s z3 -i -t 20 spi_formal.smt2
+          echo "### Formal Proof: SPI 3-Layer Firewall" >> $GITHUB_STEP_SUMMARY
+          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 spi_formal.smt2" > yosys_spi.log 2>&1
+          echo "#### SPI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -t 20 spi_formal.smt2 2>&1 | tee spi_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "#### SPI k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -i -t 20 spi_formal.smt2 2>&1 | tee spi_ind.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
-          echo "=== [FORMAL-2] OBI Subordinate Bridge, Watchdog & ST_TRAP Formal Proof (BMC + k-Induction, depth 20) ==="
-          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 obi_formal.smt2"
-          yosys-smtbmc --unroll -s z3 -t 20 obi_formal.smt2
-          yosys-smtbmc --unroll -s z3 -i -t 20 obi_formal.smt2
+      - name: Step 3b - OBI Formal Proof (BMC & k-Induction)
+        run: |
+          echo "### Formal Proof: OBI Subordinate Bridge" >> $GITHUB_STEP_SUMMARY
+          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 obi_formal.smt2" > yosys_obi.log 2>&1
+          echo "#### OBI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -t 20 obi_formal.smt2 2>&1 | tee obi_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "#### OBI k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -i -t 20 obi_formal.smt2 2>&1 | tee obi_ind.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
-          echo "=== [FORMAL-3] OTP Authorization & Single-Use Grant Formal Proof (BMC + k-Induction, depth 20) ==="
-          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 otp_formal.smt2"
-          yosys-smtbmc --unroll -s z3 -t 20 otp_formal.smt2
-          yosys-smtbmc --unroll -s z3 -i -t 20 otp_formal.smt2
+      - name: Step 3c - OTP Formal Proof (BMC & k-Induction)
+        run: |
+          echo "### Formal Proof: OTP Authorization FSM" >> $GITHUB_STEP_SUMMARY
+          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 otp_formal.smt2" > yosys_otp.log 2>&1
+          echo "#### OTP BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -t 20 otp_formal.smt2 2>&1 | tee otp_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "#### OTP k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -i -t 20 otp_formal.smt2 2>&1 | tee otp_ind.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 4 - Formal Non-Vacuity Cover Witness Checking (yosys-smtbmc -c)
         run: |
-          echo "=== [COVER-1] SPI Non-Vacuity Cover Directives ==="
-          yosys-smtbmc --unroll -s z3 -c -t 20 spi_formal.smt2
-
-          echo "=== [COVER-2] OBI Non-Vacuity Cover Directives ==="
-          yosys-smtbmc --unroll -s z3 -c -t 20 obi_formal.smt2
-
-          echo "=== [COVER-3] OTP Non-Vacuity Cover Directives ==="
-          yosys-smtbmc --unroll -s z3 -c -t 20 otp_formal.smt2
+          echo "### Non-Vacuity Cover Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "#### SPI Covers" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -c -t 20 spi_formal.smt2 2>&1 | tee spi_cov.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "#### OBI Covers" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -c -t 20 obi_formal.smt2 2>&1 | tee obi_cov.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "#### OTP Covers" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          yosys-smtbmc --unroll -s z3 -c -t 20 otp_formal.smt2 2>&1 | tee otp_cov.log >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 5 - SVA Tool Capability Notice (Normative Commercial SVA and M7/M8 Status)
         run: |
@@ -111,12 +138,46 @@ jobs:
         run: |
           ./scripts/verify_gate_b_rev28d.ps1
 
-      - name: Step 7 - Upload Gate C HDL Verification Artifacts
+      - name: Step 7 - Formal Audit Verdict Verification
+        run: |
+          echo "=== Evaluating Formal Verification Results ==="
+          FAILED=0
+          for log in spi_bmc.log spi_ind.log obi_bmc.log obi_ind.log otp_bmc.log otp_ind.log spi_cov.log obi_cov.log otp_cov.log; do
+            if [ -f "$log" ]; then
+              if grep -q "Assert failed" "$log"; then
+                echo "[ERROR] Assertion failed in $log:"
+                grep -n "Assert failed" "$log"
+                FAILED=1
+              fi
+              if grep -q "Unreached cover" "$log"; then
+                echo "[ERROR] Cover target unreached in $log:"
+                grep -n "Unreached cover" "$log"
+                FAILED=1
+              fi
+              if grep -q "syntax error" "$log"; then
+                echo "[ERROR] Syntax error in $log:"
+                grep -n "syntax error" "$log"
+                FAILED=1
+              fi
+            else
+              echo "[ERROR] Expected log file $log was not created!"
+              FAILED=1
+            fi
+          done
+          if [ $FAILED -ne 0 ]; then
+            echo "[VERDICT] Formal verification failed. See logs above."
+            exit 1
+          else
+            echo "[VERDICT] All formal assertions and non-vacuity covers PASSED successfully!"
+          fi
+
+      - name: Step 8 - Upload Gate C HDL Verification Artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: gate-c-formal-evidence
           path: |
             *.smt2
+            *.log
             evidence/gate-c/MODELING_LIMITS.md
           retention-days: 90
