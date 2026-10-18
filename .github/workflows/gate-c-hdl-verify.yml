@@ -145,27 +145,28 @@ jobs:
           for log in spi_bmc.log spi_ind.log obi_bmc.log obi_ind.log otp_bmc.log otp_ind.log spi_cov.log obi_cov.log otp_cov.log; do
             if [ -f "$log" ]; then
               if grep -q "Assert failed" "$log"; then
-                echo "[ERROR] Assertion failed in $log:"
-                grep -n "Assert failed" "$log"
+                ERR_MSG=$(grep "Assert failed" "$log" | tr '\n' ' ' | head -c 200)
+                echo "::error title=Assertion Failed in $log::$ERR_MSG"
                 FAILED=1
-              fi
-              if grep -q "Unreached cover" "$log"; then
-                echo "[ERROR] Cover target unreached in $log:"
-                grep -n "Unreached cover" "$log"
+              elif grep -q "Unreached cover" "$log"; then
+                COV_MSG=$(grep "Unreached cover" "$log" | tr '\n' ' ' | head -c 200)
+                echo "::error title=Cover Unreached in $log::$COV_MSG"
                 FAILED=1
-              fi
-              if grep -q "syntax error" "$log"; then
-                echo "[ERROR] Syntax error in $log:"
-                grep -n "syntax error" "$log"
+              elif grep -q "syntax error" "$log"; then
+                SYN_MSG=$(grep "syntax error" "$log" | tr '\n' ' ' | head -c 200)
+                echo "::error title=Syntax Error in $log::$SYN_MSG"
                 FAILED=1
+              else
+                PASS_MSG=$(tail -n 2 "$log" | tr '\n' ' ')
+                echo "::notice title=$log PASS::$PASS_MSG"
               fi
             else
-              echo "[ERROR] Expected log file $log was not created!"
+              echo "::error title=Missing Log::Expected log file $log was not created!"
               FAILED=1
             fi
           done
           if [ $FAILED -ne 0 ]; then
-            echo "[VERDICT] Formal verification failed. See logs above."
+            echo "[VERDICT] Formal verification failed. See annotations above."
             exit 1
           else
             echo "[VERDICT] All formal assertions and non-vacuity covers PASSED successfully!"
