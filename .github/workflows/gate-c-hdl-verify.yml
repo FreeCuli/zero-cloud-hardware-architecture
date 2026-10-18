@@ -62,17 +62,17 @@ jobs:
       - name: Step 3 - Formal Model Checking (Yosys + yosys-smtbmc + Z3 BMC & k-Induction)
         run: |
           echo "=== [FORMAL-1] SPI 3-Layer Firewall & Reconciler Formal Proof (BMC + k-Induction, depth 20) ==="
-          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; dffunmap; opt; write_smt2 spi_formal.smt2"
+          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 spi_formal.smt2"
           yosys-smtbmc --unroll -s z3 -t 20 spi_formal.smt2
           yosys-smtbmc --unroll -s z3 -i -t 20 spi_formal.smt2
 
           echo "=== [FORMAL-2] OBI Subordinate Bridge, Watchdog & ST_TRAP Formal Proof (BMC + k-Induction, depth 20) ==="
-          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; dffunmap; opt; write_smt2 obi_formal.smt2"
+          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 obi_formal.smt2"
           yosys-smtbmc --unroll -s z3 -t 20 obi_formal.smt2
           yosys-smtbmc --unroll -s z3 -i -t 20 obi_formal.smt2
 
           echo "=== [FORMAL-3] OTP Authorization & Single-Use Grant Formal Proof (BMC + k-Induction, depth 20) ==="
-          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; dffunmap; opt; write_smt2 otp_formal.smt2"
+          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 otp_formal.smt2"
           yosys-smtbmc --unroll -s z3 -t 20 otp_formal.smt2
           yosys-smtbmc --unroll -s z3 -i -t 20 otp_formal.smt2
 
