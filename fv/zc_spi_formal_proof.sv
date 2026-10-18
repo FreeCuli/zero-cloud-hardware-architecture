@@ -82,11 +82,15 @@ module zc_spi_formal_proof (
 
   always_ff @(posedge clk_i) begin
     if (f_past_valid && $past(rst_sys_ni) && rst_sys_ni) begin
-      // F-SPI-01 (SVA-SPI-2c): UPD_UNSYNC_RESET -> UPD_IDLE occurs ONLY on a 16-bit 05h (RDSR1)
-      // frame completion with rising /CS, SCK == 0, no secondary fault, and no watchdog timeout.
+      // Inductive Lemma L-SPI-1: cs_n_prev_q accurately tracks cs_n_to_iso_o from previous cycle
+      assert (dut.cs_n_prev_q == $past(cs_n_to_iso_o));
+
+      // F-SPI-01 (SVA-SPI-2c): Strictly normative - UPD_UNSYNC_RESET -> UPD_IDLE occurs ONLY after a fresh
+      // 16-bit 05h (RDSR1) primary frame completion with SR1[1:0] == 2'b00, sampled byte, and no secondary fault
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(cs_n_to_iso_o && !sck_to_iso_o &&
+        assert ($past(!dut.cs_n_prev_q && cs_n_to_iso_o && !sck_to_iso_o &&
                       (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) &&
+                      dut.sr1_byte_sampled_q && (dut.sr1_latched_byte_q[1:0] == 2'b00) &&
                       !fault_high_sec_i && !upd_wdog_timeout_i));
       end
 
@@ -96,11 +100,39 @@ module zc_spi_formal_proof (
         assert (spi_update_state_o == UPD_UNSYNC_RESET);
       end
 
-      // F-SPI-03 (R28-03): Any transition into UPD_IDLE from UPD_UNSYNC_RESET requires primary /CS
-      // deasserted high while SCK == 0.
-      if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(cs_n_to_iso_o && !sck_to_iso_o));
+      // F-SPI-03 (SVA-SPI-3 / R28-03): Strictly normative - No primary frame completion strobe can assert
+      // without a primary /CS rising edge ($rose) while SCK == 0
+      if (dut.wren_pri_frame_done_w || dut.wrdi_pri_frame_done_w ||
+          dut.rdsr1_pri_frame_done_w || dut.prog_or_erase_pri_done_w) begin
+        assert (cs_n_to_iso_o && !$past(cs_n_to_iso_o) && !sck_to_iso_o);
       end
+    end
+  end
+
+  // =========================================================================
+  // Non-Vacuity Cover Witness Directives (Discrete Target Reporting)
+  // =========================================================================
+  always_comb begin
+    // C-SPI-04: Secondary fault fail-closed effective CS assert
+    cover (fault_high_sec_i && cs_n_flash_eff_o);
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (f_past_valid && $past(rst_sys_ni) && rst_sys_ni) begin
+      // C-SPI-01: Reach UPD_IDLE from UPD_UNSYNC_RESET via valid RDSR1
+      cover (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE));
+
+      // C-SPI-01b: WRDI executed in UPD_UNSYNC_RESET
+      cover (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (opcode_i == 8'h04) && dut.wrdi_pri_frame_done_w);
+
+      // C-SPI-02: Bank-B commit authorization active
+      cover (bank_b_commit_ready_o);
+
+      // C-SPI-03a: WREN primary frame completion strobe
+      cover (dut.wren_pri_frame_done_w);
+
+      // C-SPI-03b: RDSR1 primary frame completion strobe
+      cover (dut.rdsr1_pri_frame_done_w);
     end
   end
 

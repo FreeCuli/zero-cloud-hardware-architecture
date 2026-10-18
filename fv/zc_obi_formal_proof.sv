@@ -86,18 +86,41 @@ module zc_obi_formal_proof (
 
   always_ff @(posedge clk_i) begin
     if (f_past_valid && $past(rst_por_ni) && rst_por_ni) begin
-      // F-OBI-01 (SVA-L0-10a): Once CPU response is delivered in ST_WAIT_RVALID, ST_TIMEOUT_ERR, or ST_TRAP,
-      // bridge returns to ST_IDLE on the next cycle and does not re-assert host_rvalid_o.
+      // Inductive Lemma L-OBI-1: Invariant - watchdog counter is strictly 0 whenever orphan drain is inactive
+      if (!orphan_drain_active_o) begin
+        assert (drain_wdog_cnt_o == 10'd0);
+      end
+
+      // Inductive Lemma L-OBI-2: Invariant - orphan drain active implies physical transaction was latched
+      if (orphan_drain_active_o) begin
+        assert (dut.phys_req_active_q);
+      end
+
+      // F-OBI-01 (SVA-L0-10a): Once CPU response is delivered, bridge returns to ST_IDLE and locks out double response
       if ($past(rst_sys_ni) && rst_sys_ni &&
           $past(host_rvalid_o && (bridge_state_o != ST_IDLE))) begin
         assert ((bridge_state_o == ST_IDLE) && !host_rvalid_o);
       end
 
-      // F-OBI-03 (SVA-L0-12a): Normal active CPU wait without orphan_drain_active_o never triggers or increments watchdog
+      // F-OBI-02a (SVA-L0-10b / Part 1): Orphan response in ST_IDLE is never forwarded to CPU on arrival cycle
+      if (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
+        assert (!host_rvalid_o);
+      end
+
+      // F-OBI-02b (SVA-L0-10b / Part 2): Orphan response in ST_IDLE unconditionally clears phys_req_active_q on next cycle
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o)) begin
+        assert (!dut.phys_req_active_q);
+      end
+
+      // F-OBI-02c (SVA-L0-10b / Part 3): No delayed synthetic or stale rvalid on the cycle following orphan drain
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) && rst_sys_ni) begin
+        assert (!host_rvalid_o);
+      end
+
+      // F-OBI-03 (SVA-L0-12a): Strictly normative - Normal active CPU wait without orphan_drain_active_o never increments watchdog
       if ($past(rst_sys_ni && (bridge_state_o == ST_WAIT_RVALID) &&
                 !orphan_drain_active_o && !subsys_fatal_fault_irq_o)) begin
-        assert (!orphan_drain_active_o && !subsys_fatal_fault_irq_o &&
-                ((drain_wdog_cnt_o == 10'd0) || (drain_wdog_cnt_o == $past(drain_wdog_cnt_o))));
+        assert (!orphan_drain_active_o && !subsys_fatal_fault_irq_o && (drain_wdog_cnt_o == 10'd0));
       end
 
       // F-OBI-04 (R28B-03 / SVA-L0-13a): Monotonic +1 progression of drain_wdog_cnt_o when orphan_drain_active_o holds
@@ -130,6 +153,30 @@ module zc_obi_formal_proof (
         assert (bridge_state_o == ST_IDLE);
         assert (subsys_fatal_fault_irq_o == 1'b1);
       end
+    end
+  end
+
+  // =========================================================================
+  // Non-Vacuity Cover Witness Directives (Discrete Target Reporting)
+  // =========================================================================
+  always_comb begin
+    // C-OBI-07: Warm reset blocks physical request witness
+    cover (rst_por_ni && !rst_sys_ni && host_req_i && !periph_phys_req_o);
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (f_past_valid && $past(rst_por_ni) && rst_por_ni) begin
+      // C-OBI-01: Normal response delivery in ST_WAIT_RVALID
+      cover ($past(rst_sys_ni) && rst_sys_ni && $past(host_rvalid_o && (bridge_state_o == ST_WAIT_RVALID)));
+
+      // C-OBI-02: Orphan physical response silent drain in ST_IDLE
+      cover (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i);
+
+      // C-OBI-03: Normal CPU wait state without orphan activation
+      cover (rst_sys_ni && (bridge_state_o == ST_WAIT_RVALID) && !orphan_drain_active_o && (drain_wdog_cnt_o == 10'd0));
+
+      // C-OBI-04: Orphan watchdog progression step
+      cover (orphan_drain_active_o && !periph_phys_rvalid_i && (drain_wdog_cnt_o > 10'd0));
     end
   end
 

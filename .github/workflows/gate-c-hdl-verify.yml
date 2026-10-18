@@ -13,6 +13,8 @@ on:
 jobs:
   gate-c-hdl-verify:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,7 +43,7 @@ jobs:
           verilator --lint-only -Wall --top-module zc_obi_subordinate_bridge rtl/zc_obi_subordinate_bridge.sv
           echo "[PASS] zc_obi_subordinate_bridge lint clean (exit 0)"
 
-      - name: Step 2 - HDL Cycle-Accurate Simulation (Verilator --binary & Icarus Verilog)
+      - name: Step 2 - HDL Cycle-Accurate Simulation & Dual-Compiled Equivalence
         run: |
           echo "=== [SIM-1] OTP 4-Phase FSM, Recovery, & Exhaustive 4,080 (k,v) Seal Simulation (tb_zc_otp) ==="
           verilator --binary -j 0 -Wno-fatal --top-module tb_zc_otp rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp.sv -o sim_otp
@@ -55,9 +57,19 @@ jobs:
           verilator --binary -j 0 -Wno-fatal --top-module tb_zc_obi rtl/zc_obi_subordinate_bridge.sv tb/tb_zc_obi.sv -o sim_obi
           ./obj_dir/sim_obi
 
-          echo "=== [SIM-4] Cross-Simulator Verification with Icarus Verilog (iverilog -g2012) ==="
+          echo "=== [SIM-4a] P-5 OTP 12,240-Word Equivalence (Verilator Standard Package Build) ==="
+          verilator --binary -j 0 -Wno-fatal --top-module tb_zc_otp_fn_equiv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_fn_equiv.sv -o sim_otp_equiv_pkg
+          ./obj_dir/sim_otp_equiv_pkg
+
+          echo "=== [SIM-4b] P-5 OTP 12,240-Word Equivalence (Verilator -DYOSYS Shift-Add Build) ==="
+          verilator --binary -j 0 -Wno-fatal -DYOSYS --top-module tb_zc_otp_fn_equiv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_fn_equiv.sv -o sim_otp_equiv_yosys
+          ./obj_dir/sim_otp_equiv_yosys
+
+          echo "=== [SIM-5] Cross-Simulator Verification with Icarus Verilog (iverilog -g2012) ==="
           iverilog -g2012 -o sim_spi_iv rtl/zc_spi_flash_firewall.sv tb/tb_zc_spi.sv && vvp sim_spi_iv
           iverilog -g2012 -o sim_obi_iv rtl/zc_obi_subordinate_bridge.sv tb/tb_zc_obi.sv && vvp sim_obi_iv
+          iverilog -g2012 -o sim_otp_equiv_iv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_fn_equiv.sv && vvp sim_otp_equiv_iv
+          iverilog -g2012 -DYOSYS -o sim_otp_equiv_yosys_iv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_fn_equiv.sv && vvp sim_otp_equiv_yosys_iv
 
       - name: Step 3 - Formal Model Checking (Yosys + yosys-smtbmc + Z3 BMC & k-Induction)
         run: |
@@ -76,13 +88,35 @@ jobs:
           yosys-smtbmc --unroll -s z3 -t 20 otp_formal.smt2
           yosys-smtbmc --unroll -s z3 -i -t 20 otp_formal.smt2
 
-      - name: Step 4 - Concurrent SVA Bind Compilation & Tool Capability Audit
+      - name: Step 4 - Formal Non-Vacuity Cover Witness Checking (yosys-smtbmc -c)
+        run: |
+          echo "=== [COVER-1] SPI Non-Vacuity Cover Directives ==="
+          yosys-smtbmc --unroll -s z3 -c -t 20 spi_formal.smt2
+
+          echo "=== [COVER-2] OBI Non-Vacuity Cover Directives ==="
+          yosys-smtbmc --unroll -s z3 -c -t 20 obi_formal.smt2
+
+          echo "=== [COVER-3] OTP Non-Vacuity Cover Directives ==="
+          yosys-smtbmc --unroll -s z3 -c -t 20 otp_formal.smt2
+
+      - name: Step 5 - SVA Tool Capability Notice (Normative Commercial SVA and M7/M8 Status)
         run: |
           echo "=== Checking Concurrent SVA Sequence Syntax (throughout / [->1] / ##[1:49152]) ==="
           echo "[INFO] Preserving full concurrent SVA files unmodified: fv/zc_otp_sva.sv, fv/zc_spi_sva.sv, fv/zc_obi_sva.sv, fv/zc_m7_m8_ni_sva.sv"
           echo "[BLOCKED] Concurrent SVA sequence operators (throughout, [->1], ##[1:49152]) and 2-trace full-SoC M7/M8 miter require commercial SVA formal tools (JasperGold / VC Formal) and top-level NPU/SRAM RTL."
+          echo "[SEE] evidence/gate-c/MODELING_LIMITS.md for detailed modeling boundaries."
 
-      - name: Step 5 - Auxiliary PowerShell Mathematical & Structural Check (19/19)
+      - name: Step 6 - Auxiliary PowerShell Mathematical & Structural Check (19/19)
         shell: pwsh
         run: |
           ./scripts/verify_gate_b_rev28d.ps1
+
+      - name: Step 7 - Upload Gate C HDL Verification Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate-c-formal-evidence
+          path: |
+            *.smt2
+            evidence/gate-c/MODELING_LIMITS.md
+          retention-days: 90
