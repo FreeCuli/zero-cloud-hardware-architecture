@@ -111,8 +111,8 @@ module zc_aon_post_auth_ctrl (
     logic [7:0] ma, mb, ba, bb;
     logic [15:0] d;
     begin
-      ma = ({4'b0000, k} * 8'd17) + 8'h5A;
-      mb = ({4'b0000, k} * 8'd29) + 8'h3C;
+      ma = {k, k} + 8'h5A;
+      mb = {k, 4'b0000} + {1'b0, k, 3'b000} + {2'b00, k, 2'b00} + {4'b0000, k} + 8'h3C;
       ba = v ^ ma;
       bb = v ^ mb;
       case (word_idx)
