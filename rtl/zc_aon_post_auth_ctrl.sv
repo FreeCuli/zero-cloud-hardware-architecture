@@ -61,6 +61,7 @@ module zc_aon_post_auth_ctrl
   output logic                  otp_word_auth_valid_o,   // Phase 1: write_authorized
   output logic                  otp_dai_we_o,            // Phase 2: dai_write_accepted single-cycle pulse
   output logic [3:0]            otp_auth_slot_o,
+  output logic [7:0]            otp_auth_svn_o,
   output logic [1:0]            otp_auth_word_sel_o,
   output logic [2:0]            otp_auth_word_mask_o,
   output logic [21:0]           otp_auth_expected_cw_o,
@@ -92,6 +93,7 @@ module zc_aon_post_auth_ctrl
 
   assign otp_word_auth_valid_o  = write_authorized_w;
   assign otp_auth_slot_o        = expected_slot_q;
+  assign otp_auth_svn_o         = expected_svn_q;
   assign otp_auth_word_sel_o    = expected_word_idx_q;
   assign otp_auth_word_mask_o   = write_authorized_w ? (3'b001 << expected_word_idx_q) : 3'b000;
   assign otp_auth_expected_cw_o = expected_codeword_q[expected_word_idx_q];

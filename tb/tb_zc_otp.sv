@@ -47,6 +47,7 @@ module tb_zc_otp;
   logic                  otp_word_auth_valid_o;
   logic                  otp_dai_we_o;
   logic [3:0]            otp_auth_slot_o;
+  logic [7:0]            otp_auth_svn_o;
   logic [1:0]            otp_auth_word_sel_o;
   logic [2:0]            otp_auth_word_mask_o;
   logic [21:0]           otp_auth_expected_cw_o;
@@ -87,6 +88,7 @@ module tb_zc_otp;
     .otp_word_auth_valid_o   (otp_word_auth_valid_o),
     .otp_dai_we_o            (otp_dai_we_o),
     .otp_auth_slot_o         (otp_auth_slot_o),
+    .otp_auth_svn_o          (otp_auth_svn_o),
     .otp_auth_word_sel_o     (otp_auth_word_sel_o),
     .otp_auth_word_mask_o    (otp_auth_word_mask_o),
     .otp_auth_expected_cw_o  (otp_auth_expected_cw_o),
