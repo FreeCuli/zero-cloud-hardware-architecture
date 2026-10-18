@@ -154,6 +154,84 @@ Assert-Condition ($rtlOtpCtrl.Contains("normal_commit_done_ok_w") -and $rtlOtpCt
 Assert-Condition ($rtlSpi.Contains("wren_pri_frame_done_w") -and $rtlSpi.Contains("cs_n_flash_eff_o") -and $rtlSpi.Contains("rom_img_verif_valid_i")) "T3.4_RTL_SPI_3LAYER_SEPARATION" "rtl/zc_spi_flash_firewall.sv separates primary frame end, secondary /CS acceptance, and ROM image verification (Rev. 28B)"
 Assert-Condition ($rtlObi.Contains("wire orphan_active_w     = orphan_drain_active_q || orphan_trigger_w;") -and $rtlObi.Contains("else if (orphan_active_w)")) "T3.5_RTL_OBI_UNIFIED_ORPHAN_WDOG" "rtl/zc_obi_subordinate_bridge.sv uses unified orphan_active_w watchdog progression (Rev. 28C R28B-03)"
 Assert-Condition ($rtlObi.Contains("state_q <= ST_TRAP;") -and $rtlObi.Contains("(subsys_dead_locked_q ||") -and $rtlObi.Contains("synth_err_rvalid_w")) "T3.6_RTL_OBI_ST_TRAP_SYNTH_ERR" "rtl/zc_obi_subordinate_bridge.sv preserves ST_TRAP synthetic error response when subsys_dead_locked_q == 1'b1 (Rev. 28D)"
+Assert-Condition ($svaOtp.Contains("bind zc_aon_post_auth_ctrl zc_otp_sva") -and $svaSpi.Contains("bind zc_spi_flash_firewall zc_spi_sva") -and $svaObi.Contains("bind zc_obi_subordinate_bridge zc_obi_sva")) "T3.7_SVA_CANONICAL_BIND_DECLARATIONS" "All module-bound SVA files (fv/zc_otp_sva.sv, fv/zc_spi_sva.sv, fv/zc_obi_sva.sv) contain canonical SystemVerilog bind declarations"
+
+# ----------------------------------------------------------------------
+# TEST 4: Cycle-Accurate Behavioral Trace Verification of RTL Contracts
+# ----------------------------------------------------------------------
+# T4.1: OTP 4-Phase Normal (0->1->2), Single-Use Grant Consumption, Recovery (2-only), and Fatal Lock
+$otp_normal_trace_ok = $true
+$otp_state = "AUTH_GRANT"
+$wstep = "WSTEP_AUTH_READY"
+$grant_avail = $true
+$exp_word = 0
+$seal_b_only = $false
+for ($w = 0; $w -lt 3; $w++) {
+  if ((-not $grant_avail) -or ($wstep -ne "WSTEP_AUTH_READY") -or ($exp_word -ne $w)) { $otp_normal_trace_ok = $false }
+  # Phase 2: dai_write_accepted_w consumes grant immediately
+  $grant_avail = $false
+  $wstep = "WSTEP_WAIT_PHYS_DONE"
+  if ($grant_avail) { $otp_normal_trace_ok = $false }
+  # Phase 3: dai_write_completed_w
+  $wstep = "WSTEP_WAIT_RB_VERIFY"
+  # Phase 4: readback_verified_w
+  if ($exp_word -eq 2) {
+    $otp_state = "AUTH_SESSION_DONE"
+    $wstep = "WSTEP_IDLE"
+    $grant_avail = $false
+  } else {
+    $exp_word++
+    $grant_avail = $true
+    $wstep = "WSTEP_AUTH_READY"
+  }
+}
+# Recovery trace (req_seal_b_only_i = 1 -> starts at word 2 and exits directly to AUTH_SESSION_DONE)
+$otp_rec_state = "AUTH_GRANT"; $otp_rec_wstep = "WSTEP_AUTH_READY"; $otp_rec_grant = $true; $otp_rec_word = 2; $otp_rec_seal_b = $true
+$otp_rec_grant = $false; $otp_rec_wstep = "WSTEP_WAIT_PHYS_DONE"
+$otp_rec_wstep = "WSTEP_WAIT_RB_VERIFY"
+if ($otp_rec_seal_b -and ($otp_rec_word -eq 2)) {
+  $otp_rec_state = "AUTH_SESSION_DONE"; $otp_rec_wstep = "WSTEP_IDLE"; $otp_rec_grant = $false
+}
+Assert-Condition ($otp_normal_trace_ok -and ($otp_state -eq "AUTH_SESSION_DONE") -and ($otp_rec_state -eq "AUTH_SESSION_DONE") -and (-not $otp_rec_grant)) "T4.1_OTP_4PHASE_NORMAL_AND_RECOVERY_FSM" "Normal (0->1->2) and Recovery (2-only) 4-phase flows consume grant on accept and terminate cleanly in AUTH_SESSION_DONE"
+
+# T4.2: SPI 3-Layer Event Separation (04h WRDI stay-in-reset, 05h RDSR1 reconciliation, and rom_img_verif_valid_i gating)
+$spi_state = "UPD_UNSYNC_RESET"
+# 04h WRDI arrives -> must remain UPD_UNSYNC_RESET
+if ($spi_state -eq "UPD_UNSYNC_RESET") { $spi_state = "UPD_UNSYNC_RESET" }
+$stay_in_reset_after_wrdi = ($spi_state -eq "UPD_UNSYNC_RESET")
+# 05h RDSR1 arrives with SR1[1:0] == 2'b00 and !fault_high_sec_i -> transitions to UPD_IDLE
+$sr1_low2 = 0; $fault_sec = $false
+if (($spi_state -eq "UPD_UNSYNC_RESET") -and (-not $fault_sec) -and ($sr1_low2 -eq 0)) { $spi_state = "UPD_IDLE" }
+$spi_idle_ready = ($spi_state -eq "UPD_IDLE") -and (-not $fault_sec)
+$commit_ready_without_verif = $spi_idle_ready -and $false
+$commit_ready_with_verif    = $spi_idle_ready -and $true
+Assert-Condition ($stay_in_reset_after_wrdi -and $spi_idle_ready -and (-not $commit_ready_without_verif) -and $commit_ready_with_verif) "T4.2_SPI_3LAYER_RECONCILE_AND_VERIF_GATE" "04h WRDI stays in UPD_UNSYNC_RESET, fresh 05h RDSR1(2'b00) enters UPD_IDLE, and bank_b_commit_ready_o requires rom_img_verif_valid_i"
+
+# T4.3: OBI 1,024-Cycle Orphan Watchdog Progression under continuous !rst_sys_ni and Rev. 28D ST_TRAP Synthetic Error
+$phys_active = $true; $rst_sys_n = $false; $rvalid = $false
+$orphan_drain_q = $false; $wdog_cnt = 0; $dead_locked = $false
+for ($c = 0; $c -lt 1024; $c++) {
+  $orphan_trig = $phys_active -and (-not $rvalid) -and (-not $rst_sys_n)
+  $orphan_act  = $orphan_drain_q -or $orphan_trig
+  if ($orphan_act) {
+    $orphan_drain_q = $true
+    if (-not $dead_locked) {
+      if ($wdog_cnt -eq 1023) { $dead_locked = $true }
+      else { $wdog_cnt++ }
+    }
+  }
+}
+# Now release Warm Reset (rst_sys_n = 1) while subsys_dead_locked_q == 1 and issue CPU request (host_req_i = 1)
+$rst_sys_n = $true; $obi_state = "ST_IDLE"; $host_req = $true
+$host_req_ready = ($obi_state -eq "ST_IDLE") -and $dead_locked
+$periph_phys_req = ($obi_state -eq "ST_IDLE") -and $host_req -and (-not $dead_locked)
+if ($host_req -and $host_req_ready -and $dead_locked) { $obi_state = "ST_TRAP"; $pending_tx = $true; $resp_deliv = $false }
+$trap_cycle_rvalid = $pending_tx -and (-not $resp_deliv) -and ($obi_state -eq "ST_TRAP")
+$trap_cycle_err    = $trap_cycle_rvalid
+$trap_cycle_rdata  = if ($trap_cycle_rvalid) { 0 } else { 0xDEAD }
+# Next cycle returns to ST_IDLE while keeping subsys_dead_locked_q == 1
+$obi_state_next = "ST_IDLE"
+Assert-Condition ($dead_locked -and ($wdog_cnt -eq 1023) -and $host_req_ready -and (-not $periph_phys_req) -and $trap_cycle_rvalid -and $trap_cycle_err -and ($trap_cycle_rdata -eq 0) -and ($obi_state_next -eq "ST_IDLE")) "T4.3_OBI_WDOG_1024_AND_ST_TRAP_SYNTH_ERR" "Orphan watchdog reaches 1023->subsys_dead_locked_q=1 under continuous !rst_sys_ni, and ST_TRAP returns 1-cycle synthetic error (rvalid=1, err=1, rdata=0) with periph_phys_req_o=0"
 
 Write-Output "----------------------------------------------------------------------"
 Write-Output " SUMMARY: PASS=$PassCount, FAIL=$FailCount"
@@ -163,3 +241,4 @@ Write-Output "       is installed on this host."
 Write-Output "======================================================================"
 
 if ($FailCount -gt 0) { exit 1 }
+

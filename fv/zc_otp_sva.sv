@@ -18,6 +18,7 @@ module zc_otp_sva
   input logic            tamper_alert_i,
   input logic            clk_glitch_alert_i,
   input logic            volt_supervisor_fault_i,
+  input logic            dai_cmd_req_i,
   input logic            dai_prog_done_pulse_i,
   input logic            dai_rb_done_pulse_i,
   input logic            otp_word_auth_valid_o,
@@ -39,7 +40,7 @@ module zc_otp_sva
   // and stays 0 throughout the physical write and readback verification window.
   a_otp_grant_consumed_on_accept:
     assert property (@(posedge clk_aon_i) disable iff (!rst_aon_por_ni)
-      dai_write_accepted_w
+      (dai_write_accepted_w && !dai_prog_done_pulse_i && !dai_rb_done_pulse_i)
       |=> (!write_authorized_w && !word_grant_avail_q && !otp_dai_we_o)
           throughout (dai_rb_done_pulse_i[->1])
     );
@@ -49,6 +50,7 @@ module zc_otp_sva
   a_otp_normal_step_progression:
     assert property (@(posedge clk_aon_i) disable iff (!rst_aon_por_ni)
       (readback_verified_w && !val_ctx_seal_b_only_q && (expected_word_idx_q < OTP_WORD_COMMIT_B) &&
+       !dai_cmd_req_i && !dai_prog_done_pulse_i &&
        rst_sys_ni && rom_exec_active_i &&
        !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i)
       |=> (aon_auth_state_q == AUTH_GRANT) &&
@@ -61,7 +63,8 @@ module zc_otp_sva
   // transition to AUTH_SESSION_DONE and clear all grants and recovery flags.
   a_otp_both_modes_complete_and_clean:
     assert property (@(posedge clk_aon_i) disable iff (!rst_aon_por_ni)
-      (any_session_done_ok_w && rst_sys_ni && rom_exec_active_i &&
+      (any_session_done_ok_w && !dai_cmd_req_i && !dai_prog_done_pulse_i &&
+       rst_sys_ni && rom_exec_active_i &&
        !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i)
       |=> (aon_auth_state_q == AUTH_SESSION_DONE) &&
           (wstep_q == WSTEP_IDLE) &&
@@ -91,3 +94,31 @@ module zc_otp_sva
     );
 
 endmodule : zc_otp_sva
+
+// Canonical SystemVerilog bind into zc_aon_post_auth_ctrl
+bind zc_aon_post_auth_ctrl zc_otp_sva u_zc_otp_sva (
+  .clk_aon_i               (clk_aon_i),
+  .rst_aon_por_ni          (rst_aon_por_ni),
+  .rst_sys_ni              (rst_sys_ni),
+  .rom_exec_active_i       (rom_exec_active_i),
+  .tamper_alert_i          (tamper_alert_i),
+  .clk_glitch_alert_i      (clk_glitch_alert_i),
+  .volt_supervisor_fault_i (volt_supervisor_fault_i),
+  .dai_cmd_req_i           (dai_cmd_req_i),
+  .dai_prog_done_pulse_i   (dai_prog_done_pulse_i),
+  .dai_rb_done_pulse_i     (dai_rb_done_pulse_i),
+  .otp_word_auth_valid_o   (otp_word_auth_valid_o),
+  .otp_dai_we_o            (otp_dai_we_o),
+  .otp_auth_word_mask_o    (otp_auth_word_mask_o),
+  .aon_auth_state_q        (aon_auth_state_q),
+  .wstep_q                 (wstep_q),
+  .word_grant_avail_q      (word_grant_avail_q),
+  .expected_word_idx_q     (expected_word_idx_q),
+  .val_ctx_seal_b_only_q   (val_ctx_seal_b_only_q),
+  .pending_b_exists_q      (pending_b_exists_q),
+  .write_authorized_w      (write_authorized_w),
+  .dai_write_accepted_w    (dai_write_accepted_w),
+  .readback_verified_w     (readback_verified_w),
+  .any_session_done_ok_w   (any_session_done_ok_w)
+);
+

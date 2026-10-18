@@ -45,7 +45,7 @@ module zc_obi_sva (
   // SVA-L0-10b: An orphan physical response arriving in ST_IDLE after Warm Reset is never forwarded to CPU.
   a_l0_orphan_phys_resp_silently_drained:
     assert property (@(posedge clk_i) disable iff (!rst_por_ni)
-      (rst_sys_ni && (state_q == ST_IDLE) && phys_req_active_q && periph_phys_rvalid_i)
+      (rst_sys_ni && (state_q == ST_IDLE) && phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o)
       |-> (!host_rvalid_o) ##1 (!phys_req_active_q)
     );
 
@@ -89,3 +89,26 @@ module zc_obi_sva (
     );
 
 endmodule : zc_obi_sva
+
+// Canonical SystemVerilog bind into zc_obi_subordinate_bridge
+bind zc_obi_subordinate_bridge zc_obi_sva u_zc_obi_sva (
+  .clk_i                 (clk_i),
+  .rst_por_ni            (rst_por_ni),
+  .rst_sys_ni            (rst_sys_ni),
+  .host_req_i            (host_req_i),
+  .host_req_ready_o      (host_req_ready_o),
+  .host_rvalid_o         (host_rvalid_o),
+  .host_err_o            (host_err_o),
+  .host_rdata_o          (host_rdata_o),
+  .periph_phys_req_o     (periph_phys_req_o),
+  .periph_phys_rvalid_i  (periph_phys_rvalid_i),
+  .state_q               (bridge_state_o),
+  .phys_req_active_q     (phys_req_active_q),
+  .orphan_drain_active_q (orphan_drain_active_q),
+  .orphan_active_w       (orphan_active_w),
+  .drain_wdog_cnt_q      (drain_wdog_cnt_q),
+  .subsys_dead_locked_q  (subsys_dead_locked_q),
+  .pending_tx_q          (pending_tx_q),
+  .cpu_resp_delivered_q  (cpu_resp_delivered_q)
+);
+

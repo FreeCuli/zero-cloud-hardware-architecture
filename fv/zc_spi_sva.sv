@@ -61,3 +61,24 @@ module zc_spi_sva (
     );
 
 endmodule : zc_spi_sva
+
+// Canonical SystemVerilog bind into zc_spi_flash_firewall
+bind zc_spi_flash_firewall zc_spi_sva u_zc_spi_sva (
+  .clk_i                    (clk_i),
+  .rst_sys_ni               (rst_sys_ni),
+  .cs_n_to_iso_o            (cs_n_to_iso_o),
+  .sck_to_iso_o             (sck_to_iso_o),
+  .cs_n_flash_eff_o         (cs_n_flash_eff_o),
+  .fault_high_sec_i         (fault_high_sec_i),
+  .upd_wdog_timeout_i       (upd_wdog_timeout_i),
+  .rom_img_verif_valid_i    (rom_img_verif_valid_i),
+  .spi_idle_ready_o         (spi_idle_ready_o),
+  .bank_b_commit_ready_o    (bank_b_commit_ready_o),
+  .spi_update_state_o       (spi_update_state_o),
+  .sr1_latched_byte_q       (sr1_latched_byte_q),
+  .wren_pri_frame_done_w    (wren_pri_frame_done_w),
+  .wrdi_pri_frame_done_w    (wrdi_pri_frame_done_w),
+  .rdsr1_pri_frame_done_w   (rdsr1_pri_frame_done_w),
+  .prog_or_erase_pri_done_w (prog_or_erase_pri_done_w)
+);
+
