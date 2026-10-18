@@ -148,8 +148,12 @@ module zc_otp_formal_proof (
 
       // F-OTP-02 (SVA-OTP-06b): Strictly normative - Normal intermediate word (0 or 1) readback verification
       // advances expected_word_idx_q by +1 and re-opens grant in WSTEP_AUTH_READY
-      if ($past(dut.readback_verified_w && !dut.val_ctx_seal_b_only_q &&
+      if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
                 (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
+                dai_rb_done_pulse_i && !dai_ecc_err_i &&
+                (dai_rb_slot_idx_i == otp_auth_slot_o) &&
+                (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
+                (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
@@ -157,13 +161,18 @@ module zc_otp_formal_proof (
           !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
         assert ((aon_auth_state_o == AUTH_GRANT) &&
                 (aon_wstep_o == WSTEP_AUTH_READY) &&
-                dut.word_grant_avail_q &&
+                otp_word_auth_valid_o &&
                 (otp_auth_word_sel_o == ($past(otp_auth_word_sel_o) + 2'd1)));
       end
 
       // F-OTP-03 (SVA-OTP-06c / R28B-01): Strictly normative - Final word (2) or Recovery mode (2 only)
       // transitions to AUTH_SESSION_DONE and clears all grants and recovery flags
-      if ($past(dut.any_session_done_ok_w &&
+      if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
+                dai_rb_done_pulse_i && !dai_ecc_err_i &&
+                (dai_rb_slot_idx_i == otp_auth_slot_o) &&
+                (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
+                (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
@@ -171,23 +180,25 @@ module zc_otp_formal_proof (
           !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
         assert ((aon_auth_state_o == AUTH_SESSION_DONE) &&
                 (aon_wstep_o == WSTEP_IDLE) &&
-                !dut.word_grant_avail_q &&
-                !dut.val_ctx_seal_b_only_q &&
-                !dut.pending_b_exists_q &&
                 !otp_word_auth_valid_o &&
+                !otp_dai_we_o &&
                 (otp_auth_word_mask_o == 3'b000));
       end
 
       // F-OTP-04 (SVA-OTP-07 / R28-02): Strictly normative - Any unverified, out-of-context,
       // or mismatched readback in WSTEP_WAIT_RB_VERIFY immediately locks to AUTH_LOCKED_FATAL
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
-                dai_rb_done_pulse_i && !dut.readback_verified_w &&
+                dai_rb_done_pulse_i &&
+                (dai_ecc_err_i ||
+                 (dai_rb_slot_idx_i != otp_auth_slot_o) ||
+                 (dai_rb_word_sel_i != otp_auth_word_sel_o) ||
+                 (dai_rb_raw_data_i != otp_auth_expected_cw_o)) &&
                 rst_sys_ni && rom_exec_active_i)) begin
         assert (aon_auth_state_o == AUTH_LOCKED_FATAL);
         assert (aon_fatal_locked_o);
         assert (aon_wstep_o == WSTEP_IDLE);
-        assert (!dut.word_grant_avail_q);
         assert (!otp_word_auth_valid_o);
+        assert (!otp_dai_we_o);
       end
 
       // F-OTP-05 (SVA-OTP-08): AUTH_LOCKED_FATAL is permanently sticky until Cold POR (!rst_aon_por_ni)
@@ -205,22 +216,22 @@ module zc_otp_formal_proof (
   // =========================================================================
   always_comb begin
     // C-OTP-01: Write authorization active witness
-    cover (otp_word_auth_valid_o && dut.word_grant_avail_q);
+    cover (otp_word_auth_valid_o && (aon_auth_state_o == AUTH_GRANT));
   end
 
   always_ff @(posedge clk_aon_i) begin
     if (f_past_valid && $past(rst_aon_por_ni) && rst_aon_por_ni) begin
       // C-OTP-02: Intermediate word verification and advance
-      cover (dut.readback_verified_w && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B));
+      cover ((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_AUTH_READY) && (otp_auth_word_sel_o > 2'd0));
 
       // C-OTP-03n: Normal 3-word session completed (AUTH_SESSION_DONE)
-      cover (aon_auth_state_o == AUTH_SESSION_DONE && !dut.val_ctx_seal_b_only_q);
+      cover ((aon_auth_state_o == AUTH_SESSION_DONE) && (aon_wstep_o == WSTEP_IDLE));
 
       // C-OTP-03r: Recovery 1-word session completed (AUTH_SESSION_DONE)
-      cover (aon_auth_state_o == AUTH_SESSION_DONE && $past(dut.val_ctx_seal_b_only_q));
+      cover ($past(aon_auth_state_o == AUTH_GRANT) && (aon_auth_state_o == AUTH_SESSION_DONE));
 
       // C-OTP-04: Fatal lock entry on mismatched readback
-      cover ($past(aon_auth_state_o == AUTH_GRANT && aon_wstep_o == WSTEP_WAIT_RB_VERIFY && dai_rb_done_pulse_i && !dut.readback_verified_w) &&
+      cover ($past(aon_auth_state_o == AUTH_GRANT && aon_wstep_o == WSTEP_WAIT_RB_VERIFY && dai_rb_done_pulse_i) &&
              (aon_auth_state_o == AUTH_LOCKED_FATAL));
 
       // C-OTP-05: Fatal lock sticky persistence

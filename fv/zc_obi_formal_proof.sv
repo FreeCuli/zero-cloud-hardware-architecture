@@ -97,18 +97,18 @@ module zc_obi_formal_proof (
       end
 
       // F-OBI-02a (SVA-L0-10b / Part 1): Orphan response in ST_IDLE is never forwarded to CPU on arrival cycle
-      if (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
+      if (rst_sys_ni && (bridge_state_o == ST_IDLE) && periph_phys_rvalid_i && !periph_phys_req_o) begin
         assert (!host_rvalid_o);
       end
 
-      // F-OBI-02b (SVA-L0-10b / Part 2): Orphan response in ST_IDLE unconditionally clears phys_req_active_q on next cycle
-      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) &&
+      // F-OBI-02b (SVA-L0-10b / Part 2): Orphan response in ST_IDLE unconditionally clears orphan drain on next cycle
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && orphan_drain_active_o && periph_phys_rvalid_i && !periph_phys_req_o) &&
           !periph_phys_req_o) begin
-        assert (!dut.phys_req_active_q);
+        assert (!orphan_drain_active_o);
       end
 
       // F-OBI-02c (SVA-L0-10b / Part 3): No delayed synthetic or stale rvalid on cycle following orphan drain
-      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) &&
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && periph_phys_rvalid_i && !periph_phys_req_o) &&
           rst_sys_ni && !host_req_i) begin
         assert (!host_rvalid_o);
       end
@@ -168,7 +168,7 @@ module zc_obi_formal_proof (
       cover ($past(rst_sys_ni) && rst_sys_ni && $past(host_rvalid_o && (bridge_state_o == ST_WAIT_RVALID)));
 
       // C-OBI-02: Orphan physical response silent drain in ST_IDLE
-      cover (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i);
+      cover (rst_sys_ni && (bridge_state_o == ST_IDLE) && (orphan_drain_active_o || !periph_phys_req_o) && periph_phys_rvalid_i);
 
       // C-OBI-03: Normal CPU wait state without orphan activation
       cover (rst_sys_ni && (bridge_state_o == ST_WAIT_RVALID) && !orphan_drain_active_o && (drain_wdog_cnt_o == 10'd0));
