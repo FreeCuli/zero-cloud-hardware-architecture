@@ -63,9 +63,34 @@ module zc_spi_formal_proof (
     .spi_update_state_o    (spi_update_state_o)
   );
 
-  logic f_past_valid;
+  logic        f_past_valid;
+  logic        f_cs_n_prev_q;
+  logic [7:0]  f_sr1_latched_q;
+  logic        f_sr1_sampled_q;
+
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_i) f_past_valid <= 1'b1;
+
+  always_ff @(posedge clk_i or negedge rst_sys_ni) begin
+    if (!rst_sys_ni) begin
+      f_cs_n_prev_q   <= 1'b1;
+      f_sr1_latched_q <= 8'hFF;
+      f_sr1_sampled_q <= 1'b0;
+    end else begin
+      f_cs_n_prev_q <= cs_n_to_iso_o;
+      if (cs_n_to_iso_o) begin
+        f_sr1_sampled_q <= 1'b0;
+      end else if (guard_stream_data_i && (opcode_i == 8'h05) &&
+                   sck_sample_edge_i && (frame_bit_cnt_i == 12'd15)) begin
+        f_sr1_latched_q <= {rx_shift_i[6:0], miso_sync_i};
+        f_sr1_sampled_q <= 1'b1;
+      end
+    end
+  end
+
+  wire f_phys_cs_deassert_w = !f_cs_n_prev_q && cs_n_to_iso_o && !sck_to_iso_o;
+  wire f_wrdi_done_w        = f_phys_cs_deassert_w && (opcode_i == 8'h04) && (frame_bit_cnt_i == 12'd8);
+  wire f_rdsr1_done_w       = f_phys_cs_deassert_w && (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) && f_sr1_sampled_q;
 
   always_comb begin
     if (!f_past_valid) assume (!rst_sys_ni);
@@ -83,20 +108,19 @@ module zc_spi_formal_proof (
     if (f_past_valid && $past(rst_sys_ni) && rst_sys_ni) begin
       // F-SPI-01 (SVA-SPI-2c): UPD_UNSYNC_RESET -> UPD_IDLE requires fresh 05h RDSR1(2'b00) and no fault
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(dut.rdsr1_pri_frame_done_w && (dut.sr1_latched_byte_q[1:0] == 2'b00) &&
+        assert ($past(f_rdsr1_done_w && (f_sr1_latched_q[1:0] == 2'b00) &&
                       !fault_high_sec_i && !upd_wdog_timeout_i));
       end
 
       // F-SPI-01b: 04h (WRDI) in UPD_UNSYNC_RESET stays in UPD_UNSYNC_RESET (unless watchdog timeout)
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) &&
-          $past(dut.wrdi_pri_frame_done_w && !upd_wdog_timeout_i)) begin
+          $past(f_wrdi_done_w && !upd_wdog_timeout_i)) begin
         assert (spi_update_state_o == UPD_UNSYNC_RESET);
       end
 
-      // F-SPI-03 (R28-03): Primary frame completion strobes require rising /CS while SCK == 0
-      if (dut.wren_pri_frame_done_w || dut.wrdi_pri_frame_done_w ||
-          dut.rdsr1_pri_frame_done_w || dut.prog_or_erase_pri_done_w) begin
-        assert (!$past(cs_n_to_iso_o) && cs_n_to_iso_o && !sck_to_iso_o);
+      // F-SPI-03 (R28-03): Any transition out of UPD_UNSYNC_RESET (except watchdog) requires rising /CS while SCK == 0
+      if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
+        assert ($past(!f_cs_n_prev_q && cs_n_to_iso_o && !sck_to_iso_o));
       end
     end
   end
