@@ -1,0 +1,88 @@
+name: Gate C HDL Verification
+
+on:
+  push:
+    branches:
+      - 'gate-c/**'
+  pull_request:
+    branches:
+      - 'main'
+      - 'gate-c/**'
+  workflow_dispatch:
+
+jobs:
+  gate-c-hdl-verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Open-Source HDL & Formal Toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y verilator iverilog yosys z3 python3
+          echo "=== Installed Tool Versions ==="
+          verilator --version
+          iverilog -V | head -n 3
+          yosys -V
+          z3 --version
+
+      - name: Step 1 - Verilator RTL Lint & Elaboration (-Wall)
+        run: |
+          echo "=== [1/3] Verilator Lint: zc_otp_pkg.sv + zc_aon_post_auth_ctrl.sv ==="
+          verilator --lint-only -Wall --top-module zc_aon_post_auth_ctrl rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv
+          echo "[PASS] zc_aon_post_auth_ctrl lint clean (exit 0)"
+
+          echo "=== [2/3] Verilator Lint: zc_spi_flash_firewall.sv ==="
+          verilator --lint-only -Wall --top-module zc_spi_flash_firewall rtl/zc_spi_flash_firewall.sv
+          echo "[PASS] zc_spi_flash_firewall lint clean (exit 0)"
+
+          echo "=== [3/3] Verilator Lint: zc_obi_subordinate_bridge.sv ==="
+          verilator --lint-only -Wall --top-module zc_obi_subordinate_bridge rtl/zc_obi_subordinate_bridge.sv
+          echo "[PASS] zc_obi_subordinate_bridge lint clean (exit 0)"
+
+      - name: Step 2 - HDL Cycle-Accurate Simulation (Verilator --binary & Icarus Verilog)
+        run: |
+          echo "=== [SIM-1] OTP 4-Phase FSM, Recovery, & Exhaustive 4,080 (k,v) Seal Simulation (tb_zc_otp) ==="
+          verilator --binary -j 0 -Wno-fatal --top-module tb_zc_otp rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp.sv -o sim_otp
+          ./obj_dir/sim_otp
+
+          echo "=== [SIM-2] SPI 3-Layer Event Separation & Update Reconciler Simulation (tb_zc_spi) ==="
+          verilator --binary -j 0 -Wno-fatal --top-module tb_zc_spi rtl/zc_spi_flash_firewall.sv tb/tb_zc_spi.sv -o sim_spi
+          ./obj_dir/sim_spi
+
+          echo "=== [SIM-3] OBI Warm Reset (GCR-01), 1024-Cycle Watchdog, & ST_TRAP Simulation (tb_zc_obi) ==="
+          verilator --binary -j 0 -Wno-fatal --top-module tb_zc_obi rtl/zc_obi_subordinate_bridge.sv tb/tb_zc_obi.sv -o sim_obi
+          ./obj_dir/sim_obi
+
+          echo "=== [SIM-4] Cross-Simulator Verification with Icarus Verilog (iverilog -g2012) ==="
+          iverilog -g2012 -o sim_spi_iv rtl/zc_spi_flash_firewall.sv tb/tb_zc_spi.sv && vvp sim_spi_iv
+          iverilog -g2012 -o sim_obi_iv rtl/zc_obi_subordinate_bridge.sv tb/tb_zc_obi.sv && vvp sim_obi_iv
+
+      - name: Step 3 - Formal Model Checking (Yosys + yosys-smtbmc + Z3 BMC & k-Induction)
+        run: |
+          echo "=== [FORMAL-1] OTP Authorization & Single-Use Grant Formal Proof (BMC + k-Induction, depth 20) ==="
+          yosys -p "read_verilog -sv -formal rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof; write_smt2 -wires otp_formal.smt2"
+          yosys-smtbmc -s z3 -t 20 otp_formal.smt2
+          yosys-smtbmc -s z3 -i -t 20 otp_formal.smt2
+
+          echo "=== [FORMAL-2] SPI 3-Layer Firewall & Reconciler Formal Proof (BMC + k-Induction, depth 20) ==="
+          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof; write_smt2 -wires spi_formal.smt2"
+          yosys-smtbmc -s z3 -t 20 spi_formal.smt2
+          yosys-smtbmc -s z3 -i -t 20 spi_formal.smt2
+
+          echo "=== [FORMAL-3] OBI Subordinate Bridge, Watchdog & ST_TRAP Formal Proof (BMC + k-Induction, depth 20) ==="
+          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof; write_smt2 -wires obi_formal.smt2"
+          yosys-smtbmc -s z3 -t 20 obi_formal.smt2
+          yosys-smtbmc -s z3 -i -t 20 obi_formal.smt2
+
+      - name: Step 4 - Concurrent SVA Bind Compilation & Tool Capability Audit
+        run: |
+          echo "=== Checking Concurrent SVA Sequence Syntax (throughout / [->1] / ##[1:49152]) ==="
+          echo "[INFO] Preserving full concurrent SVA files unmodified: fv/zc_otp_sva.sv, fv/zc_spi_sva.sv, fv/zc_obi_sva.sv, fv/zc_m7_m8_ni_sva.sv"
+          echo "[BLOCKED] Concurrent SVA sequence operators (throughout, [->1], ##[1:49152]) and 2-trace full-SoC M7/M8 miter require commercial SVA formal tools (JasperGold / VC Formal) and top-level NPU/SRAM RTL."
+
+      - name: Step 5 - Auxiliary PowerShell Mathematical & Structural Check (19/19)
+        shell: pwsh
+        run: |
+          ./scripts/verify_gate_b_rev28d.ps1

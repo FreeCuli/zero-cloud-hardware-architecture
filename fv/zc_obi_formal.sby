@@ -1,0 +1,21 @@
+[tasks]
+bmc
+prove
+
+[options]
+bmc: mode bmc
+bmc: depth 20
+prove: mode prove
+prove: depth 20
+
+[engines]
+smtbmc
+
+[script]
+read -formal zc_obi_subordinate_bridge.sv
+read -formal zc_obi_formal_proof.sv
+prep -top zc_obi_formal_proof
+
+[files]
+../rtl/zc_obi_subordinate_bridge.sv
+zc_obi_formal_proof.sv

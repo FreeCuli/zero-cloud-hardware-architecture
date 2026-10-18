@@ -1,0 +1,23 @@
+[tasks]
+bmc
+prove
+
+[options]
+bmc: mode bmc
+bmc: depth 20
+prove: mode prove
+prove: depth 20
+
+[engines]
+smtbmc
+
+[script]
+read -formal zc_otp_pkg.sv
+read -formal zc_aon_post_auth_ctrl.sv
+read -formal zc_otp_formal_proof.sv
+prep -top zc_otp_formal_proof
+
+[files]
+../rtl/zc_otp_pkg.sv
+../rtl/zc_aon_post_auth_ctrl.sv
+zc_otp_formal_proof.sv

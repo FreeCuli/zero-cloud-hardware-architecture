@@ -1,0 +1,21 @@
+[tasks]
+bmc
+prove
+
+[options]
+bmc: mode bmc
+bmc: depth 20
+prove: mode prove
+prove: depth 20
+
+[engines]
+smtbmc
+
+[script]
+read -formal zc_spi_flash_firewall.sv
+read -formal zc_spi_formal_proof.sv
+prep -top zc_spi_formal_proof
+
+[files]
+../rtl/zc_spi_flash_firewall.sv
+zc_spi_formal_proof.sv
