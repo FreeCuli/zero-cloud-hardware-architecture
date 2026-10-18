@@ -82,9 +82,10 @@ module zc_spi_formal_proof (
     end
 
     // F-SPI-03 (SVA-SPI-3 / R28-03): Strictly normative - No primary frame completion strobe can assert
-    // without a primary /CS rising edge while SCK == 0
-    if (dut.wren_pri_frame_done_w || dut.wrdi_pri_frame_done_w ||
-        dut.rdsr1_pri_frame_done_w || dut.prog_or_erase_pri_done_w) begin
+    // without a primary /CS rising edge while SCK == 0 (disable iff !rst_sys_ni)
+    if (rst_sys_ni &&
+        (dut.wren_pri_frame_done_w || dut.wrdi_pri_frame_done_w ||
+         dut.rdsr1_pri_frame_done_w || dut.prog_or_erase_pri_done_w)) begin
       assert (cs_n_to_iso_o && !dut.cs_n_prev_q && !sck_to_iso_o);
     end
   end

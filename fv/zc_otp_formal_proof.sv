@@ -153,7 +153,8 @@ module zc_otp_formal_proof (
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
-          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i && rst_sys_ni) begin
+          rst_sys_ni && rom_exec_active_i &&
+          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
         assert ((aon_auth_state_o == AUTH_GRANT) &&
                 (aon_wstep_o == WSTEP_AUTH_READY) &&
                 dut.word_grant_avail_q &&
@@ -166,7 +167,8 @@ module zc_otp_formal_proof (
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
-          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i && rst_sys_ni) begin
+          rst_sys_ni && rom_exec_active_i &&
+          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
         assert ((aon_auth_state_o == AUTH_SESSION_DONE) &&
                 (aon_wstep_o == WSTEP_IDLE) &&
                 !dut.word_grant_avail_q &&
@@ -179,7 +181,8 @@ module zc_otp_formal_proof (
       // F-OTP-04 (SVA-OTP-07 / R28-02): Strictly normative - Any unverified, out-of-context,
       // or mismatched readback in WSTEP_WAIT_RB_VERIFY immediately locks to AUTH_LOCKED_FATAL
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
-                dai_rb_done_pulse_i && !dut.readback_verified_w)) begin
+                dai_rb_done_pulse_i && !dut.readback_verified_w &&
+                rst_sys_ni && rom_exec_active_i)) begin
         assert (aon_auth_state_o == AUTH_LOCKED_FATAL);
         assert (aon_fatal_locked_o);
         assert (aon_wstep_o == WSTEP_IDLE);

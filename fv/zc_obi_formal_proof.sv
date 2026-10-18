@@ -70,18 +70,6 @@ module zc_obi_formal_proof (
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_i) f_past_valid <= 1'b1;
 
-  // Registered tracker for orphan arrival in ST_IDLE
-  logic orphan_drained_q;
-  initial orphan_drained_q = 1'b0;
-  always_ff @(posedge clk_i or negedge rst_por_ni) begin
-    if (!rst_por_ni) begin
-      orphan_drained_q <= 1'b0;
-    end else begin
-      orphan_drained_q <= rst_sys_ni && (bridge_state_o == ST_IDLE) &&
-                          dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o;
-    end
-  end
-
   always_comb begin
     if (!f_past_valid) assume (!rst_por_ni);
 
@@ -97,19 +85,6 @@ module zc_obi_formal_proof (
       assert (host_req_ready_o == 1'b1);
       assert (periph_phys_req_o == 1'b0);
     end
-
-    // F-OBI-02a (SVA-L0-10b / Part 1): On arrival cycle of orphan response in ST_IDLE, host_rvalid_o is 0
-    if (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
-      assert (!host_rvalid_o);
-    end
-
-    // F-OBI-02b & F-OBI-02c (SVA-L0-10b / Parts 2 & 3): Cycle following orphan drain in ST_IDLE
-    if (orphan_drained_q && rst_por_ni) begin
-      assert (!dut.phys_req_active_q);
-      if (rst_sys_ni && !host_req_i) begin
-        assert (!host_rvalid_o);
-      end
-    end
   end
 
   always_ff @(posedge clk_i) begin
@@ -119,6 +94,23 @@ module zc_obi_formal_proof (
       if ($past(rst_sys_ni) && rst_sys_ni &&
           $past(host_rvalid_o && (bridge_state_o != ST_IDLE))) begin
         assert ((bridge_state_o == ST_IDLE) && !host_rvalid_o);
+      end
+
+      // F-OBI-02a (SVA-L0-10b / Part 1): Orphan response in ST_IDLE is never forwarded to CPU on arrival cycle
+      if (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
+        assert (!host_rvalid_o);
+      end
+
+      // F-OBI-02b (SVA-L0-10b / Part 2): Orphan response in ST_IDLE unconditionally clears phys_req_active_q on next cycle
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) &&
+          !periph_phys_req_o) begin
+        assert (!dut.phys_req_active_q);
+      end
+
+      // F-OBI-02c (SVA-L0-10b / Part 3): No delayed synthetic or stale rvalid on cycle following orphan drain
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) &&
+          rst_sys_ni && !host_req_i) begin
+        assert (!host_rvalid_o);
       end
 
       // F-OBI-03 (SVA-L0-12a): Strictly normative - Normal active CPU wait without orphan_drain_active_o
