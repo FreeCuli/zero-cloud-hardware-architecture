@@ -15,8 +15,6 @@
 //     to AUTH_LOCKED_FATAL on the same clock edge
 //   - F-OTP-05: AUTH_LOCKED_FATAL is permanently sticky until Cold POR (!rst_aon_por_ni)
 
-import zc_otp_pkg::*;
-
 module zc_otp_formal_proof (
   input logic                  clk_aon_i,
   input logic                  rst_aon_por_ni,
@@ -34,7 +32,7 @@ module zc_otp_formal_proof (
   input logic [3:0]            req_target_slot_i,
   input logic [7:0]            req_target_svn_i,
   input logic                  req_seal_b_only_i,
-  input dai_ctrl_state_e       dai_state_i,
+  input logic [1:0]            dai_state_i,
   input logic                  otp_macro_phys_active_i,
   input logic                  dai_cmd_req_i,
   input logic [3:0]            dai_slot_idx_i,
@@ -49,6 +47,8 @@ module zc_otp_formal_proof (
   input logic [21:0]           dai_rb_raw_data_i
 );
 
+  import zc_otp_pkg::*;
+
   logic                  otp_word_auth_valid_o;
   logic                  otp_dai_we_o;
   logic [3:0]            otp_auth_slot_o;
@@ -56,8 +56,8 @@ module zc_otp_formal_proof (
   logic [1:0]            otp_auth_word_sel_o;
   logic [2:0]            otp_auth_word_mask_o;
   logic [21:0]           otp_auth_expected_cw_o;
-  aon_auth_state_e       aon_auth_state_o;
-  otp_wstep_e            aon_wstep_o;
+  logic [2:0]            aon_auth_state_o;
+  logic [1:0]            aon_wstep_o;
   logic                  aon_fatal_locked_o;
 
   zc_aon_post_auth_ctrl dut (

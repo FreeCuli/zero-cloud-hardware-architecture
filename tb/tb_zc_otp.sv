@@ -30,7 +30,7 @@ module tb_zc_otp;
   logic [3:0]            req_target_slot_i;
   logic [7:0]            req_target_svn_i;
   logic                  req_seal_b_only_i;
-  dai_ctrl_state_e       dai_state_i;
+  logic [1:0]            dai_state_i;
   logic                  otp_macro_phys_active_i;
   logic                  dai_cmd_req_i;
   logic [3:0]            dai_slot_idx_i;
@@ -51,8 +51,8 @@ module tb_zc_otp;
   logic [1:0]            otp_auth_word_sel_o;
   logic [2:0]            otp_auth_word_mask_o;
   logic [21:0]           otp_auth_expected_cw_o;
-  aon_auth_state_e       aon_auth_state_o;
-  otp_wstep_e            aon_wstep_o;
+  logic [2:0]            aon_auth_state_o;
+  logic [1:0]            aon_wstep_o;
   logic                  aon_fatal_locked_o;
 
   zc_aon_post_auth_ctrl dut (

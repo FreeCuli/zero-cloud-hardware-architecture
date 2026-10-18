@@ -16,10 +16,6 @@
 //   - Locks permanently to AUTH_LOCKED_FATAL on any out-of-context/mismatched readback
 //     or unauthorized DAI activity (recoverable only via Cold POR rst_aon_por_ni)
 
-/* verilator lint_off IMPORTSTAR */
-import zc_otp_pkg::*;
-/* verilator lint_on IMPORTSTAR */
-
 module zc_aon_post_auth_ctrl (
   input  logic                  clk_aon_i,
   input  logic                  rst_aon_por_ni,          // Cold POR (only reset that clears AUTH_LOCKED_FATAL)
@@ -45,7 +41,7 @@ module zc_aon_post_auth_ctrl (
   input  logic                  req_seal_b_only_i,       // 1: PENDING_B_SEAL recovery, 0: normal 3-word commit
 
   // OTP DAI interface
-  input  dai_ctrl_state_e       dai_state_i,
+  input  logic [1:0]            dai_state_i,
   input  logic                  otp_macro_phys_active_i,
   input  logic                  dai_cmd_req_i,
   input  logic [3:0]            dai_slot_idx_i,
@@ -67,10 +63,12 @@ module zc_aon_post_auth_ctrl (
   output logic [1:0]            otp_auth_word_sel_o,
   output logic [2:0]            otp_auth_word_mask_o,
   output logic [21:0]           otp_auth_expected_cw_o,
-  output aon_auth_state_e       aon_auth_state_o,
-  output otp_wstep_e            aon_wstep_o,
+  output logic [2:0]            aon_auth_state_o,
+  output logic [1:0]            aon_wstep_o,
   output logic                  aon_fatal_locked_o
 );
+
+  import zc_otp_pkg::*;
 
   aon_auth_state_e aon_auth_state_q;
   otp_wstep_e      wstep_q;

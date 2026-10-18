@@ -8,10 +8,6 @@
 //   covering Gate B Rev. 28 - Rev. 28D OTP authorization, single-use grant consumption,
 //   normal vs. recovery completion, and fatal lock transitions.
 
-/* verilator lint_off IMPORTSTAR */
-import zc_otp_pkg::*;
-/* verilator lint_on IMPORTSTAR */
-
 module zc_otp_sva (
   input logic            clk_aon_i,
   input logic            rst_aon_por_ni,
@@ -26,8 +22,8 @@ module zc_otp_sva (
   input logic            otp_word_auth_valid_o,
   input logic            otp_dai_we_o,
   input logic [2:0]      otp_auth_word_mask_o,
-  input aon_auth_state_e aon_auth_state_q,
-  input otp_wstep_e      wstep_q,
+  input logic [2:0]      aon_auth_state_q,
+  input logic [1:0]      wstep_q,
   input logic            word_grant_avail_q,
   input logic [1:0]      expected_word_idx_q,
   input logic            val_ctx_seal_b_only_q,
@@ -37,6 +33,8 @@ module zc_otp_sva (
   input logic            readback_verified_w,
   input logic            any_session_done_ok_w
 );
+
+  import zc_otp_pkg::*;
 
   // SVA-OTP-06a (R28B-02): Single-word grant is consumed immediately on dai_write_accepted_w
   // and stays 0 throughout the physical write and readback verification window.
