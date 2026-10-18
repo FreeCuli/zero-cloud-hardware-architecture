@@ -16,9 +16,11 @@
 //   - Locks permanently to AUTH_LOCKED_FATAL on any out-of-context/mismatched readback
 //     or unauthorized DAI activity (recoverable only via Cold POR rst_aon_por_ni)
 
-module zc_aon_post_auth_ctrl
-  import zc_otp_pkg::*;
-(
+/* verilator lint_off IMPORTSTAR */
+import zc_otp_pkg::*;
+/* verilator lint_on IMPORTSTAR */
+
+module zc_aon_post_auth_ctrl (
   input  logic                  clk_aon_i,
   input  logic                  rst_aon_por_ni,          // Cold POR (only reset that clears AUTH_LOCKED_FATAL)
   input  logic                  rst_sys_ni,              // System Warm Reset status

@@ -15,9 +15,9 @@
 //     to AUTH_LOCKED_FATAL on the same clock edge
 //   - F-OTP-05: AUTH_LOCKED_FATAL is permanently sticky until Cold POR (!rst_aon_por_ni)
 
-module zc_otp_formal_proof
-  import zc_otp_pkg::*;
-(
+import zc_otp_pkg::*;
+
+module zc_otp_formal_proof (
   input logic                  clk_aon_i,
   input logic                  rst_aon_por_ni,
   input logic                  rst_sys_ni,

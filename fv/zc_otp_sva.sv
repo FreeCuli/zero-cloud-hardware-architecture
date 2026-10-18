@@ -8,9 +8,11 @@
 //   covering Gate B Rev. 28 - Rev. 28D OTP authorization, single-use grant consumption,
 //   normal vs. recovery completion, and fatal lock transitions.
 
-module zc_otp_sva
-  import zc_otp_pkg::*;
-(
+/* verilator lint_off IMPORTSTAR */
+import zc_otp_pkg::*;
+/* verilator lint_on IMPORTSTAR */
+
+module zc_otp_sva (
   input logic            clk_aon_i,
   input logic            rst_aon_por_ni,
   input logic            rst_sys_ni,
