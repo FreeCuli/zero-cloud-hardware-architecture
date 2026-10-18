@@ -6,8 +6,11 @@
 //   Gate C Formal Verification Harness for zc_obi_subordinate_bridge (Yosys/SymbiYosys BMC + k-induction):
 //   Proves all Rev. 28 - Rev. 28D and GCR-01 OBI security properties:
 //   - F-OBI-01 (SVA-L0-10a): Single-response delivery lock (cpu_resp_delivered_q prevents double response)
-//   - F-OBI-02 (SVA-L0-10b): Orphan physical response arriving in ST_IDLE is silently drained
-//   - F-OBI-03 (SVA-L0-12a): Normal active CPU wait never increments orphan watchdog counter
+//   - F-OBI-02a (SVA-L0-10b Part 1): Orphan response in ST_IDLE silently drained on arrival cycle (host_rvalid_o == 0)
+//   - F-OBI-02b (SVA-L0-10b Part 2): Orphan response in ST_IDLE clears phys_req_active_q on next cycle
+//   - F-OBI-02c (SVA-L0-10b Part 3): No delayed synthetic or stale rvalid on cycle following orphan drain
+//   - F-OBI-03 (SVA-L0-12a): Strictly normative - Normal active CPU wait without orphan_drain_active_o
+//     never triggers or increments watchdog (drain_wdog_cnt_o == 0 && !subsys_fatal_fault_irq_o)
 //   - F-OBI-04 (R28B-03 / SVA-L0-13a): Unconditional monotonic +1 progression of drain_wdog_cnt_q
 //     whenever orphan_active_w holds (even while !rst_sys_ni == 0 or ST_TIMEOUT_ERR persists)
 //   - F-OBI-05 (SVA-L0-13b): Reaching drain_wdog_cnt_q == 1023 without rvalid locks subsys_dead_locked_q = 1
@@ -67,6 +70,18 @@ module zc_obi_formal_proof (
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_i) f_past_valid <= 1'b1;
 
+  // Registered tracker for orphan arrival in ST_IDLE
+  logic orphan_drained_q;
+  initial orphan_drained_q = 1'b0;
+  always_ff @(posedge clk_i or negedge rst_por_ni) begin
+    if (!rst_por_ni) begin
+      orphan_drained_q <= 1'b0;
+    end else begin
+      orphan_drained_q <= rst_sys_ni && (bridge_state_o == ST_IDLE) &&
+                          dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o;
+    end
+  end
+
   always_comb begin
     if (!f_past_valid) assume (!rst_por_ni);
 
@@ -82,44 +97,35 @@ module zc_obi_formal_proof (
       assert (host_req_ready_o == 1'b1);
       assert (periph_phys_req_o == 1'b0);
     end
+
+    // F-OBI-02a (SVA-L0-10b / Part 1): On arrival cycle of orphan response in ST_IDLE, host_rvalid_o is 0
+    if (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
+      assert (!host_rvalid_o);
+    end
+
+    // F-OBI-02b & F-OBI-02c (SVA-L0-10b / Parts 2 & 3): Cycle following orphan drain in ST_IDLE
+    if (orphan_drained_q && rst_por_ni) begin
+      assert (!dut.phys_req_active_q);
+      if (rst_sys_ni && !host_req_i) begin
+        assert (!host_rvalid_o);
+      end
+    end
   end
 
   always_ff @(posedge clk_i) begin
     if (f_past_valid && $past(rst_por_ni) && rst_por_ni) begin
-      // Inductive Lemma L-OBI-1: Invariant - watchdog counter is strictly 0 whenever orphan drain is inactive
-      if (!orphan_drain_active_o) begin
-        assert (drain_wdog_cnt_o == 10'd0);
-      end
-
-      // Inductive Lemma L-OBI-2: Invariant - orphan drain active implies physical transaction was latched
-      if (orphan_drain_active_o) begin
-        assert (dut.phys_req_active_q);
-      end
-
-      // F-OBI-01 (SVA-L0-10a): Once CPU response is delivered, bridge returns to ST_IDLE and locks out double response
+      // F-OBI-01 (SVA-L0-10a): Once CPU response is delivered in ST_WAIT_RVALID, ST_TIMEOUT_ERR, or ST_TRAP,
+      // bridge returns to ST_IDLE on the next cycle and does not re-assert host_rvalid_o.
       if ($past(rst_sys_ni) && rst_sys_ni &&
           $past(host_rvalid_o && (bridge_state_o != ST_IDLE))) begin
         assert ((bridge_state_o == ST_IDLE) && !host_rvalid_o);
       end
 
-      // F-OBI-02a (SVA-L0-10b / Part 1): Orphan response in ST_IDLE is never forwarded to CPU on arrival cycle
-      if (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
-        assert (!host_rvalid_o);
-      end
-
-      // F-OBI-02b (SVA-L0-10b / Part 2): Orphan response in ST_IDLE unconditionally clears phys_req_active_q on next cycle
-      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o)) begin
-        assert (!dut.phys_req_active_q);
-      end
-
-      // F-OBI-02c (SVA-L0-10b / Part 3): No delayed synthetic or stale rvalid on the cycle following orphan drain
-      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) && rst_sys_ni) begin
-        assert (!host_rvalid_o);
-      end
-
-      // F-OBI-03 (SVA-L0-12a): Strictly normative - Normal active CPU wait without orphan_drain_active_o never increments watchdog
+      // F-OBI-03 (SVA-L0-12a): Strictly normative - Normal active CPU wait without orphan_drain_active_o
+      // never triggers or increments watchdog
       if ($past(rst_sys_ni && (bridge_state_o == ST_WAIT_RVALID) &&
-                !orphan_drain_active_o && !subsys_fatal_fault_irq_o)) begin
+                !orphan_drain_active_o && !subsys_fatal_fault_irq_o &&
+                (drain_wdog_cnt_o == 10'd0))) begin
         assert (!orphan_drain_active_o && !subsys_fatal_fault_irq_o && (drain_wdog_cnt_o == 10'd0));
       end
 

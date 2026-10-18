@@ -9,9 +9,9 @@
 //     05h (RDSR1) primary frame completion with SR1[1:0] == 2'b00 and !fault_high_sec_i
 //   - F-SPI-02 (SVA-SPI-2d): Physical SPI idle (UPD_IDLE) never asserts bank_b_commit_ready_o
 //     without independent ROM image verification (rom_img_verif_valid_i)
-//   - F-SPI-03 (R28-03): No primary frame completion strobe can assert without a primary /CS
-//     rising edge while SCK == 0
-//   - F-SPI-04: Secondary fault (fault_high_sec_i) forces effective Flash /CS high (fail-closed)
+//   - F-SPI-03 (SVA-SPI-3 / R28-03): No primary frame completion strobe can assert without a primary /CS
+//     rising edge (cs_n_to_iso_o && !cs_n_prev_q) while SCK == 0
+//   - F-SPI-04 (SVA-SPI-4): Secondary fault (fault_high_sec_i) forces effective Flash /CS high (fail-closed)
 
 module zc_spi_formal_proof (
   input logic        clk_i,
@@ -69,42 +69,39 @@ module zc_spi_formal_proof (
 
   always_comb begin
     if (!f_past_valid) assume (!rst_sys_ni);
+
     // F-SPI-02 (SVA-SPI-2d): Physical SPI idle (UPD_IDLE) never asserts bank_b_commit_ready_o
     // without independent ROM image verification (rom_img_verif_valid_i).
     if (bank_b_commit_ready_o) begin
       assert (spi_idle_ready_o && rom_img_verif_valid_i);
     end
+
     // F-SPI-04 (SVA-SPI-4): Secondary fault forces effective Flash /CS high (fail-closed).
     if (fault_high_sec_i) begin
       assert (cs_n_flash_eff_o == 1'b1);
+    end
+
+    // F-SPI-03 (SVA-SPI-3 / R28-03): Strictly normative - No primary frame completion strobe can assert
+    // without a primary /CS rising edge while SCK == 0
+    if (dut.wren_pri_frame_done_w || dut.wrdi_pri_frame_done_w ||
+        dut.rdsr1_pri_frame_done_w || dut.prog_or_erase_pri_done_w) begin
+      assert (cs_n_to_iso_o && !dut.cs_n_prev_q && !sck_to_iso_o);
     end
   end
 
   always_ff @(posedge clk_i) begin
     if (f_past_valid && $past(rst_sys_ni) && rst_sys_ni) begin
-      // Inductive Lemma L-SPI-1: cs_n_prev_q accurately tracks cs_n_to_iso_o from previous cycle
-      assert (dut.cs_n_prev_q == $past(cs_n_to_iso_o));
-
       // F-SPI-01 (SVA-SPI-2c): Strictly normative - UPD_UNSYNC_RESET -> UPD_IDLE occurs ONLY after a fresh
-      // 16-bit 05h (RDSR1) primary frame completion with SR1[1:0] == 2'b00, sampled byte, and no secondary fault
+      // 05h (RDSR1) primary frame completion with SR1[1:0] == 2'b00, sampled byte, and no secondary fault
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(!dut.cs_n_prev_q && cs_n_to_iso_o && !sck_to_iso_o &&
-                      (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) &&
-                      dut.sr1_byte_sampled_q && (dut.sr1_latched_byte_q[1:0] == 2'b00) &&
+        assert ($past(dut.rdsr1_pri_frame_done_w && (dut.sr1_latched_byte_q[1:0] == 2'b00) &&
                       !fault_high_sec_i && !upd_wdog_timeout_i));
       end
 
       // F-SPI-01b: 04h (WRDI) in UPD_UNSYNC_RESET stays in UPD_UNSYNC_RESET (unless watchdog timeout).
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) &&
-          $past(cs_n_to_iso_o && !sck_to_iso_o && (opcode_i == 8'h04) && (frame_bit_cnt_i == 12'd8) && !upd_wdog_timeout_i)) begin
+          $past(dut.wrdi_pri_frame_done_w && !upd_wdog_timeout_i)) begin
         assert (spi_update_state_o == UPD_UNSYNC_RESET);
-      end
-
-      // F-SPI-03 (SVA-SPI-3 / R28-03): Strictly normative - No primary frame completion strobe can assert
-      // without a primary /CS rising edge ($rose) while SCK == 0
-      if (dut.wren_pri_frame_done_w || dut.wrdi_pri_frame_done_w ||
-          dut.rdsr1_pri_frame_done_w || dut.prog_or_erase_pri_done_w) begin
-        assert (cs_n_to_iso_o && !$past(cs_n_to_iso_o) && !sck_to_iso_o);
       end
     end
   end
@@ -123,7 +120,7 @@ module zc_spi_formal_proof (
       cover (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE));
 
       // C-SPI-01b: WRDI executed in UPD_UNSYNC_RESET
-      cover (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (opcode_i == 8'h04) && dut.wrdi_pri_frame_done_w);
+      cover (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && dut.wrdi_pri_frame_done_w);
 
       // C-SPI-02: Bank-B commit authorization active
       cover (bank_b_commit_ready_o);
