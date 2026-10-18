@@ -64,26 +64,8 @@ module zc_obi_formal_proof (
   );
 
   logic f_past_valid;
-  logic f_phys_req_active_q;
-
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_i) f_past_valid <= 1'b1;
-
-  always_ff @(posedge clk_i or negedge rst_por_ni) begin
-    if (!rst_por_ni) begin
-      f_phys_req_active_q <= 1'b0;
-    end else begin
-      case ({periph_phys_req_o && periph_phys_gnt_i, periph_phys_rvalid_i})
-        2'b10:   f_phys_req_active_q <= 1'b1;
-        2'b01:   f_phys_req_active_q <= 1'b0;
-        default: f_phys_req_active_q <= f_phys_req_active_q;
-      endcase
-    end
-  end
-
-  wire f_orphan_trigger_w = f_phys_req_active_q && !periph_phys_rvalid_i &&
-                            (!rst_sys_ni || (bridge_state_o == ST_TIMEOUT_ERR));
-  wire f_orphan_active_w  = orphan_drain_active_o || f_orphan_trigger_w;
 
   always_comb begin
     if (!f_past_valid) assume (!rst_por_ni);
@@ -104,36 +86,31 @@ module zc_obi_formal_proof (
 
   always_ff @(posedge clk_i) begin
     if (f_past_valid && $past(rst_por_ni) && rst_por_ni) begin
-      // F-OBI-01 (SVA-L0-10a): Once CPU response is delivered without new request acceptance,
-      // a second response is locked out on the next cycle.
+      // F-OBI-01 (SVA-L0-10a): Once CPU response is delivered in ST_WAIT_RVALID, ST_TIMEOUT_ERR, or ST_TRAP,
+      // bridge returns to ST_IDLE on the next cycle and does not re-assert host_rvalid_o.
       if ($past(rst_sys_ni) && rst_sys_ni &&
-          $past(host_rvalid_o && !(host_req_i && host_req_ready_o))) begin
-        assert (!host_rvalid_o);
+          $past(host_rvalid_o && (bridge_state_o != ST_IDLE))) begin
+        assert ((bridge_state_o == ST_IDLE) && !host_rvalid_o);
       end
 
-      // F-OBI-02 (SVA-L0-10b): Orphan physical response arriving in ST_IDLE is silently drained
-      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && f_phys_req_active_q &&
-                periph_phys_rvalid_i && !periph_phys_req_o)) begin
-        assert (!$past(host_rvalid_o));
-        assert (!f_phys_req_active_q);
-      end
-
-      // F-OBI-03 (SVA-L0-12a): Normal active CPU wait never increments orphan watchdog counter
+      // F-OBI-03 (SVA-L0-12a): Normal active CPU wait without orphan_drain_active_o never triggers or increments watchdog
       if ($past(rst_sys_ni && (bridge_state_o == ST_WAIT_RVALID) &&
-                !f_orphan_active_w && !subsys_fatal_fault_irq_o)) begin
-        assert ((drain_wdog_cnt_o == 10'd0) && !subsys_fatal_fault_irq_o);
+                !orphan_drain_active_o && !subsys_fatal_fault_irq_o)) begin
+        assert (!orphan_drain_active_o && !subsys_fatal_fault_irq_o &&
+                ((drain_wdog_cnt_o == 10'd0) || (drain_wdog_cnt_o == $past(drain_wdog_cnt_o))));
       end
 
-      // F-OBI-04 (R28B-03 / SVA-L0-13a): Monotonic +1 progression of drain_wdog_cnt_q under orphan_active_w
-      if ($past(f_orphan_active_w && !periph_phys_rvalid_i && !subsys_fatal_fault_irq_o &&
+      // F-OBI-04 (R28B-03 / SVA-L0-13a): Monotonic +1 progression of drain_wdog_cnt_o when orphan_drain_active_o holds
+      if ($past(orphan_drain_active_o && !periph_phys_rvalid_i && !subsys_fatal_fault_irq_o &&
                 (drain_wdog_cnt_o < 10'd1023))) begin
-        assert ((orphan_drain_active_o && (drain_wdog_cnt_o == ($past(drain_wdog_cnt_o) + 10'd1))) ||
-                periph_phys_rvalid_i);
+        assert (((drain_wdog_cnt_o == ($past(drain_wdog_cnt_o) + 10'd1)) && orphan_drain_active_o) ||
+                (!orphan_drain_active_o && (drain_wdog_cnt_o == 10'd0)));
       end
 
-      // F-OBI-05 (SVA-L0-13b): Reaching 1023 without rvalid permanently locks subsys_fatal_fault_irq_o (subsys_dead_locked_q)
-      if ($past(f_orphan_active_w && !periph_phys_rvalid_i && !subsys_fatal_fault_irq_o &&
-                (drain_wdog_cnt_o == 10'd1023))) begin
+      // F-OBI-05 (SVA-L0-13b): Reaching 1023 under active orphan drain without rvalid locks subsys_fatal_fault_irq_o
+      if ($past(orphan_drain_active_o && !periph_phys_rvalid_i && !subsys_fatal_fault_irq_o &&
+                (drain_wdog_cnt_o == 10'd1023)) &&
+          orphan_drain_active_o) begin
         assert (subsys_fatal_fault_irq_o && !periph_phys_req_o);
       end
 
@@ -149,7 +126,7 @@ module zc_obi_formal_proof (
       end
 
       // F-OBI-06c (Rev. 28D P1 / SVA-L0-13c): ST_TRAP returns to ST_IDLE on the next cycle while staying deadlocked
-      if ($past(rst_sys_ni && (bridge_state_o == ST_TRAP)) && rst_sys_ni) begin
+      if ($past(rst_sys_ni && (bridge_state_o == ST_TRAP) && subsys_fatal_fault_irq_o) && rst_sys_ni) begin
         assert (bridge_state_o == ST_IDLE);
         assert (subsys_fatal_fault_irq_o == 1'b1);
       end

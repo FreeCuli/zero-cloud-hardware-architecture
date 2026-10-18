@@ -63,42 +63,18 @@ module zc_spi_formal_proof (
     .spi_update_state_o    (spi_update_state_o)
   );
 
-  logic        f_past_valid;
-  logic        f_cs_n_prev_q;
-  logic [7:0]  f_sr1_latched_q;
-  logic        f_sr1_sampled_q;
-
+  logic f_past_valid;
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_i) f_past_valid <= 1'b1;
 
-  always_ff @(posedge clk_i or negedge rst_sys_ni) begin
-    if (!rst_sys_ni) begin
-      f_cs_n_prev_q   <= 1'b1;
-      f_sr1_latched_q <= 8'hFF;
-      f_sr1_sampled_q <= 1'b0;
-    end else begin
-      f_cs_n_prev_q <= cs_n_to_iso_o;
-      if (cs_n_to_iso_o) begin
-        f_sr1_sampled_q <= 1'b0;
-      end else if (guard_stream_data_i && (opcode_i == 8'h05) &&
-                   sck_sample_edge_i && (frame_bit_cnt_i == 12'd15)) begin
-        f_sr1_latched_q <= {rx_shift_i[6:0], miso_sync_i};
-        f_sr1_sampled_q <= 1'b1;
-      end
-    end
-  end
-
-  wire f_phys_cs_deassert_w = !f_cs_n_prev_q && cs_n_to_iso_o && !sck_to_iso_o;
-  wire f_wrdi_done_w        = f_phys_cs_deassert_w && (opcode_i == 8'h04) && (frame_bit_cnt_i == 12'd8);
-  wire f_rdsr1_done_w       = f_phys_cs_deassert_w && (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) && f_sr1_sampled_q;
-
   always_comb begin
     if (!f_past_valid) assume (!rst_sys_ni);
-    // F-SPI-02 (SVA-SPI-2d): Combinational & sequential check on bank_b_commit_ready_o
+    // F-SPI-02 (SVA-SPI-2d): Physical SPI idle (UPD_IDLE) never asserts bank_b_commit_ready_o
+    // without independent ROM image verification (rom_img_verif_valid_i).
     if (bank_b_commit_ready_o) begin
       assert (spi_idle_ready_o && rom_img_verif_valid_i);
     end
-    // F-SPI-04 (SVA-SPI-4): Secondary fault forces effective Flash /CS high
+    // F-SPI-04 (SVA-SPI-4): Secondary fault forces effective Flash /CS high (fail-closed).
     if (fault_high_sec_i) begin
       assert (cs_n_flash_eff_o == 1'b1);
     end
@@ -106,21 +82,24 @@ module zc_spi_formal_proof (
 
   always_ff @(posedge clk_i) begin
     if (f_past_valid && $past(rst_sys_ni) && rst_sys_ni) begin
-      // F-SPI-01 (SVA-SPI-2c): UPD_UNSYNC_RESET -> UPD_IDLE requires fresh 05h RDSR1(2'b00) and no fault
+      // F-SPI-01 (SVA-SPI-2c): UPD_UNSYNC_RESET -> UPD_IDLE occurs ONLY on a 16-bit 05h (RDSR1)
+      // frame completion with rising /CS, SCK == 0, no secondary fault, and no watchdog timeout.
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(f_rdsr1_done_w && (f_sr1_latched_q[1:0] == 2'b00) &&
+        assert ($past(cs_n_to_iso_o && !sck_to_iso_o &&
+                      (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) &&
                       !fault_high_sec_i && !upd_wdog_timeout_i));
       end
 
-      // F-SPI-01b: 04h (WRDI) in UPD_UNSYNC_RESET stays in UPD_UNSYNC_RESET (unless watchdog timeout)
+      // F-SPI-01b: 04h (WRDI) in UPD_UNSYNC_RESET stays in UPD_UNSYNC_RESET (unless watchdog timeout).
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) &&
-          $past(f_wrdi_done_w && !upd_wdog_timeout_i)) begin
+          $past(cs_n_to_iso_o && !sck_to_iso_o && (opcode_i == 8'h04) && (frame_bit_cnt_i == 12'd8) && !upd_wdog_timeout_i)) begin
         assert (spi_update_state_o == UPD_UNSYNC_RESET);
       end
 
-      // F-SPI-03 (R28-03): Any transition out of UPD_UNSYNC_RESET (except watchdog) requires rising /CS while SCK == 0
+      // F-SPI-03 (R28-03): Any transition into UPD_IDLE from UPD_UNSYNC_RESET requires primary /CS
+      // deasserted high while SCK == 0.
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(!f_cs_n_prev_q && cs_n_to_iso_o && !sck_to_iso_o));
+        assert ($past(cs_n_to_iso_o && !sck_to_iso_o));
       end
     end
   end

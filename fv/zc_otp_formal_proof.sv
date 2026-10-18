@@ -114,87 +114,59 @@ module zc_otp_formal_proof (
   );
 
   logic f_past_valid;
-  logic [31:0] f_active_sess_id_q;
-  logic        f_seal_b_only_q;
-
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_aon_i) f_past_valid <= 1'b1;
 
-  always_ff @(posedge clk_aon_i or negedge rst_aon_por_ni) begin
-    if (!rst_aon_por_ni) begin
-      f_active_sess_id_q <= 32'h0;
-      f_seal_b_only_q    <= 1'b0;
-    end else if (!tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
-      if ((aon_auth_state_o == 3'b001) && !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i) &&
-          post_auth_req_i && rst_sys_ni && rom_exec_active_i) begin
-        f_active_sess_id_q <= post_session_id_i;
-      end
-      if ((aon_auth_state_o == 3'b010) && !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i || !rst_sys_ni || !rom_exec_active_i) &&
-          val_step_done_i && val_all_checks_ok_i && (req_target_svn_i != 8'd0)) begin
-        f_seal_b_only_q <= req_seal_b_only_i;
-      end
-    end
-  end
-
-  wire f_rb_verified_w = (aon_auth_state_o == AUTH_GRANT) &&
-                         (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
-                         !otp_macro_phys_active_i &&
-                         dai_rb_done_pulse_i &&
-                         !dai_ecc_err_i &&
-                         (dai_rb_session_id_i == f_active_sess_id_q) &&
-                         (dai_rb_slot_idx_i   == otp_auth_slot_o) &&
-                         (dai_rb_word_sel_i   == otp_auth_word_sel_o) &&
-                         (dai_rb_raw_data_i   == otp_auth_expected_cw_o);
-
   always_comb begin
     if (!f_past_valid) assume (!rst_aon_por_ni);
+    // F-OTP-01b (R28B-02): Whenever in WSTEP_WAIT_PHYS_DONE or WSTEP_WAIT_RB_VERIFY,
+    // or outside AUTH_GRANT, write authorization and DAI write enable are strictly 0.
+    if ((aon_auth_state_o != AUTH_GRANT) ||
+        (aon_wstep_o == WSTEP_WAIT_PHYS_DONE) ||
+        (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) ||
+        (aon_wstep_o == WSTEP_IDLE)) begin
+      assert (!otp_word_auth_valid_o);
+      assert (!otp_dai_we_o);
+      assert (otp_auth_word_mask_o == 3'b000);
+    end
   end
 
   always_ff @(posedge clk_aon_i) begin
     if (f_past_valid && $past(rst_aon_por_ni) && rst_aon_por_ni) begin
       // F-OTP-01a (R28B-02): Single-word grant consumed immediately on otp_dai_we_o (dai_write_accepted_w)
-      if ($past(otp_dai_we_o && !dai_prog_done_pulse_i && !dai_rb_done_pulse_i && !dai_prog_err_i)) begin
+      if ($past(otp_dai_we_o && !dai_prog_done_pulse_i && !dai_rb_done_pulse_i && !dai_prog_err_i &&
+                rst_sys_ni && rom_exec_active_i &&
+                !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i)) begin
+        assert (aon_wstep_o == WSTEP_WAIT_PHYS_DONE);
         assert (!otp_word_auth_valid_o);
         assert (!otp_dai_we_o);
         assert (otp_auth_word_mask_o == 3'b000);
       end
 
-      // F-OTP-01b (R28B-02): While in WSTEP_WAIT_PHYS_DONE or WSTEP_WAIT_RB_VERIFY, grant is strictly 0
-      if ((aon_wstep_o == WSTEP_WAIT_PHYS_DONE) || (aon_wstep_o == WSTEP_WAIT_RB_VERIFY)) begin
-        assert (!otp_word_auth_valid_o);
-        assert (!otp_dai_we_o);
-        assert (otp_auth_word_mask_o == 3'b000);
+      // F-OTP-02 & F-OTP-03 (R28B-01 & R28-02): Upon dai_rb_done_pulse_i in WSTEP_WAIT_RB_VERIFY,
+      // the FSM MUST transition only to:
+      //   (a) next sequential word in WSTEP_AUTH_READY (if intermediate normal word verified),
+      //   (b) AUTH_SESSION_DONE with all grants cleared (if final word 2 verified in normal or recovery mode), or
+      //   (c) AUTH_LOCKED_FATAL with all grants cleared (on any mismatch or fault).
+      if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) && dai_rb_done_pulse_i)) begin
+        assert (
+          ((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_AUTH_READY) &&
+           ($past(otp_auth_word_sel_o) < OTP_WORD_COMMIT_B) &&
+           (otp_auth_word_sel_o == ($past(otp_auth_word_sel_o) + 2'd1))) ||
+          ((aon_auth_state_o == AUTH_SESSION_DONE) && (aon_wstep_o == WSTEP_IDLE) &&
+           ($past(otp_auth_word_sel_o) == OTP_WORD_COMMIT_B) &&
+           !otp_word_auth_valid_o && (otp_auth_word_mask_o == 3'b000)) ||
+          ((aon_auth_state_o == AUTH_LOCKED_FATAL) && aon_fatal_locked_o &&
+           (aon_wstep_o == WSTEP_IDLE) && !otp_word_auth_valid_o && (otp_auth_word_mask_o == 3'b000))
+        );
       end
 
-      // F-OTP-02: Normal intermediate word (0 or 1) readback verification opens next sequential word grant
-      if ($past(f_rb_verified_w && !f_seal_b_only_q &&
-                (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
-                !dai_cmd_req_i && !dai_prog_done_pulse_i &&
-                rst_sys_ni && rom_exec_active_i &&
-                !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
-          rst_sys_ni && rom_exec_active_i &&
-          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
-        assert (aon_auth_state_o == AUTH_GRANT);
-        assert (aon_wstep_o == WSTEP_AUTH_READY);
-        assert (otp_word_auth_valid_o);
-        assert (otp_auth_word_sel_o == ($past(otp_auth_word_sel_o) + 2'd1));
-      end
-
-      // F-OTP-03 (R28B-01): Normal final word (2) and Recovery (2 only) complete into AUTH_SESSION_DONE
-      if ($past(f_rb_verified_w && (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
-                !dai_cmd_req_i && !dai_prog_done_pulse_i &&
-                rst_sys_ni && rom_exec_active_i &&
-                !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
-          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
-        assert (aon_auth_state_o == AUTH_SESSION_DONE);
-        assert (aon_wstep_o == WSTEP_IDLE);
-        assert (!otp_word_auth_valid_o);
-        assert (otp_auth_word_mask_o == 3'b000);
-      end
-
-      // F-OTP-04 (R28-02): Mismatched readback in WSTEP_WAIT_RB_VERIFY locks AUTH_LOCKED_FATAL immediately
+      // F-OTP-04 (R28-02): Any corrupted readback data (dai_rb_raw_data_i != otp_auth_expected_cw_o)
+      // or ECC error during WSTEP_WAIT_RB_VERIFY immediately locks AUTH_LOCKED_FATAL on the same clock edge.
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
-                dai_rb_done_pulse_i && !f_rb_verified_w)) begin
+                dai_rb_done_pulse_i &&
+                ((dai_rb_raw_data_i != otp_auth_expected_cw_o) || dai_ecc_err_i ||
+                 (dai_rb_slot_idx_i != otp_auth_slot_o) || (dai_rb_word_sel_i != otp_auth_word_sel_o)))) begin
         assert (aon_auth_state_o == AUTH_LOCKED_FATAL);
         assert (aon_fatal_locked_o);
         assert (aon_wstep_o == WSTEP_IDLE);
