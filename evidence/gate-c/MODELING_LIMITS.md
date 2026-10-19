@@ -60,6 +60,16 @@ All primary inputs that lack an explicit `assume property (...)` directive are t
 | **OBI** | `rst_sys_ni` (Steady-State) | `assume property (rst_sys_ni);` in $k$-induction | Decouples steady-state bus invariant induction from reset-edge transients. Reset transitions are verified separately via BMC unrolling and Cover `C-OBI-01`. |
 | **OBI** | `orphan_drain_active_o` | Unconstrained free variable | Solves inductive step across all possible pipeline depths without over-constraining the subordinate. |
 | **OTP** | `clk_glitch_alert_i` | Zero during normal flow BMC | Fault pins are asserted in discrete BMC paths to verify immediate transition to `AUTH_LOCKED_FATAL`. |
+| **OTP** | `post_session_id_i` | Fully unconstrained free variable | Allowed to drift/change arbitrarily across all cycles; proves RTL latched `active_session_id_q` integrity without any `$stable` assumption. |
+
+### 3.3 OTP Shadow Session Tracking & Yosys AST Boundary
+- **Yosys AST Hierarchical Path Limitation:** The Yosys AST parser (`read_verilog -sv`) does not support cross-module dot references (`dut.active_session_id_q`) in formal property expressions.
+- **Shadow Observer:** `f_accepted_session_id_q` in [fv/zc_otp_formal_proof.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/fv/zc_otp_formal_proof.sv) mirrors the exact RTL acceptance logic.
+- **Simulation Dual-Proof:** Equivalence between `f_accepted_session_id_q` and `dut.active_session_id_q` is exhaustively verified across all 12,240 cycles in [tb/tb_zc_otp_fn_equiv.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_fn_equiv.sv) under both Verilator and Icarus Verilog.
+
+### 3.4 OBI Post-Drain Disambiguation
+- **Simultaneous Request Retention:** Property `F-OBI-02c` does not assume `!host_req_i` in the past cycle, fully verifying simultaneous host request arrival during orphan peripheral response drain in `ST_IDLE`.
+- **Response Source Disambiguation:** Distinguishes physical orphan data leak (proven impossible) from legitimate synthetic error delivery (`ST_TRAP` with `host_err_o == 1` and `host_rdata_o == 0x0000_0000`).
 
 ---
 

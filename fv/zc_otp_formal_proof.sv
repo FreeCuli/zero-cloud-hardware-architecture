@@ -118,11 +118,21 @@ module zc_otp_formal_proof (
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_aon_i) f_past_valid <= 1'b1;
 
+  logic [31:0] f_accepted_session_id_q;
+  always_ff @(posedge clk_aon_i or negedge rst_aon_por_ni) begin
+    if (!rst_aon_por_ni) begin
+      f_accepted_session_id_q <= 32'h0;
+    end else if (!tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
+      if ((aon_auth_state_o == AUTH_WAIT_CHAL) &&
+          !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i) &&
+          post_auth_req_i && rst_sys_ni && rom_exec_active_i) begin
+        f_accepted_session_id_q <= post_session_id_i;
+      end
+    end
+  end
+
   always_comb begin
     if (!f_past_valid) assume (!rst_aon_por_ni);
-
-    // Environment: DAI readback session ID matches active session when readback completes
-    assume (!dai_rb_done_pulse_i || (dai_rb_session_id_i == post_session_id_i));
 
     // F-OTP-01b (SVA-OTP-06a Part 2 / R28B-02 Structural):
     // Throughout the wait steps (WAIT_PHYS_DONE, WAIT_RB_VERIFY) or outside AUTH_GRANT,
@@ -155,6 +165,7 @@ module zc_otp_formal_proof (
                 (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
                 !otp_macro_phys_active_i && !req_seal_b_only_i &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
+                (dai_rb_session_id_i == f_accepted_session_id_q) &&
                 (dai_rb_slot_idx_i == otp_auth_slot_o) &&
                 (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
                 (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
@@ -175,6 +186,7 @@ module zc_otp_formal_proof (
                 !otp_macro_phys_active_i &&
                 (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
+                (dai_rb_session_id_i == f_accepted_session_id_q) &&
                 (dai_rb_slot_idx_i == otp_auth_slot_o) &&
                 (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
                 (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
@@ -193,12 +205,18 @@ module zc_otp_formal_proof (
       // F-OTP-04 (SVA-OTP-07 / R28-02): Strictly normative - Any unverified, out-of-context,
       // or mismatched readback in WSTEP_WAIT_RB_VERIFY immediately locks to AUTH_LOCKED_FATAL
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                !otp_macro_phys_active_i &&
+                !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 dai_rb_done_pulse_i &&
                 (dai_ecc_err_i ||
+                 (dai_rb_session_id_i != f_accepted_session_id_q) ||
                  (dai_rb_slot_idx_i != otp_auth_slot_o) ||
                  (dai_rb_word_sel_i != otp_auth_word_sel_o) ||
                  (dai_rb_raw_data_i != otp_auth_expected_cw_o)) &&
-                rst_sys_ni && rom_exec_active_i)) begin
+                rst_sys_ni && rom_exec_active_i &&
+                !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
+          rst_sys_ni && rom_exec_active_i &&
+          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
         assert (aon_auth_state_o == AUTH_LOCKED_FATAL);
         assert (aon_fatal_locked_o);
         assert (aon_wstep_o == WSTEP_IDLE);
@@ -241,6 +259,11 @@ module zc_otp_formal_proof (
 
       // C-OTP-05: Fatal lock sticky persistence
       cover ($past(aon_auth_state_o == AUTH_LOCKED_FATAL) && (aon_auth_state_o == AUTH_LOCKED_FATAL));
+
+      // C-OTP-06: Mismatched / hijacked readback session ID rejected and fatal locked
+      cover ($past(aon_auth_state_o == AUTH_GRANT && aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
+                   dai_rb_done_pulse_i && (dai_rb_session_id_i != f_accepted_session_id_q)) &&
+             (aon_auth_state_o == AUTH_LOCKED_FATAL));
     end
   end
 

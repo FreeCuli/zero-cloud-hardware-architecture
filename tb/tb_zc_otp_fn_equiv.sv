@@ -140,6 +140,19 @@ module tb_zc_otp_fn_equiv;
     .aon_fatal_locked_o      (aon_fatal_locked_o)
   );
 
+  logic [31:0] f_accepted_session_id_q;
+  always_ff @(posedge clk_aon_i or negedge rst_aon_por_ni) begin
+    if (!rst_aon_por_ni) begin
+      f_accepted_session_id_q <= 32'h0;
+    end else if (!tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
+      if ((aon_auth_state_o == 3'b001) &&
+          !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i) &&
+          post_auth_req_i && rst_sys_ni && rom_exec_active_i) begin
+        f_accepted_session_id_q <= post_session_id_i;
+      end
+    end
+  end
+
   initial clk_aon_i = 1'b0;
   always #5 clk_aon_i = ~clk_aon_i;
 
@@ -243,6 +256,13 @@ module tb_zc_otp_fn_equiv;
         @(posedge clk_aon_i);
         @(negedge clk_aon_i);
         post_auth_req_i   = 1'b0;
+
+        // Verify shadow session register matches DUT internal active_session_id_q
+        if (dut.active_session_id_q !== f_accepted_session_id_q) begin
+          $display("[FAIL][SESSION-EQUIV] Session ID mismatch at slot=%0d svn=%0d : dut=0x%08x shadow=0x%08x",
+                   k, v, dut.active_session_id_q, f_accepted_session_id_q);
+          dut_mismatches++;
+        end
 
         // Validation step complete -> latches expected_cw0_q, cw1_q, cw2_q
         val_step_done_i     = 1'b1;
