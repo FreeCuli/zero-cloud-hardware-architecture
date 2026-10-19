@@ -129,11 +129,35 @@ $$\forall \tau_1, \tau_2 \in \mathcal{T}: \tau_1 \equiv_{\text{low}} \tau_2 \imp
 
 ---
 
-## 7. Sign-Off & Status Matrix
+## 7. OTP Multi-Word Physical Transaction Horizon vs. Step Induction Boundaries
+
+### 7.1 Scope of Formal Inductive Proofs
+Under the Gate C formal harness ([fv/zc_otp_formal_proof.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/fv/zc_otp_formal_proof.sv)), BMC and $k$-induction prove the following normative invariants and safety/liveness properties:
+1. **Immediate Grant Consumption (`F-OTP-01a`):** A single-word grant in `WSTEP_AUTH_READY` is consumed immediately upon `otp_dai_we_o` assertion, transitioning the subordinate to `WSTEP_WAIT_PHYS_DONE` and deasserting all write strobes.
+2. **Structural Write Isolation (`F-OTP-01b`):** Outside `WSTEP_AUTH_READY` during `AUTH_GRANT`, `otp_word_auth_valid_o`, `otp_dai_we_o`, and `otp_auth_word_mask_o` are strictly and unconditionally deasserted (`0`).
+3. **Step-Wise Inductive Forward Liveness (`F-OTP-02`):** For any intermediate word $w \in \{\text{WORD\_SVN}, \text{WORD\_COMMIT\_A}\}$, verified readback pulse arrival under normal mode (`!f_val_ctx_seal_b_only_o`) unconditionally advances `expected_word_idx_q` to $w+1$ and re-asserts word authorization in `WSTEP_AUTH_READY`.
+4. **Final Word Session Completion (`F-OTP-03a/b`):** Verified readback pulse arrival for `OTP_WORD_COMMIT_B` (in either normal or recovery mode) unconditionally transitions the FSM to `AUTH_SESSION_DONE`, clearing all active grants, recovery context, and pending seal flags.
+5. **Recovery Mode Write Restriction Invariant:** In recovery mode (`val_ctx_seal_b_only_q == 1`), `expected_word_idx_q` is initialized strictly to `OTP_WORD_COMMIT_B` (2'd2). Because `expected_word_idx_q` has no decrement logic in the entire RTL, `val_ctx_seal_b_only_q == 1` architecturally precludes write authorization for Word 0 (`WORD_SVN`) and Word 1 (`WORD_COMMIT_A`).
+6. **Permanent Fatal Lock Sticky Invariant (`F-OTP-05`):** `AUTH_LOCKED_FATAL` permanently persists until Cold Power-On Reset (`rst_aon_por_ni`).
+
+### 7.2 Modeling Horizon vs. Monolithic Physical Sequence
+1. **Multi-Cycle Physical Horizon Limit:** In silicon, programming an antifuse non-volatile OTP bit-cell requires high-voltage pulse application spanning tens to hundreds of clock cycles per word, followed by analog charge-pump recovery and readback sensing. A monolithic, unbroken end-to-end execution of all 3 sequential words from Cold POR through all physical programming delays spans several hundred to thousands of clock cycles ($N \gg 20$).
+2. **Cover Witness Interpretation:** Under SMT-LIB2 bounded model checking at depth $k=20$, discrete non-vacuity covers `C-OTP-03n` and `C-OTP-03r` prove that the terminal state `AUTH_SESSION_DONE` is reachable within 8 clock cycles from valid precursor states for both Normal Mode (`!f_val_ctx_seal_b_only_o`) and Recovery Mode (`f_val_ctx_seal_b_only_o`). **These cover witnesses prove that neither normal nor recovery mode is blocked or vacuous.** However, an 8-cycle or 20-cycle cover reachability witness does not constitute a monolithic formal trace of an unbroken 3-word physical transaction starting from cycle 0.
+3. **Complementary Dynamic Verification Strategy:**
+   - **Continuous 3-Word Sequence Verification:** The uninterrupted, cycle-by-cycle physical write and readback progression across all 3 words (SVN $\to$ COMMIT_A $\to$ COMMIT_B) and the 1-word recovery path are exhaustively verified in dynamic cycle-accurate simulation across 12,240 cycles ([tb/tb_zc_otp_fn_equiv.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_fn_equiv.sv)) and PowerShell structural FSM simulation ([scripts/verify_gate_b_rev28d.ps1](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/scripts/verify_gate_b_rev28d.ps1) Test `T4.1`).
+   - **Gate D Deferral:** Physical analog high-voltage macro timing, charge-pump ramp-up constraints, and foundry OTP physical macro sign-off are formally deferred to **Gate D (Physical & Silicon Validation)**.
+
+---
+
+## 8. Sign-Off & Status Matrix
 
 | Audit Item | Verification Method | Status | Sign-Off Authority |
 | :--- | :--- | :--- | :--- |
 | **GCR-01 (Warm Reset Gating)** | BMC + $k$-Induction + RTL Sim (Verilator/Icarus) | **CLOSED** | Gate C Formal Proof (`F-OBI-04`, `F-OBI-05`) |
+| **GCR-05 (Session-ID Observability & Identity)** | Formal Observation Port + Inductive Invariant | **CLOSED** | Gate C Formal Proof (`F-OTP-SESSION-EQ`) |
+| **GCR-06 (Source Equivalence & Port Isolation)**| Regression SHA-256 + Yosys Non-Formal Synth Stat | **CLOSED** | PowerShell `T4.5` + CI Step 1 (Class A & B) |
+| **GCR-07 (Normative SVA-OTP-06b Mapping)** | Exact Component Mapping + Inductive Invariant | **CLOSED** | Gate C Formal Proof (`F-OTP-02`) |
+| **GCR-07 (Modal Recovery Cover Witness)** | Discrete Target SMTBMC Cover (`-c`, $t=20$) | **CLOSED** | Gate C Cover Proofs (`C-OTP-03n`, `C-OTP-03r`) |
 | **P-1 (F-OBI-03 Restoration)** | $k$-Induction ($t=20$) with `L-OBI-1` | **PROVEN** | Gate C Formal Proof (`F-OBI-03`) |
 | **P-2 (10 Upgraded SVA Properties)** | Exact Normative Form BMC + $k$-Induction | **PROVEN** | Gate C Formal Proof (`fv/*.sv`) |
 | **P-3 (F-OBI-02 3-Part Obligation)** | BMC + $k$-Induction ($t=20$) | **PROVEN** | Gate C Formal Proof (`F-OBI-02a/b/c`) |
@@ -141,5 +165,8 @@ $$\forall \tau_1, \tau_2 \in \mathcal{T}: \tau_1 \equiv_{\text{low}} \tau_2 \imp
 | **P-5 (OTP Dual Implementation Equiv)** | Dual-Compile Verilator & Icarus (12,240 Words) | **PROVEN** | [tb/tb_zc_otp_fn_equiv.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_fn_equiv.sv) |
 | **P-6 (CI Integrity & Artifact Upload)** | GitHub Actions Read-Only Workflow + Artifacts | **ACTIVE** | [.github/workflows/gate-c-hdl-verify.yml](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/.github/workflows/gate-c-hdl-verify.yml) |
 | **P-7 (Modeling Limits Documentation)** | Normative Audit Disclosure | **PUBLISHED** | This Document |
+| **Full Continuous Physical Transaction Sequence**| 12,240-Cycle Dynamic Sim + Step-Wise Induction | **DISCLOSED LIMIT** | Proven via Step Induction + Sim; Full Macro Timing Deferred to Gate D |
+| **Gate-Level Logic Equivalence Checking (LEC)** | Post-Synthesis Equivalence vs PDK | **DEFERRED TO GATE D** | Class C (Requires Foundry PDK Cell Library) |
+| **Gate C Milestone Verdict** | Open-Source HDL & Formal Sign-Off | **PARTIAL** | Pending Final Auditor Scope Alignment |
 | **Gate D (SoC / STA / Silicon Sign-Off)** | Top-Level Integration & Timing Sign-Off | **UNVERIFIED** | Gate D Milestone (v3.4.0 / v4.0.0 Blocked) |
 
