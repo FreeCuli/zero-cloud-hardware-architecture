@@ -86,6 +86,11 @@ module zc_obi_formal_proof (
   always_comb begin
     if (!f_past_valid) assume (!rst_por_ni);
 
+    // Combinational invariant: In ST_IDLE, host_rvalid_o is strictly 0
+    if (bridge_state_o == ST_IDLE) begin
+      assert (!host_rvalid_o);
+    end
+
     // F-OBI-07 (GCR-01 / SVA-L0-14): Warm Reset (!rst_sys_ni == 0) blocks request, ready, and rvalid
     if (rst_por_ni && !rst_sys_ni) begin
       assert (!host_req_ready_o);

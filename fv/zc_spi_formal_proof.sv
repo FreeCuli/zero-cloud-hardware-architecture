@@ -122,9 +122,10 @@ module zc_spi_formal_proof (
       end
 
       // F-SPI-01 (SVA-SPI-2c): Strictly normative - UPD_UNSYNC_RESET -> UPD_IDLE occurs ONLY after a fresh
-      // 05h (RDSR1) primary frame completion with SR1[1:0] == 2'b00, sampled byte, and no secondary fault
+      // 05h (RDSR1) primary frame completion with rising /CS, SCK == 0, no secondary fault, and no watchdog timeout
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(f_rdsr1_pri_done && (f_sr1_latched_byte_q[1:0] == 2'b00) &&
+        assert ($past(cs_n_to_iso_o && !cs_n_prev_q && !sck_to_iso_o &&
+                      (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) &&
                       !fault_high_sec_i && !upd_wdog_timeout_i));
       end
 

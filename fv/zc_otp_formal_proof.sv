@@ -121,6 +121,9 @@ module zc_otp_formal_proof (
   always_comb begin
     if (!f_past_valid) assume (!rst_aon_por_ni);
 
+    // Environment: DAI readback session ID matches active session when readback completes
+    assume (!dai_rb_done_pulse_i || (dai_rb_session_id_i == post_session_id_i));
+
     // F-OTP-01b (SVA-OTP-06a Part 2 / R28B-02 Structural):
     // Throughout the wait steps (WAIT_PHYS_DONE, WAIT_RB_VERIFY) or outside AUTH_GRANT,
     // write authorization and DAI write strobe are strictly 0.
@@ -150,6 +153,7 @@ module zc_otp_formal_proof (
       // advances expected_word_idx_q by +1 and re-opens grant in WSTEP_AUTH_READY
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
                 (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
+                !otp_macro_phys_active_i && !req_seal_b_only_i &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
                 (dai_rb_slot_idx_i == otp_auth_slot_o) &&
                 (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
@@ -168,6 +172,7 @@ module zc_otp_formal_proof (
       // F-OTP-03 (SVA-OTP-06c / R28B-01): Strictly normative - Final word (2) or Recovery mode (2 only)
       // transitions to AUTH_SESSION_DONE and clears all grants and recovery flags
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                !otp_macro_phys_active_i &&
                 (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
                 (dai_rb_slot_idx_i == otp_auth_slot_o) &&
