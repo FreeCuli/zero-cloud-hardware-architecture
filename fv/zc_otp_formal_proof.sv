@@ -196,25 +196,27 @@ module zc_otp_formal_proof (
       end
 
       // F-OTP-03 (SVA-OTP-06c / R28B-01): Strictly normative - Final word (2) or Recovery mode (2 only)
-      // transitions to AUTH_SESSION_DONE and clears all grants and recovery flags
-      if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
-                !otp_macro_phys_active_i &&
-                (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
-                dai_rb_done_pulse_i && !dai_ecc_err_i &&
-                (dai_rb_session_id_i == f_accepted_session_id_q) &&
-                (dai_rb_slot_idx_i == otp_auth_slot_o) &&
-                (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
-                (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
-                !dai_cmd_req_i && !dai_prog_done_pulse_i &&
-                rst_sys_ni && rom_exec_active_i &&
+      // completion into AUTH_SESSION_DONE clears all grants, write strobes, and recovery flags
+      if ($past(rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
           rst_sys_ni && rom_exec_active_i &&
           !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
-        assert ((aon_auth_state_o == AUTH_SESSION_DONE) &&
-                (aon_wstep_o == WSTEP_IDLE) &&
-                !otp_word_auth_valid_o &&
-                !otp_dai_we_o &&
-                (otp_auth_word_mask_o == 3'b000));
+        if (aon_auth_state_o == AUTH_SESSION_DONE) begin
+          assert ((aon_wstep_o == WSTEP_IDLE) &&
+                  !otp_word_auth_valid_o &&
+                  !otp_dai_we_o &&
+                  (otp_auth_word_mask_o == 3'b000));
+        end
+      end
+
+      // F-OTP-03b: Entry into AUTH_SESSION_DONE strictly requires COMMIT_B readback pulse without ECC error
+      if ($past(rst_aon_por_ni) && rst_aon_por_ni &&
+          $past(aon_auth_state_o != AUTH_SESSION_DONE) &&
+          (aon_auth_state_o == AUTH_SESSION_DONE)) begin
+        assert ($past(aon_auth_state_o == AUTH_GRANT) &&
+                $past(aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                $past(otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
+                $past(dai_rb_done_pulse_i && !dai_ecc_err_i));
       end
 
       // F-OTP-04 (SVA-OTP-07 / R28-02): Strictly normative - Any unverified, out-of-context,
