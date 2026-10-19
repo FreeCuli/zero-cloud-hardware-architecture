@@ -154,6 +154,11 @@ module zc_otp_formal_proof (
       assert (!f_seal_b_only_q);
     end
 
+    // Inductive invariant: Shadow session ID matches DUT internal active_session_id_q
+    if (rst_aon_por_ni && (aon_auth_state_o != AUTH_RESET_IDLE) && (aon_auth_state_o != AUTH_WAIT_CHAL)) begin
+      assert (f_accepted_session_id_q == dut.active_session_id_q);
+    end
+
     // F-OTP-01b (SVA-OTP-06a Part 2 / R28B-02 Structural):
     // Throughout the wait steps (WAIT_PHYS_DONE, WAIT_RB_VERIFY) or outside AUTH_GRANT,
     // write authorization and DAI write strobe are strictly 0.
@@ -195,18 +200,26 @@ module zc_otp_formal_proof (
         end
       end
 
-      // F-OTP-03 (SVA-OTP-06c / R28B-01): Strictly normative - Final word (2) or Recovery mode (2 only)
-      // completion into AUTH_SESSION_DONE clears all grants, write strobes, and recovery flags
-      if ($past(rst_sys_ni && rom_exec_active_i &&
+      // F-OTP-03a (SVA-OTP-06c Forward Direction / Liveness): Strictly normative -
+      // Valid COMMIT_B readback pulse transitions to AUTH_SESSION_DONE on the next cycle
+      if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                !otp_macro_phys_active_i &&
+                (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
+                dai_rb_done_pulse_i && !dai_ecc_err_i &&
+                (dai_rb_session_id_i == f_accepted_session_id_q) &&
+                (dai_rb_slot_idx_i == otp_auth_slot_o) &&
+                (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
+                (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
+                !dai_cmd_req_i && !dai_prog_done_pulse_i &&
+                rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
           rst_sys_ni && rom_exec_active_i &&
           !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
-        if (aon_auth_state_o == AUTH_SESSION_DONE) begin
-          assert ((aon_wstep_o == WSTEP_IDLE) &&
-                  !otp_word_auth_valid_o &&
-                  !otp_dai_we_o &&
-                  (otp_auth_word_mask_o == 3'b000));
-        end
+        assert ((aon_auth_state_o == AUTH_SESSION_DONE) &&
+                (aon_wstep_o == WSTEP_IDLE) &&
+                !otp_word_auth_valid_o &&
+                !otp_dai_we_o &&
+                (otp_auth_word_mask_o == 3'b000));
       end
 
       // F-OTP-03b: Entry into AUTH_SESSION_DONE strictly requires COMMIT_B readback pulse without ECC error
@@ -217,6 +230,17 @@ module zc_otp_formal_proof (
                 $past(aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
                 $past(otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                 $past(dai_rb_done_pulse_i && !dai_ecc_err_i));
+      end
+
+      // F-OTP-03c (SVA-OTP-06c State Invariant): In AUTH_SESSION_DONE, grants and write permissions are 0
+      if (rst_sys_ni && rom_exec_active_i &&
+          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
+        if (aon_auth_state_o == AUTH_SESSION_DONE) begin
+          assert ((aon_wstep_o == WSTEP_IDLE) &&
+                  !otp_word_auth_valid_o &&
+                  !otp_dai_we_o &&
+                  (otp_auth_word_mask_o == 3'b000));
+        end
       end
 
       // F-OTP-04 (SVA-OTP-07 / R28-02): Strictly normative - Any unverified, out-of-context,
