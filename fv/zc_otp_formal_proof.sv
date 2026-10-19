@@ -51,12 +51,17 @@ module zc_otp_formal_proof (
 `ifndef YOSYS
   import zc_otp_pkg::*;
 `else
+  localparam logic [1:0] OTP_WORD_SVN      = 2'd0;
+  localparam logic [1:0] OTP_WORD_COMMIT_A = 2'd1;
   localparam logic [1:0] OTP_WORD_COMMIT_B = 2'd2;
+  localparam logic [2:0] AUTH_RESET_IDLE   = 3'b000;
+  localparam logic [2:0] AUTH_WAIT_CHAL    = 3'b001;
+  localparam logic [2:0] AUTH_VALIDATE     = 3'b010;
   localparam logic [2:0] AUTH_GRANT        = 3'b011;
   localparam logic [2:0] AUTH_SESSION_DONE = 3'b100;
   localparam logic [2:0] AUTH_LOCKED_FATAL = 3'b111;
-  localparam logic [1:0] WSTEP_IDLE           = 2'b00;
-  localparam logic [1:0] WSTEP_AUTH_READY     = 2'b01;
+  localparam logic [1:0] WSTEP_IDLE        = 2'b00;
+  localparam logic [1:0] WSTEP_AUTH_READY  = 2'b01;
   localparam logic [1:0] WSTEP_WAIT_PHYS_DONE = 2'b10;
   localparam logic [1:0] WSTEP_WAIT_RB_VERIFY = 2'b11;
 `endif
@@ -119,20 +124,35 @@ module zc_otp_formal_proof (
   always_ff @(posedge clk_aon_i) f_past_valid <= 1'b1;
 
   logic [31:0] f_accepted_session_id_q;
+  logic        f_seal_b_only_q;
   always_ff @(posedge clk_aon_i or negedge rst_aon_por_ni) begin
     if (!rst_aon_por_ni) begin
       f_accepted_session_id_q <= 32'h0;
+      f_seal_b_only_q         <= 1'b0;
     end else if (!tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
       if ((aon_auth_state_o == AUTH_WAIT_CHAL) &&
           !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i) &&
           post_auth_req_i && rst_sys_ni && rom_exec_active_i) begin
         f_accepted_session_id_q <= post_session_id_i;
       end
+      if ((aon_auth_state_o == AUTH_VALIDATE) &&
+          !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i || !rst_sys_ni || !rom_exec_active_i) &&
+          val_step_done_i && val_all_checks_ok_i && (req_target_svn_i != 8'd0)) begin
+        f_seal_b_only_q <= req_seal_b_only_i;
+      end
+      if (aon_auth_state_o == AUTH_SESSION_DONE || aon_auth_state_o == AUTH_LOCKED_FATAL) begin
+        f_seal_b_only_q <= 1'b0;
+      end
     end
   end
 
   always_comb begin
     if (!f_past_valid) assume (!rst_aon_por_ni);
+
+    // Inductive invariant: In AUTH_GRANT, intermediate word selection implies !f_seal_b_only_q
+    if (aon_auth_state_o == AUTH_GRANT && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B)) begin
+      assert (!f_seal_b_only_q);
+    end
 
     // F-OTP-01b (SVA-OTP-06a Part 2 / R28B-02 Structural):
     // Throughout the wait steps (WAIT_PHYS_DONE, WAIT_RB_VERIFY) or outside AUTH_GRANT,
@@ -163,7 +183,7 @@ module zc_otp_formal_proof (
       // advances expected_word_idx_q by +1 and re-opens grant in WSTEP_AUTH_READY
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
                 (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
-                !otp_macro_phys_active_i && !req_seal_b_only_i &&
+                !otp_macro_phys_active_i && !f_seal_b_only_q &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
                 (dai_rb_session_id_i == f_accepted_session_id_q) &&
                 (dai_rb_slot_idx_i == otp_auth_slot_o) &&
