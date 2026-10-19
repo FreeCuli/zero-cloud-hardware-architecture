@@ -36,6 +36,8 @@ module zc_spi_formal_proof (
   logic        spi_idle_ready_o;
   logic        bank_b_commit_ready_o;
   logic [2:0]  spi_update_state_o;
+  logic [7:0]  f_sr1_latched_byte_o;
+  logic        f_sr1_byte_sampled_o;
 
   localparam logic [2:0] UPD_UNSYNC_RESET = 3'b000;
   localparam logic [2:0] UPD_IDLE         = 3'b001;
@@ -62,6 +64,11 @@ module zc_spi_formal_proof (
     .spi_idle_ready_o      (spi_idle_ready_o),
     .bank_b_commit_ready_o (bank_b_commit_ready_o),
     .spi_update_state_o    (spi_update_state_o)
+`ifdef FORMAL
+    ,
+    .f_sr1_latched_byte_o  (f_sr1_latched_byte_o),
+    .f_sr1_byte_sampled_o  (f_sr1_byte_sampled_o)
+`endif
   );
 
   logic f_past_valid;
@@ -93,7 +100,7 @@ module zc_spi_formal_proof (
   wire f_phys_cs_edge_w = !cs_n_prev_q && cs_n_to_iso_o && !sck_to_iso_o;
   wire f_wren_pri_done  = f_phys_cs_edge_w && (opcode_i == 8'h06) && (frame_bit_cnt_i == 12'd8);
   wire f_wrdi_pri_done  = f_phys_cs_edge_w && (opcode_i == 8'h04) && (frame_bit_cnt_i == 12'd8);
-  wire f_rdsr1_pri_done = f_phys_cs_edge_w && (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) && f_sr1_byte_sampled_q;
+  wire f_rdsr1_pri_done = f_phys_cs_edge_w && (opcode_i == 8'h05) && (frame_bit_cnt_i == 12'd16) && f_sr1_byte_sampled_o;
 
   always_comb begin
     if (!f_past_valid) assume (!rst_sys_ni);
@@ -122,10 +129,10 @@ module zc_spi_formal_proof (
       end
 
       // F-SPI-01 (SVA-SPI-2c): Strictly normative - UPD_UNSYNC_RESET -> UPD_IDLE occurs ONLY after a fresh
-      // 05h (RDSR1) primary frame completion with rising /CS, SCK == 0, f_sr1_byte_sampled_q == 1,
-      // f_sr1_latched_byte_q[1:0] == 2'b00 (WIP==0, WEL==0), no secondary fault, and no watchdog timeout
+      // 05h (RDSR1) primary frame completion with rising /CS, SCK == 0, f_sr1_byte_sampled_o == 1,
+      // f_sr1_latched_byte_o[1:0] == 2'b00 (WIP==0, WEL==0), no secondary fault, and no watchdog timeout
       if (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE)) begin
-        assert ($past(f_rdsr1_pri_done && (f_sr1_latched_byte_q[1:0] == 2'b00) &&
+        assert ($past(f_rdsr1_pri_done && (f_sr1_latched_byte_o[1:0] == 2'b00) &&
                       !fault_high_sec_i && !upd_wdog_timeout_i));
       end
 
@@ -149,7 +156,7 @@ module zc_spi_formal_proof (
     if (f_past_valid && $past(rst_sys_ni) && rst_sys_ni) begin
       // C-SPI-01: Reach UPD_IDLE from UPD_UNSYNC_RESET via valid RDSR1 with SR1[1:0] == 2'b00
       cover (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && (spi_update_state_o == UPD_IDLE) &&
-             $past(f_rdsr1_pri_done && (f_sr1_latched_byte_q[1:0] == 2'b00)));
+             $past(f_rdsr1_pri_done && (f_sr1_latched_byte_o[1:0] == 2'b00)));
 
       // C-SPI-01b: WRDI executed in UPD_UNSYNC_RESET
       cover (($past(spi_update_state_o) == UPD_UNSYNC_RESET) && f_wrdi_pri_done);

@@ -42,6 +42,11 @@ module zc_spi_flash_firewall (
   output logic        spi_idle_ready_o,        // Physical SPI bus idle (does NOT imply Bank-B verified)
   output logic        bank_b_commit_ready_o,   // Requires BOTH spi_idle_ready_o AND rom_img_verif_valid_i
   output logic [2:0]  spi_update_state_o
+`ifdef FORMAL
+  ,
+  output logic [7:0]  f_sr1_latched_byte_o,
+  output logic        f_sr1_byte_sampled_o
+`endif
 );
 
   typedef enum logic [2:0] {
@@ -57,6 +62,11 @@ module zc_spi_flash_firewall (
   logic              cs_n_prev_q;
   logic [7:0]        sr1_latched_byte_q;
   logic              sr1_byte_sampled_q;
+
+`ifdef FORMAL
+  assign f_sr1_latched_byte_o = sr1_latched_byte_q;
+  assign f_sr1_byte_sampled_o = sr1_byte_sampled_q;
+`endif
 
   assign cs_n_to_iso_o    = cs_n_to_iso_i;
   assign sck_to_iso_o     = sck_to_iso_i;
