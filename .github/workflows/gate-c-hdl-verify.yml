@@ -45,6 +45,22 @@ jobs:
           verilator --lint-only -Wall --top-module zc_obi_subordinate_bridge rtl/zc_obi_subordinate_bridge.sv
           echo "[PASS] zc_obi_subordinate_bridge lint clean (exit 0)"
 
+      - name: Step 1b - Comparative Production Synthesis Netlist & Pinout Equivalence (GCR-06)
+        run: |
+          echo "=== [GCR-06] Comparative Production Netlist Equivalence: e57d16d Baseline vs Current RTL ==="
+          git show e57d16d:rtl/zc_aon_post_auth_ctrl.sv > /tmp/zc_aon_e57d16d.sv
+          
+          echo "--- [1/2] Yosys Combinational & Sequential Equivalence Checking (LEC) ---"
+          yosys -p "read_verilog -sv rtl/zc_otp_pkg.sv /tmp/zc_aon_e57d16d.sv; rename zc_aon_post_auth_ctrl gold; read_verilog -sv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv; rename zc_aon_post_auth_ctrl gate; equiv_make gold gate equiv; hierarchy -top equiv; equiv_simple; equiv_status -assert"
+          
+          echo "--- [2/2] Yosys Full Gate-Level Synthesis & Netlist Diff ---"
+          yosys -p "read_verilog -sv rtl/zc_otp_pkg.sv /tmp/zc_aon_e57d16d.sv; synth -top zc_aon_post_auth_ctrl; write_verilog /tmp/synth_ref.v" > /tmp/yosys_synth_ref.log
+          yosys -p "read_verilog -sv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv; synth -top zc_aon_post_auth_ctrl; write_verilog /tmp/synth_curr.v" > /tmp/yosys_synth_curr.log
+          grep -v -E '^(\s*//|/\*)' /tmp/synth_ref.v > /tmp/synth_ref_clean.v
+          grep -v -E '^(\s*//|/\*)' /tmp/synth_curr.v > /tmp/synth_curr_clean.v
+          diff -u /tmp/synth_ref_clean.v /tmp/synth_curr_clean.v
+          echo "[PASS] GCR-06: 100% gate-level netlist, pinout, and logic equivalence to e57d16d confirmed (zero production impact)"
+
       - name: Step 2 - HDL Cycle-Accurate Simulation & Dual-Compiled Equivalence
         run: |
           echo "=== [SIM-1] OTP 4-Phase FSM, Recovery, & Exhaustive 4,080 (k,v) Seal Simulation (tb_zc_otp) ==="

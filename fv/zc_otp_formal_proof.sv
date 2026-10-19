@@ -196,20 +196,27 @@ module zc_otp_formal_proof (
         assert (otp_auth_word_mask_o == 3'b000);
       end
 
-      // F-OTP-02 (SVA-OTP-06b): Strictly normative - Normal intermediate word (0 or 1) readback verification
-      // advances expected_word_idx_q by +1 and re-opens grant in WSTEP_AUTH_READY
+      // F-OTP-02 (SVA-OTP-06b Forward Liveness Direction): Strictly normative -
+      // In normal mode (!f_seal_b_only_q), verified intermediate word (0 or 1) readback
+      // unconditionally advances expected_word_idx_q by +1 and re-opens grant in WSTEP_AUTH_READY
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                !otp_macro_phys_active_i &&
+                !f_seal_b_only_q &&
                 (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
-                dai_rb_done_pulse_i &&
+                dai_rb_done_pulse_i && !dai_ecc_err_i &&
+                (dai_rb_session_id_i == f_active_session_id_o) &&
+                (dai_rb_slot_idx_i == otp_auth_slot_o) &&
+                (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
+                (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
+                !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
           rst_sys_ni && rom_exec_active_i &&
           !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
-        if (aon_wstep_o == WSTEP_AUTH_READY) begin
-          assert ((aon_auth_state_o == AUTH_GRANT) &&
-                  otp_word_auth_valid_o &&
-                  (otp_auth_word_sel_o == ($past(otp_auth_word_sel_o) + 2'd1)));
-        end
+        assert ((aon_auth_state_o == AUTH_GRANT) &&
+                (aon_wstep_o == WSTEP_AUTH_READY) &&
+                otp_word_auth_valid_o &&
+                (otp_auth_word_sel_o == ($past(otp_auth_word_sel_o) + 2'd1)));
       end
 
       // F-OTP-03a (SVA-OTP-06c Forward Liveness Direction): Strictly normative -
@@ -311,14 +318,26 @@ module zc_otp_formal_proof (
 
   always_ff @(posedge clk_aon_i) begin
     if (f_past_valid && $past(rst_aon_por_ni) && rst_aon_por_ni) begin
-      // C-OTP-02: Intermediate word verification and advance
-      cover ((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_AUTH_READY) && (otp_auth_word_sel_o > 2'd0));
+      // C-OTP-02: Intermediate word verification and advance witness (WSTEP_WAIT_RB_VERIFY -> WSTEP_AUTH_READY)
+      cover ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                   !f_seal_b_only_q && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
+                   dai_rb_done_pulse_i && !dai_ecc_err_i) &&
+             (aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_AUTH_READY) &&
+             (otp_auth_word_sel_o > 2'd0));
 
-      // C-OTP-03n: Normal 3-word session completed (AUTH_SESSION_DONE)
-      cover ((aon_auth_state_o == AUTH_SESSION_DONE) && (aon_wstep_o == WSTEP_IDLE));
+      // C-OTP-03n: Normal 3-word session completed (!f_seal_b_only_q) to AUTH_SESSION_DONE
+      cover ($past(aon_auth_state_o == AUTH_GRANT && !f_seal_b_only_q &&
+                   aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
+                   (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
+                   dai_rb_done_pulse_i && !dai_ecc_err_i) &&
+             (aon_auth_state_o == AUTH_SESSION_DONE));
 
-      // C-OTP-03r: Recovery 1-word session completed (AUTH_SESSION_DONE)
-      cover ($past(aon_auth_state_o == AUTH_GRANT) && (aon_auth_state_o == AUTH_SESSION_DONE));
+      // C-OTP-03r: Recovery-only 1-word session completed (f_seal_b_only_q) to AUTH_SESSION_DONE
+      cover ($past(aon_auth_state_o == AUTH_GRANT && f_seal_b_only_q &&
+                   aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
+                   (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
+                   dai_rb_done_pulse_i && !dai_ecc_err_i) &&
+             (aon_auth_state_o == AUTH_SESSION_DONE));
 
       // C-OTP-04: Fatal lock entry on mismatched readback
       cover ($past(aon_auth_state_o == AUTH_GRANT && aon_wstep_o == WSTEP_WAIT_RB_VERIFY && dai_rb_done_pulse_i) &&

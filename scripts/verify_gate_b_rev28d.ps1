@@ -241,7 +241,8 @@ $gcr01_host_ready = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and ($gc
 $gcr01_phys_req   = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and $gcr01_host_req -and (-not $gcr01_phys_active) -and (-not $gcr01_orphan_act) -and (-not $gcr01_dead_locked)
 Assert-Condition ((-not $gcr01_host_ready) -and (-not $gcr01_phys_req)) "T4.4_OBI_GCR01_WARM_RESET_BLOCKS_PHYS_REQ" "Under rst_sys_ni=0, state_q=ST_IDLE, host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0 -> periph_phys_req_o=0 and host_req_ready_o=0"
 
-# T4.5 (GCR-05): Automated proof that non-formal production RTL has 0 gate/pin impact and is bit-for-bit identical to e57d16d
+# T4.5 (GCR-06): Automated source-level regression equivalence proof that non-formal production RTL
+# is normalized bit-for-bit identical to e57d16d and matches canonical SHA-256 (pre-synthesis source check)
 $orig_rtl = $null
 try {
     $orig_lines = git show e57d16d:rtl/zc_aon_post_auth_ctrl.sv 2>$null
@@ -266,7 +267,7 @@ $rtl_equiv_match = if ($orig_rtl) {
 } else {
     ($curr_sha -eq $expected_sha)
 }
-Assert-Condition $rtl_equiv_match "T4.5_RTL_NON_FORMAL_BIT_FOR_BIT_EQUIV" "rtl/zc_aon_post_auth_ctrl.sv without FORMAL is 100% bit-for-bit equivalent to e57d16d (zero production pin/gate impact)"
+Assert-Condition $rtl_equiv_match "T4.5_RTL_NON_FORMAL_SOURCE_EQUIV" "rtl/zc_aon_post_auth_ctrl.sv without FORMAL has identical normalized source text and SHA-256 to e57d16d (source-level regression equivalence)"
 
 Write-Output "----------------------------------------------------------------------"
 Write-Output " SUMMARY: PASS=$PassCount, FAIL=$FailCount"
