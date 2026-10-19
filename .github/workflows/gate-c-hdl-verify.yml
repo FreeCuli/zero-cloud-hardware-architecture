@@ -74,40 +74,40 @@ jobs:
       - name: Step 3a - SPI Formal Proof (BMC & k-Induction)
         run: |
           echo "### Formal Proof: SPI 3-Layer Firewall" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; write_smt2 spi_formal.smt2" 2>&1 | tee yosys_spi.log
+          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; write_smt2 -top zc_spi_formal_proof spi_formal.smt2" 2>&1 | tee yosys_spi.log
           echo "#### SPI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -t 20 spi_formal.smt2 2>&1 | tee spi_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_spi_formal_proof -t 20 spi_formal.smt2 2>&1 | tee spi_bmc.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### SPI k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -i -t 20 spi_formal.smt2 2>&1 | tee spi_ind.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_spi_formal_proof -i -t 20 spi_formal.smt2 2>&1 | tee spi_ind.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 3b - OBI Formal Proof (BMC & k-Induction)
         run: |
           echo "### Formal Proof: OBI Subordinate Bridge" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; write_smt2 obi_formal.smt2" 2>&1 | tee yosys_obi.log
+          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; write_smt2 -top zc_obi_formal_proof obi_formal.smt2" 2>&1 | tee yosys_obi.log
           echo "#### OBI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -t 20 obi_formal.smt2 2>&1 | tee obi_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_obi_formal_proof -t 20 obi_formal.smt2 2>&1 | tee obi_bmc.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OBI k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -i -t 20 obi_formal.smt2 2>&1 | tee obi_ind.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_obi_formal_proof -i -t 20 obi_formal.smt2 2>&1 | tee obi_ind.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 3c - OTP Formal Proof (BMC & k-Induction)
         run: |
           echo "### Formal Proof: OTP Authorization FSM" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; write_smt2 otp_formal.smt2" 2>&1 | tee yosys_otp.log
+          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; write_smt2 -top zc_otp_formal_proof otp_formal.smt2" 2>&1 | tee yosys_otp.log
           echo "#### OTP BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -t 20 otp_formal.smt2 2>&1 | tee otp_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_otp_formal_proof -t 20 otp_formal.smt2 2>&1 | tee otp_bmc.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OTP k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -i -t 20 otp_formal.smt2 2>&1 | tee otp_ind.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_otp_formal_proof -i -t 20 otp_formal.smt2 2>&1 | tee otp_ind.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 4 - Formal Non-Vacuity Cover Witness Checking (yosys-smtbmc -c)
@@ -115,15 +115,15 @@ jobs:
           echo "### Non-Vacuity Cover Analysis" >> $GITHUB_STEP_SUMMARY
           echo "#### SPI Covers" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -c -t 20 spi_formal.smt2 2>&1 | tee spi_cov.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_spi_formal_proof -c -t 20 spi_formal.smt2 2>&1 | tee spi_cov.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OBI Covers" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -c -t 20 obi_formal.smt2 2>&1 | tee obi_cov.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_obi_formal_proof -c -t 20 obi_formal.smt2 2>&1 | tee obi_cov.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OTP Covers" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc --unroll -s z3 -c -t 20 otp_formal.smt2 2>&1 | tee otp_cov.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc -s z3 -m zc_otp_formal_proof -c -t 20 otp_formal.smt2 2>&1 | tee otp_cov.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 5 - SVA Tool Capability Notice (Normative Commercial SVA and M7/M8 Status)
@@ -144,27 +144,20 @@ jobs:
           FAILED=0
           for log in spi_bmc.log spi_ind.log obi_bmc.log obi_ind.log otp_bmc.log otp_ind.log spi_cov.log obi_cov.log otp_cov.log; do
             if [ -f "$log" ]; then
-              if grep -q "Assert failed" "$log"; then
-                echo "--- ASSERTION FAILURE IN $log ---"
-                grep -C 3 "Assert failed" "$log"
-                ERR_MSG=$(grep "Assert failed" "$log" | head -n 3 | tr '\n' ' ')
-                echo "::error title=Assertion Failed in $log::$ERR_MSG"
+              if grep -q -E "(Assert failed|Unreached cover|syntax error|AssertionError|Traceback)" "$log"; then
+                echo "--- FAILURE IN $log ---"
+                cat "$log"
+                ERR_MSG=$(grep -E "(Assert failed|Unreached cover|syntax error|AssertionError|Traceback)" "$log" | head -n 3 | tr '\n' ' ')
+                echo "::error title=Verification Failure in $log::$ERR_MSG"
                 FAILED=1
-              elif grep -q "Unreached cover" "$log"; then
-                echo "--- UNREACHED COVER IN $log ---"
-                grep -C 2 "Unreached cover" "$log"
-                COV_MSG=$(grep "Unreached cover" "$log" | head -n 3 | tr '\n' ' ')
-                echo "::error title=Cover Unreached in $log::$COV_MSG"
-                FAILED=1
-              elif grep -q "syntax error" "$log"; then
-                echo "--- SYNTAX ERROR IN $log ---"
-                grep -C 2 "syntax error" "$log"
-                SYN_MSG=$(grep "syntax error" "$log" | head -n 3 | tr '\n' ' ')
-                echo "::error title=Syntax Error in $log::$SYN_MSG"
-                FAILED=1
-              else
-                PASS_MSG=$(tail -n 2 "$log" | tr '\n' ' ')
+              elif grep -q "Status: PASSED" "$log"; then
+                PASS_MSG=$(grep -E "(Status: PASSED|Reached cover)" "$log" | tr '\n' ' ')
                 echo "::notice title=$log PASS::$PASS_MSG"
+              else
+                echo "--- UNEXPECTED LOG CONTENT IN $log ---"
+                cat "$log"
+                echo "::error title=Unexpected Output in $log::Did not find Status: PASSED or expected failure"
+                FAILED=1
               fi
             else
               echo "::error title=Missing Log::Expected log file $log was not created!"
