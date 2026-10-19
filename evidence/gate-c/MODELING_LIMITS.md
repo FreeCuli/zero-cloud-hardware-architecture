@@ -58,7 +58,7 @@ All primary inputs that lack an explicit `assume property (...)` directive are t
 | **SPI** | `sck_to_iso_o` | `assume property (!(cs_n_to_iso_o && sck_to_iso_o));` | Standard SPI Mode 0/3 physical bus invariant: SCK must remain idle during /CS deselect. |
 | **SPI** | `rom_exec_active_i` | Unconstrained (`1'b0` or `1'b1`) | Proves firewall gating holds under both ROM boot and post-boot application phases. |
 | **OBI** | `rst_sys_ni` (Steady-State) | `assume property (rst_sys_ni);` in $k$-induction | Decouples steady-state bus invariant induction from reset-edge transients. Reset transitions are verified separately via BMC unrolling and Cover `C-OBI-01`. |
-| **OBI** | `orphan_drain_active_o` | Unconstrained free variable | Solves inductive step across all possible pipeline depths without over-constraining the subordinate. |
+| **OBI** | Primary Bus Inputs (`periph_phys_rvalid_i`, `host_req_i`, `periph_phys_gnt_i`, etc.) | Unconstrained free variables | Treated as non-deterministic free variables at every cycle, providing exhaustive adversarial fuzzing against unexpected bus interleaving. Note: `orphan_drain_active_o` is a DUT internal status output driven by `orphan_active_w`, NOT a free input. |
 | **OTP** | `clk_glitch_alert_i` | Zero during normal flow BMC | Fault pins are asserted in discrete BMC paths to verify immediate transition to `AUTH_LOCKED_FATAL`. |
 | **OTP** | `post_session_id_i` | Fully unconstrained free variable | Allowed to drift/change arbitrarily across all cycles; proves RTL latched `active_session_id_q` integrity without any `$stable` assumption. |
 
@@ -181,6 +181,9 @@ To ensure absolute precision and avoid evidence misclassification (resolving Aud
 | **GCR-07 (Normative SVA-OTP-06b Mapping)** | Exact Component Mapping + Inductive Invariant | **CLOSED** | Gate C Formal Proof (`F-OTP-02`) |
 | **GCR-07 (Modal Recovery Cover Witness)** | Discrete Target SMTBMC Cover (`-c`, $t=20$) | **CLOSED** | Gate C Cover Proofs (`C-OTP-03n`, `C-OTP-03r`) |
 | **GCR-08 (Simulation Evidence Classification)** | Precise Separation of Math Equiv, RTL E2E Sim, & PS Model | **CLOSED** | [tb/tb_zc_otp_protocol_e2e.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_protocol_e2e.sv) + `MODELING_LIMITS.md` |
+| **GCR-09 (SPI RDSR1 Normative Proof Completeness)** | Strengthened F-SPI-01 + C-SPI-01 (WIP/WEL==00) | **PROVEN** | `fv/zc_spi_formal_proof.sv` |
+| **GCR-10 (OBI Watchdog & Cover Inventory)** | 1024-Cycle Sim vs Step Induction + 6 Discrete Covers | **CLOSED** | `tb/tb_zc_obi.sv` + `fv/zc_obi_formal_proof.sv` |
+| **GCR-11 (Claim Inventory & Modeling Limits)** | 1-to-1 33-Claim Inventory + Fixed Free Inputs Table | **CLOSED** | `MODELING_LIMITS.md` + Consolidated Matrix |
 | **P-1 (F-OBI-03 Restoration)** | $k$-Induction ($t=20$) with `L-OBI-1` | **PROVEN** | Gate C Formal Proof (`F-OBI-03`) |
 | **P-2 (10 Upgraded SVA Properties)** | Exact Normative Form BMC + $k$-Induction | **PROVEN** | Gate C Formal Proof (`fv/*.sv`) |
 | **P-3 (F-OBI-02 3-Part Obligation)** | BMC + $k$-Induction ($t=20$) | **PROVEN** | Gate C Formal Proof (`F-OBI-02a/b/c`) |
