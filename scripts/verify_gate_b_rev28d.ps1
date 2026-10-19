@@ -193,7 +193,7 @@ $otp_rec_wstep = "WSTEP_WAIT_RB_VERIFY"
 if ($otp_rec_seal_b -and ($otp_rec_word -eq 2)) {
   $otp_rec_state = "AUTH_SESSION_DONE"; $otp_rec_wstep = "WSTEP_IDLE"; $otp_rec_grant = $false
 }
-Assert-Condition ($otp_normal_trace_ok -and ($otp_state -eq "AUTH_SESSION_DONE") -and ($otp_rec_state -eq "AUTH_SESSION_DONE") -and (-not $otp_rec_grant)) "T4.1_OTP_4PHASE_NORMAL_AND_RECOVERY_FSM" "Normal (0->1->2) and Recovery (2-only) 4-phase flows consume grant on accept and terminate cleanly in AUTH_SESSION_DONE"
+Assert-Condition ($otp_normal_trace_ok -and ($otp_state -eq "AUTH_SESSION_DONE") -and ($otp_rec_state -eq "AUTH_SESSION_DONE") -and (-not $otp_rec_grant)) "T4.1_OTP_4PHASE_FSM_STRUCTURAL_REF_MODEL" "Auxiliary PowerShell Behavioral FSM Reference Model (Normal 0->1->2 and Recovery 2-only state progression)"
 
 # T4.2: SPI 3-Layer Event Separation (04h WRDI stay-in-reset, 05h RDSR1 reconciliation, and rom_img_verif_valid_i gating)
 $spi_state = "UPD_UNSYNC_RESET"

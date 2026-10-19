@@ -140,12 +140,34 @@ Under the Gate C formal harness ([fv/zc_otp_formal_proof.sv](file:///C:/Users/aj
 5. **Recovery Mode Write Restriction Invariant:** In recovery mode (`val_ctx_seal_b_only_q == 1`), `expected_word_idx_q` is initialized strictly to `OTP_WORD_COMMIT_B` (2'd2). Because `expected_word_idx_q` has no decrement logic in the entire RTL, `val_ctx_seal_b_only_q == 1` architecturally precludes write authorization for Word 0 (`WORD_SVN`) and Word 1 (`WORD_COMMIT_A`).
 6. **Permanent Fatal Lock Sticky Invariant (`F-OTP-05`):** `AUTH_LOCKED_FATAL` permanently persists until Cold Power-On Reset (`rst_aon_por_ni`).
 
-### 7.2 Modeling Horizon vs. Monolithic Physical Sequence
-1. **Multi-Cycle Physical Horizon Limit:** In silicon, programming an antifuse non-volatile OTP bit-cell requires high-voltage pulse application spanning tens to hundreds of clock cycles per word, followed by analog charge-pump recovery and readback sensing. A monolithic, unbroken end-to-end execution of all 3 sequential words from Cold POR through all physical programming delays spans several hundred to thousands of clock cycles ($N \gg 20$).
-2. **Cover Witness Interpretation:** Under SMT-LIB2 bounded model checking at depth $k=20$, discrete non-vacuity covers `C-OTP-03n` and `C-OTP-03r` prove that the terminal state `AUTH_SESSION_DONE` is reachable within 8 clock cycles from valid precursor states for both Normal Mode (`!f_val_ctx_seal_b_only_o`) and Recovery Mode (`f_val_ctx_seal_b_only_o`). **These cover witnesses prove that neither normal nor recovery mode is blocked or vacuous.** However, an 8-cycle or 20-cycle cover reachability witness does not constitute a monolithic formal trace of an unbroken 3-word physical transaction starting from cycle 0.
-3. **Complementary Dynamic Verification Strategy:**
-   - **Continuous 3-Word Sequence Verification:** The uninterrupted, cycle-by-cycle physical write and readback progression across all 3 words (SVN $\to$ COMMIT_A $\to$ COMMIT_B) and the 1-word recovery path are exhaustively verified in dynamic cycle-accurate simulation across 12,240 cycles ([tb/tb_zc_otp_fn_equiv.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_fn_equiv.sv)) and PowerShell structural FSM simulation ([scripts/verify_gate_b_rev28d.ps1](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/scripts/verify_gate_b_rev28d.ps1) Test `T4.1`).
-   - **Gate D Deferral:** Physical analog high-voltage macro timing, charge-pump ramp-up constraints, and foundry OTP physical macro sign-off are formally deferred to **Gate D (Physical & Silicon Validation)**.
+### 7.2 Verification Classification and Modeling Horizon Disclosures
+
+To ensure absolute precision and avoid evidence misclassification (resolving Auditor finding **GCR-08 / P2**), the verification of the 4-phase DAI write/readback sequence and codeword generation is partitioned into four distinct, rigorously defined domains:
+
+1. **Mathematical & Expected Register Equivalence ([tb/tb_zc_otp_fn_equiv.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_fn_equiv.sv)):**
+   - **Scope:** Exhaustively tests all 16 slots $\times$ 255 SVNs $\times$ 3 words = 12,240 codeword generations across both standard package functions and `-DYOSYS` shift-add implementations.
+   - **Purpose:** Compares the mathematical parity equations against the DUT expected codeword registers (`expected_cw0_q`, `expected_cw1_q`, `expected_cw2_q`).
+   - **Auditor Boundary Disclosed:** This testbench is strictly an exhaustive mathematical codeword and DUT register equivalence check. It does **not** execute the multi-step DAI physical write handshake, pulse arrivals (`dai_prog_done_pulse_i`, `dai_rb_done_pulse_i`), or the `AUTH_SESSION_DONE` transition. It is not described as a multi-cycle protocol simulation.
+
+2. **Dedicated End-to-End Cycle-Accurate RTL Protocol Simulation ([tb/tb_zc_otp_protocol_e2e.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_protocol_e2e.sv) & [tb/tb_zc_otp.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp.sv)):**
+   - **Scope:** Cycle-accurate execution of the full 4-phase DAI protocol (`WSTEP_AUTH_READY` $\to$ `WSTEP_WAIT_PHYS_DONE` $\to$ `WSTEP_WAIT_RB_VERIFY` $\to$ Next Word / `AUTH_SESSION_DONE`).
+   - **Coverage Scenarios in `tb_zc_otp_protocol_e2e.sv`:**
+     - *Scenario 1 (Normal 3-Word Sequential Commit):* SVN (Word 0) $\to$ COMMIT_A (Word 1) $\to$ COMMIT_B (Word 2) $\to$ clean entry into `AUTH_SESSION_DONE` with write grants deasserted.
+     - *Scenario 2 (Recovery 1-Word Commit):* `req_seal_b_only_i` $\to$ Word 2 only $\to$ clean entry into `AUTH_SESSION_DONE` with Words 0 and 1 never authorized.
+     - *Scenario 3 (Immediate Grant Consumption):* Write grant (`otp_word_auth_valid_o`, `otp_dai_we_o`) consumes in exactly one cycle upon `dai_cmd_req_i` acceptance.
+     - *Scenario 4 (Data Mismatch Fatal Lock):* Corrupted readback data triggers immediate `AUTH_LOCKED_FATAL`.
+     - *Scenario 5 (Warm Reset Persistence):* `!rst_sys_ni = 0` does not clear `AUTH_LOCKED_FATAL` (FSM remains permanently locked).
+     - *Scenario 6 (Cold POR Recovery):* Cold Power-On Reset (`!rst_aon_por_ni = 0`) cleanly resets `AUTH_LOCKED_FATAL` to `AUTH_RESET_IDLE`.
+     - *Scenario 7 (Session-ID Mismatch Fatal Lock):* Mismatched readback session-ID triggers immediate `AUTH_LOCKED_FATAL`.
+   - **Simulator Targets:** Verified clean across both Verilator (`sim_otp_e2e`) and Icarus Verilog (`sim_otp_e2e_iv`).
+
+3. **Auxiliary Behavioral Reference Model ([scripts/verify_gate_b_rev28d.ps1](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/scripts/verify_gate_b_rev28d.ps1) Test `T4.1`):**
+   - **Scope:** An auxiliary PowerShell structural reference model verifying the state transition logic for normal ($0 \to 1 \to 2 \to \text{AUTH\_SESSION\_DONE}$) and recovery ($2 \to \text{AUTH\_SESSION\_DONE}$) progression.
+   - **Auditor Boundary Disclosed:** This is a software behavioral reference model, not a physical macro or RTL simulation.
+
+4. **Gate D Foundry Physical Macro Analog Validation (UNVERIFIED):**
+   - **Scope:** Physical antifuse cell programming, high-voltage ($V_{\text{PP}}$) charge pump ramp-up, analog pulse duration ($t_{\text{PROG}} \approx 10\,\mu\text{s}$), thermal soak, and read-sense margin timings.
+   - **Sign-Off Boundary:** Formally disclosed as **Gate D UNVERIFIED**. Silicon sign-off is blocked until foundry physical PDK macro integration.
 
 ---
 
@@ -158,6 +180,7 @@ Under the Gate C formal harness ([fv/zc_otp_formal_proof.sv](file:///C:/Users/aj
 | **GCR-06 (Source Equivalence & Port Isolation)**| Regression SHA-256 + Yosys Non-Formal Synth Stat | **CLOSED** | PowerShell `T4.5` + CI Step 1 (Class A & B) |
 | **GCR-07 (Normative SVA-OTP-06b Mapping)** | Exact Component Mapping + Inductive Invariant | **CLOSED** | Gate C Formal Proof (`F-OTP-02`) |
 | **GCR-07 (Modal Recovery Cover Witness)** | Discrete Target SMTBMC Cover (`-c`, $t=20$) | **CLOSED** | Gate C Cover Proofs (`C-OTP-03n`, `C-OTP-03r`) |
+| **GCR-08 (Simulation Evidence Classification)** | Precise Separation of Math Equiv, RTL E2E Sim, & PS Model | **CLOSED** | [tb/tb_zc_otp_protocol_e2e.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_protocol_e2e.sv) + `MODELING_LIMITS.md` |
 | **P-1 (F-OBI-03 Restoration)** | $k$-Induction ($t=20$) with `L-OBI-1` | **PROVEN** | Gate C Formal Proof (`F-OBI-03`) |
 | **P-2 (10 Upgraded SVA Properties)** | Exact Normative Form BMC + $k$-Induction | **PROVEN** | Gate C Formal Proof (`fv/*.sv`) |
 | **P-3 (F-OBI-02 3-Part Obligation)** | BMC + $k$-Induction ($t=20$) | **PROVEN** | Gate C Formal Proof (`F-OBI-02a/b/c`) |
@@ -165,8 +188,8 @@ Under the Gate C formal harness ([fv/zc_otp_formal_proof.sv](file:///C:/Users/aj
 | **P-5 (OTP Dual Implementation Equiv)** | Dual-Compile Verilator & Icarus (12,240 Words) | **PROVEN** | [tb/tb_zc_otp_fn_equiv.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_fn_equiv.sv) |
 | **P-6 (CI Integrity & Artifact Upload)** | GitHub Actions Read-Only Workflow + Artifacts | **ACTIVE** | [.github/workflows/gate-c-hdl-verify.yml](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/.github/workflows/gate-c-hdl-verify.yml) |
 | **P-7 (Modeling Limits Documentation)** | Normative Audit Disclosure | **PUBLISHED** | This Document |
-| **Full Continuous Physical Transaction Sequence**| 12,240-Cycle Dynamic Sim + Step-Wise Induction | **DISCLOSED LIMIT** | Proven via Step Induction + Sim; Full Macro Timing Deferred to Gate D |
+| **Full Continuous Physical Transaction Sequence**| Dedicated RTL Sim ([tb/tb_zc_otp_protocol_e2e.sv](file:///C:/Users/ajiba/rentalais/zero-cloud-hardware-architecture/tb/tb_zc_otp_protocol_e2e.sv)) + Step Induction | **CLOSED AT RTL** | Proven at RTL level; Analog Macro Physics Deferred to Gate D |
 | **Gate-Level Logic Equivalence Checking (LEC)** | Post-Synthesis Equivalence vs PDK | **DEFERRED TO GATE D** | Class C (Requires Foundry PDK Cell Library) |
-| **Gate C Milestone Verdict** | Open-Source HDL & Formal Sign-Off | **PARTIAL** | Pending Final Auditor Scope Alignment |
+| **Gate C Milestone Verdict** | Open-Source HDL & Formal Sign-Off | **COMPLETE (PENDING AUDITOR SIGNOFF)** | All Gate C audit items (GCR-01 through GCR-08, P-1 through P-7) fully resolved and proven |
 | **Gate D (SoC / STA / Silicon Sign-Off)** | Top-Level Integration & Timing Sign-Off | **UNVERIFIED** | Gate D Milestone (v3.4.0 / v4.0.0 Blocked) |
 

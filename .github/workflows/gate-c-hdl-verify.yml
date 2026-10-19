@@ -55,6 +55,10 @@ jobs:
           verilator --binary -j 0 -Wno-fatal --top-module tb_zc_otp rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp.sv -o sim_otp
           ./obj_dir/sim_otp
 
+          echo "=== [SIM-1b] GCR-08 Dedicated End-to-End OTP Protocol Simulation (tb_zc_otp_protocol_e2e) ==="
+          verilator --binary -j 0 -Wno-fatal --top-module tb_zc_otp_protocol_e2e rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_protocol_e2e.sv -o sim_otp_e2e
+          ./obj_dir/sim_otp_e2e
+
           echo "=== [SIM-2] SPI 3-Layer Event Separation & Update Reconciler Simulation (tb_zc_spi) ==="
           verilator --binary -j 0 -Wno-fatal --top-module tb_zc_spi rtl/zc_spi_flash_firewall.sv tb/tb_zc_spi.sv -o sim_spi
           ./obj_dir/sim_spi
@@ -72,6 +76,8 @@ jobs:
           ./obj_dir/sim_otp_equiv_yosys
 
           echo "=== [SIM-5] Cross-Simulator Verification with Icarus Verilog (iverilog -g2012) ==="
+          iverilog -g2012 -o sim_otp_iv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp.sv && vvp sim_otp_iv
+          iverilog -g2012 -o sim_otp_e2e_iv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_protocol_e2e.sv && vvp sim_otp_e2e_iv
           iverilog -g2012 -o sim_spi_iv rtl/zc_spi_flash_firewall.sv tb/tb_zc_spi.sv && vvp sim_spi_iv
           iverilog -g2012 -o sim_obi_iv rtl/zc_obi_subordinate_bridge.sv tb/tb_zc_obi.sv && vvp sim_obi_iv
           iverilog -g2012 -o sim_otp_equiv_iv rtl/zc_otp_pkg.sv rtl/zc_aon_post_auth_ctrl.sv tb/tb_zc_otp_fn_equiv.sv && vvp sim_otp_equiv_iv
