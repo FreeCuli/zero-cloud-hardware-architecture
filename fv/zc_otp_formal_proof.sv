@@ -77,6 +77,7 @@ module zc_otp_formal_proof (
   logic [1:0]            aon_wstep_o;
   logic                  aon_fatal_locked_o;
   logic [31:0]           f_active_session_id_o;
+  logic                  f_val_ctx_seal_b_only_o;
 
   zc_aon_post_auth_ctrl dut (
     .clk_aon_i               (clk_aon_i),
@@ -120,7 +121,8 @@ module zc_otp_formal_proof (
     .aon_fatal_locked_o      (aon_fatal_locked_o)
 `ifdef FORMAL
     ,
-    .f_active_session_id_o   (f_active_session_id_o)
+    .f_active_session_id_o   (f_active_session_id_o),
+    .f_val_ctx_seal_b_only_o (f_val_ctx_seal_b_only_o)
 `endif
   );
 
@@ -160,8 +162,9 @@ module zc_otp_formal_proof (
   always_comb begin
     if (!f_past_valid) assume (!rst_aon_por_ni);
 
-    // Inductive invariant: In AUTH_GRANT, intermediate word selection implies !f_seal_b_only_q
+    // Inductive invariant: In AUTH_GRANT, intermediate word selection implies !f_val_ctx_seal_b_only_o and !f_seal_b_only_q
     if (aon_auth_state_o == AUTH_GRANT && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B)) begin
+      assert (!f_val_ctx_seal_b_only_o);
       assert (!f_seal_b_only_q);
     end
 
@@ -197,10 +200,11 @@ module zc_otp_formal_proof (
       end
 
       // F-OTP-02 (SVA-OTP-06b Forward Liveness Direction): Strictly normative -
-      // In normal mode (!f_seal_b_only_q), verified intermediate word (0 or 1) readback
+      // In normal mode (!f_val_ctx_seal_b_only_o), verified intermediate word (0 or 1) readback
       // unconditionally advances expected_word_idx_q by +1 and re-opens grant in WSTEP_AUTH_READY
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
                 !otp_macro_phys_active_i &&
+                !f_val_ctx_seal_b_only_o &&
                 !f_seal_b_only_q &&
                 (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
@@ -320,20 +324,20 @@ module zc_otp_formal_proof (
     if (f_past_valid && $past(rst_aon_por_ni) && rst_aon_por_ni) begin
       // C-OTP-02: Intermediate word verification and advance witness (WSTEP_WAIT_RB_VERIFY -> WSTEP_AUTH_READY)
       cover ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
-                   !f_seal_b_only_q && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
+                   !f_val_ctx_seal_b_only_o && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B) &&
                    dai_rb_done_pulse_i && !dai_ecc_err_i) &&
              (aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_AUTH_READY) &&
              (otp_auth_word_sel_o > 2'd0));
 
-      // C-OTP-03n: Normal 3-word session completed (!f_seal_b_only_q) to AUTH_SESSION_DONE
-      cover ($past(aon_auth_state_o == AUTH_GRANT && !f_seal_b_only_q &&
+      // C-OTP-03n: Normal 3-word session completed (!f_val_ctx_seal_b_only_o) to AUTH_SESSION_DONE
+      cover ($past(aon_auth_state_o == AUTH_GRANT && !f_val_ctx_seal_b_only_o &&
                    aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
                    (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                    dai_rb_done_pulse_i && !dai_ecc_err_i) &&
              (aon_auth_state_o == AUTH_SESSION_DONE));
 
-      // C-OTP-03r: Recovery-only 1-word session completed (f_seal_b_only_q) to AUTH_SESSION_DONE
-      cover ($past(aon_auth_state_o == AUTH_GRANT && f_seal_b_only_q &&
+      // C-OTP-03r: Recovery-only 1-word session completed (f_val_ctx_seal_b_only_o) to AUTH_SESSION_DONE
+      cover ($past(aon_auth_state_o == AUTH_GRANT && f_val_ctx_seal_b_only_o &&
                    aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
                    (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                    dai_rb_done_pulse_i && !dai_ecc_err_i) &&

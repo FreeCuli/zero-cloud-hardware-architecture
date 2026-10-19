@@ -68,7 +68,8 @@ module zc_aon_post_auth_ctrl (
   output logic                  aon_fatal_locked_o
 `ifdef FORMAL
   ,
-  output logic [31:0]           f_active_session_id_o  // Gate C formal observation port (zero production impact)
+  output logic [31:0]           f_active_session_id_o,     // Gate C formal observation port (zero production impact)
+  output logic                  f_val_ctx_seal_b_only_o    // Gate C formal observation port (zero production impact)
 `endif
 );
 
@@ -204,7 +205,8 @@ module zc_aon_post_auth_ctrl (
   assign aon_wstep_o        = wstep_q;
   assign aon_fatal_locked_o = (aon_auth_state_q == AUTH_LOCKED_FATAL);
 `ifdef FORMAL
-  assign f_active_session_id_o = active_session_id_q;
+  assign f_active_session_id_o    = active_session_id_q;
+  assign f_val_ctx_seal_b_only_o  = val_ctx_seal_b_only_q;
 `endif
 
   // -------------------------------------------------------------------------
