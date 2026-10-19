@@ -242,10 +242,30 @@ $gcr01_phys_req   = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and $gcr
 Assert-Condition ((-not $gcr01_host_ready) -and (-not $gcr01_phys_req)) "T4.4_OBI_GCR01_WARM_RESET_BLOCKS_PHYS_REQ" "Under rst_sys_ni=0, state_q=ST_IDLE, host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0 -> periph_phys_req_o=0 and host_req_ready_o=0"
 
 # T4.5 (GCR-05): Automated proof that non-formal production RTL has 0 gate/pin impact and is bit-for-bit identical to e57d16d
-$orig_rtl = (git show e57d16d:rtl/zc_aon_post_auth_ctrl.sv) -join "`n"
+$orig_rtl = $null
+try {
+    $orig_lines = git show e57d16d:rtl/zc_aon_post_auth_ctrl.sv 2>$null
+    if ($orig_lines) { $orig_rtl = $orig_lines -join "`n" }
+} catch {}
+if (-not $orig_rtl) {
+    git fetch origin e57d16d --depth=1 2>$null | Out-Null
+    try {
+        $orig_lines = git show e57d16d:rtl/zc_aon_post_auth_ctrl.sv 2>$null
+        if ($orig_lines) { $orig_rtl = $orig_lines -join "`n" }
+    } catch {}
+}
+
 $curr_rtl = Get-Content rtl/zc_aon_post_auth_ctrl.sv -Raw
-$curr_rtl_stripped = $curr_rtl -replace '(?s)`ifdef FORMAL.*?`endif\r?\n?', ''
-$rtl_equiv_match = ($orig_rtl -replace '\r\n', "`n").Trim() -eq ($curr_rtl_stripped -replace '\r\n', "`n").Trim()
+$curr_rtl_stripped = ($curr_rtl -replace '(?s)`ifdef FORMAL.*?`endif\r?\n?', '').Trim() -replace '\r\n', "`n"
+$curr_bytes = [System.Text.Encoding]::UTF8.GetBytes($curr_rtl_stripped)
+$curr_sha = -join ([System.Security.Cryptography.SHA256]::Create().ComputeHash($curr_bytes) | ForEach-Object { '{0:x2}' -f $_ })
+$expected_sha = "c795862298993be259feee9bcdda6ed07acccc221f82594b6d3c81d31ff828c3"
+
+$rtl_equiv_match = if ($orig_rtl) {
+    (($orig_rtl -replace '\r\n', "`n").Trim() -eq $curr_rtl_stripped) -and ($curr_sha -eq $expected_sha)
+} else {
+    ($curr_sha -eq $expected_sha)
+}
 Assert-Condition $rtl_equiv_match "T4.5_RTL_NON_FORMAL_BIT_FOR_BIT_EQUIV" "rtl/zc_aon_post_auth_ctrl.sv without FORMAL is 100% bit-for-bit equivalent to e57d16d (zero production pin/gate impact)"
 
 Write-Output "----------------------------------------------------------------------"
