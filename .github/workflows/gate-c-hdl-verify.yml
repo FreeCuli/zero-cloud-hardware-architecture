@@ -82,11 +82,11 @@ jobs:
           fi
           echo "#### SPI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_spi_formal_proof -t 20 spi_formal.smt2 2>&1 | tee spi_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_spi_formal_proof -t 20 spi_formal.smt2 2>&1 | tee spi_bmc.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### SPI k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_spi_formal_proof -i -t 20 spi_formal.smt2 2>&1 | tee spi_ind.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_spi_formal_proof -i -t 20 spi_formal.smt2 2>&1 | tee spi_ind.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 3b - OBI Formal Proof (BMC & k-Induction)
@@ -100,11 +100,11 @@ jobs:
           fi
           echo "#### OBI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_obi_formal_proof -t 20 obi_formal.smt2 2>&1 | tee obi_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_obi_formal_proof -t 20 obi_formal.smt2 2>&1 | tee obi_bmc.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OBI k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_obi_formal_proof -i -t 20 obi_formal.smt2 2>&1 | tee obi_ind.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_obi_formal_proof -i -t 20 obi_formal.smt2 2>&1 | tee obi_ind.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 3c - OTP Formal Proof (BMC & k-Induction)
@@ -118,11 +118,11 @@ jobs:
           fi
           echo "#### OTP BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_otp_formal_proof -t 20 otp_formal.smt2 2>&1 | tee otp_bmc.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_otp_formal_proof -t 20 otp_formal.smt2 2>&1 | tee otp_bmc.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OTP k-Induction (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_otp_formal_proof -i -t 20 otp_formal.smt2 2>&1 | tee otp_ind.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_otp_formal_proof -i -t 20 otp_formal.smt2 2>&1 | tee otp_ind.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 4 - Formal Non-Vacuity Cover Witness Checking (yosys-smtbmc -c)
@@ -130,15 +130,15 @@ jobs:
           echo "### Non-Vacuity Cover Analysis" >> $GITHUB_STEP_SUMMARY
           echo "#### SPI Covers" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_spi_formal_proof -c -t 20 spi_formal.smt2 2>&1 | tee spi_cov.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_spi_formal_proof -c -t 20 spi_formal.smt2 2>&1 | tee spi_cov.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OBI Covers" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_obi_formal_proof -c -t 20 obi_formal.smt2 2>&1 | tee obi_cov.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_obi_formal_proof -c -t 20 obi_formal.smt2 2>&1 | tee obi_cov.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "#### OTP Covers" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          yosys-smtbmc -s z3 -m zc_otp_formal_proof -c -t 20 otp_formal.smt2 2>&1 | tee otp_cov.log >> $GITHUB_STEP_SUMMARY || true
+          yosys-smtbmc --unroll -s z3 -m zc_otp_formal_proof -c -t 20 otp_formal.smt2 2>&1 | tee otp_cov.log >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Step 5 - SVA Tool Capability Notice (Normative Commercial SVA and M7/M8 Status)
