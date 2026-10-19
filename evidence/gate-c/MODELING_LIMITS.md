@@ -176,14 +176,14 @@ To ensure absolute precision and avoid evidence misclassification (resolving Aud
 
 | Audit Item | Verification Method | Status | Sign-Off Authority |
 | :--- | :--- | :--- | :--- |
-| **GCR-01 (Warm Reset Gating)** | BMC + $k$-Induction + RTL Sim (Verilator/Icarus) | **CLOSED** | Gate C Formal Proof (`F-OBI-04`, `F-OBI-05`) |
+| **GCR-01 (Warm Reset Gating)** | BMC + $k$-Induction + RTL Sim (Verilator/Icarus) | **CLOSED** | Gate C Formal Proof (`F-OBI-07`) |
 | **GCR-05 (Session-ID Observability & Identity)** | Formal Observation Port + Inductive Invariant | **CLOSED** | Gate C Formal Proof (`F-OTP-SESSION-EQ`) |
 | **GCR-06 (Source Equivalence & Port Isolation)**| Regression SHA-256 + Yosys Non-Formal Synth Stat | **CLOSED** | PowerShell `T4.5` + CI Step 1 (Class A & B) |
 | **GCR-07 (Normative SVA-OTP-06b Mapping)** | Exact Component Mapping + Inductive Invariant | **CLOSED** | Gate C Formal Proof (`F-OTP-02`) |
 | **GCR-07 (Modal Recovery Cover Witness)** | Discrete Target SMTBMC Cover (`-c`, $t=20$) | **CLOSED** | Gate C Cover Proofs (`C-OTP-03n`, `C-OTP-03r`) |
 | **GCR-08 (Simulation Evidence Classification)** | Precise Separation of Math Equiv, RTL E2E Sim, & PS Model | **CLOSED** | [tb/tb_zc_otp_protocol_e2e.sv](../../tb/tb_zc_otp_protocol_e2e.sv) + `MODELING_LIMITS.md` |
 | **GCR-09 (SPI RDSR1 Normative Proof Completeness)** | Strengthened F-SPI-01 + C-SPI-01 (WIP/WEL==00) | **CLOSED** | Gate C Formal Proof (`F-SPI-01`, `C-SPI-01`) |
-| **GCR-10 (OBI Watchdog & Cover Inventory)** | 1024-Cycle Sim vs Step Induction + 6 Discrete Covers | **CLOSED** | [tb/tb_zc_obi.sv](../../tb/tb_zc_obi.sv) + Gate C Formal Cover (`C-OBI-01..07`) + `MODELING_LIMITS.md` |
+| **GCR-10 (OBI Watchdog & Cover Inventory)** | 1024-Cycle Sim vs Step Induction + 6 Discrete Covers | **CLOSED** | Gate C Formal Cover (`C-OBI-01`, `C-OBI-02`, `C-OBI-02b`, `C-OBI-03`, `C-OBI-04`, `C-OBI-07`) + [tb/tb_zc_obi.sv](../../tb/tb_zc_obi.sv) + `MODELING_LIMITS.md` |
 | **GCR-11 (Claim Inventory & Modeling Limits)** | 1-to-1 33-Claim Inventory + Disclosed Modeling Limits | **CLOSED** | `evidence/gate-c/CONSOLIDATED_NORMATIVE_EVIDENCE_MATRIX.md` |
 | **P-1 (F-OBI-03 Restoration)** | $k$-Induction ($t=20$) with `L-OBI-1` | **PROVEN** | Gate C Formal Proof (`F-OBI-03`) |
 | **P-2 (10 Upgraded SVA Properties)** | Exact Normative Form BMC + $k$-Induction | **PROVEN** | Gate C Formal Proof (`fv/*.sv`) |
@@ -192,7 +192,7 @@ To ensure absolute precision and avoid evidence misclassification (resolving Aud
 | **P-5 (OTP Dual Implementation Equiv)** | Dual-Compile Verilator & Icarus (12,240 Words) | **SIMULATED** | [tb/tb_zc_otp_fn_equiv.sv](../../tb/tb_zc_otp_fn_equiv.sv) |
 | **P-6 (CI Integrity & Artifact Upload)** | GitHub Actions Read-Only Workflow + Artifacts | **ACTIVE** | [.github/workflows/gate-c-hdl-verify.yml](../../.github/workflows/gate-c-hdl-verify.yml) |
 | **P-7 (Modeling Limits Documentation)** | Normative Audit Disclosure | **PUBLISHED** | This Document |
-| **Full Continuous Physical Transaction Sequence**| Dedicated RTL Sim ([tb/tb_zc_otp_protocol_e2e.sv](../../tb/tb_zc_otp_protocol_e2e.sv)) + Step Induction | **CLOSED AT RTL** | Proven at RTL level; Analog Macro Physics Deferred to Gate D |
+| **Full Continuous Physical Transaction Sequence**| Dedicated RTL Sim ([tb/tb_zc_otp_protocol_e2e.sv](../../tb/tb_zc_otp_protocol_e2e.sv)) + Step Induction | **SIMULATED AT RTL** | SIMULATED at digital RTL level; not universally formally proven; analog OTP macro UNVERIFIED |
 | **Gate-Level Logic Equivalence Checking (LEC)** | Post-Synthesis Equivalence vs PDK | **DEFERRED TO GATE D** | Class C (Requires Foundry PDK Cell Library) |
 | **Gate C Milestone Verdict** | Open-Source HDL & Formal Sign-Off | **PARTIAL / QUALIFIED** | All Gate C audit items (GCR-01 through GCR-11, P-1 through P-7) resolved; Gate C HDL/formal scope signed off; full-SoC M7/M8 and physical silicon deferred to Gate D |
 | **Gate D (SoC / STA / Silicon Sign-Off)** | Top-Level Integration & Timing Sign-Off | **UNVERIFIED** | Gate D Milestone (v3.4.0 / v4.0.0 Blocked) |
