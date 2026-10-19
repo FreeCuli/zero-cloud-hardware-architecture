@@ -66,6 +66,10 @@ module zc_aon_post_auth_ctrl (
   output logic [2:0]            aon_auth_state_o,
   output logic [1:0]            aon_wstep_o,
   output logic                  aon_fatal_locked_o
+`ifdef FORMAL
+  ,
+  output logic [31:0]           f_active_session_id_o  // Gate C formal observation port (zero production impact)
+`endif
 );
 
 `ifndef YOSYS
@@ -199,6 +203,9 @@ module zc_aon_post_auth_ctrl (
   assign aon_auth_state_o   = aon_auth_state_q;
   assign aon_wstep_o        = wstep_q;
   assign aon_fatal_locked_o = (aon_auth_state_q == AUTH_LOCKED_FATAL);
+`ifdef FORMAL
+  assign f_active_session_id_o = active_session_id_q;
+`endif
 
   // -------------------------------------------------------------------------
   // AON Authorization & Word-Step State Machine

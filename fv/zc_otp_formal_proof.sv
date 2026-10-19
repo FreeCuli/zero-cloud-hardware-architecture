@@ -76,6 +76,7 @@ module zc_otp_formal_proof (
   logic [2:0]            aon_auth_state_o;
   logic [1:0]            aon_wstep_o;
   logic                  aon_fatal_locked_o;
+  logic [31:0]           f_active_session_id_o;
 
   zc_aon_post_auth_ctrl dut (
     .clk_aon_i               (clk_aon_i),
@@ -117,6 +118,10 @@ module zc_otp_formal_proof (
     .aon_auth_state_o        (aon_auth_state_o),
     .aon_wstep_o             (aon_wstep_o),
     .aon_fatal_locked_o      (aon_fatal_locked_o)
+`ifdef FORMAL
+    ,
+    .f_active_session_id_o   (f_active_session_id_o)
+`endif
   );
 
   logic f_past_valid;
@@ -139,12 +144,31 @@ module zc_otp_formal_proof (
     end
   end
 
+  logic [31:0] f_accepted_session_id_q;
+  always_ff @(posedge clk_aon_i or negedge rst_aon_por_ni) begin
+    if (!rst_aon_por_ni) begin
+      f_accepted_session_id_q <= 32'h0;
+    end else if (!tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
+      if ((aon_auth_state_o == AUTH_WAIT_CHAL) &&
+          !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i) &&
+          post_auth_req_i && rst_sys_ni && rom_exec_active_i) begin
+        f_accepted_session_id_q <= post_session_id_i;
+      end
+    end
+  end
+
   always_comb begin
     if (!f_past_valid) assume (!rst_aon_por_ni);
 
     // Inductive invariant: In AUTH_GRANT, intermediate word selection implies !f_seal_b_only_q
     if (aon_auth_state_o == AUTH_GRANT && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B)) begin
       assert (!f_seal_b_only_q);
+    end
+
+    // F-OTP-SESSION-EQ: Formal proof of identity between independent shadow session register
+    // and DUT internal active_session_id_q (via formal observation port f_active_session_id_o)
+    if (rst_aon_por_ni && f_past_valid) begin
+      assert (f_accepted_session_id_q == f_active_session_id_o);
     end
 
     // F-OTP-01b (SVA-OTP-06a Part 2 / R28B-02 Structural):
@@ -189,15 +213,18 @@ module zc_otp_formal_proof (
       end
 
       // F-OTP-03a (SVA-OTP-06c Forward Liveness Direction): Strictly normative -
-      // Final word (COMMIT_B) readback completion without fatal lock transitions to AUTH_SESSION_DONE
+      // Final word (COMMIT_B) verified readback completion unconditionally transitions to AUTH_SESSION_DONE
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
                 !otp_macro_phys_active_i &&
                 (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
+                (dai_rb_session_id_i == f_active_session_id_o) &&
+                (dai_rb_slot_idx_i == otp_auth_slot_o) &&
+                (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
+                (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
-          (aon_auth_state_o != AUTH_LOCKED_FATAL) &&
           rst_sys_ni && rom_exec_active_i &&
           !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
         assert ((aon_auth_state_o == AUTH_SESSION_DONE) &&
@@ -235,6 +262,7 @@ module zc_otp_formal_proof (
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 dai_rb_done_pulse_i &&
                 (dai_ecc_err_i ||
+                 (dai_rb_session_id_i != f_active_session_id_o) ||
                  (dai_rb_slot_idx_i != otp_auth_slot_o) ||
                  (dai_rb_word_sel_i != otp_auth_word_sel_o) ||
                  (dai_rb_raw_data_i != otp_auth_expected_cw_o)) &&
@@ -301,7 +329,7 @@ module zc_otp_formal_proof (
 
       // C-OTP-06: Mismatched / hijacked readback session ID rejected and fatal locked
       cover ($past(aon_auth_state_o == AUTH_GRANT && aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
-                   dai_rb_done_pulse_i && (dai_rb_session_id_i != post_session_id_i)) &&
+                   dai_rb_done_pulse_i && (dai_rb_session_id_i != f_active_session_id_o)) &&
              (aon_auth_state_o == AUTH_LOCKED_FATAL));
     end
   end
