@@ -74,7 +74,7 @@ jobs:
       - name: Step 3a - SPI Formal Proof (BMC & k-Induction)
         run: |
           echo "### Formal Proof: SPI 3-Layer Firewall" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 spi_formal.smt2" > yosys_spi.log 2>&1
+          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; write_smt2 spi_formal.smt2" 2>&1 | tee yosys_spi.log
           echo "#### SPI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           yosys-smtbmc --unroll -s z3 -t 20 spi_formal.smt2 2>&1 | tee spi_bmc.log >> $GITHUB_STEP_SUMMARY || true
@@ -87,7 +87,7 @@ jobs:
       - name: Step 3b - OBI Formal Proof (BMC & k-Induction)
         run: |
           echo "### Formal Proof: OBI Subordinate Bridge" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 obi_formal.smt2" > yosys_obi.log 2>&1
+          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; write_smt2 obi_formal.smt2" 2>&1 | tee yosys_obi.log
           echo "#### OBI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           yosys-smtbmc --unroll -s z3 -t 20 obi_formal.smt2 2>&1 | tee obi_bmc.log >> $GITHUB_STEP_SUMMARY || true
@@ -100,7 +100,7 @@ jobs:
       - name: Step 3c - OTP Formal Proof (BMC & k-Induction)
         run: |
           echo "### Formal Proof: OTP Authorization FSM" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; dffunmap; write_smt2 otp_formal.smt2" > yosys_otp.log 2>&1
+          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; write_smt2 otp_formal.smt2" 2>&1 | tee yosys_otp.log
           echo "#### OTP BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           yosys-smtbmc --unroll -s z3 -t 20 otp_formal.smt2 2>&1 | tee otp_bmc.log >> $GITHUB_STEP_SUMMARY || true
@@ -145,15 +145,21 @@ jobs:
           for log in spi_bmc.log spi_ind.log obi_bmc.log obi_ind.log otp_bmc.log otp_ind.log spi_cov.log obi_cov.log otp_cov.log; do
             if [ -f "$log" ]; then
               if grep -q "Assert failed" "$log"; then
-                ERR_MSG=$(grep "Assert failed" "$log" | tr '\n' ' ' | head -c 200)
+                echo "--- ASSERTION FAILURE IN $log ---"
+                grep -C 3 "Assert failed" "$log"
+                ERR_MSG=$(grep "Assert failed" "$log" | head -n 3 | tr '\n' ' ')
                 echo "::error title=Assertion Failed in $log::$ERR_MSG"
                 FAILED=1
               elif grep -q "Unreached cover" "$log"; then
-                COV_MSG=$(grep "Unreached cover" "$log" | tr '\n' ' ' | head -c 200)
+                echo "--- UNREACHED COVER IN $log ---"
+                grep -C 2 "Unreached cover" "$log"
+                COV_MSG=$(grep "Unreached cover" "$log" | head -n 3 | tr '\n' ' ')
                 echo "::error title=Cover Unreached in $log::$COV_MSG"
                 FAILED=1
               elif grep -q "syntax error" "$log"; then
-                SYN_MSG=$(grep "syntax error" "$log" | tr '\n' ' ' | head -c 200)
+                echo "--- SYNTAX ERROR IN $log ---"
+                grep -C 2 "syntax error" "$log"
+                SYN_MSG=$(grep "syntax error" "$log" | head -n 3 | tr '\n' ' ')
                 echo "::error title=Syntax Error in $log::$SYN_MSG"
                 FAILED=1
               else
@@ -166,7 +172,7 @@ jobs:
             fi
           done
           if [ $FAILED -ne 0 ]; then
-            echo "[VERDICT] Formal verification failed. See annotations above."
+            echo "[VERDICT] Formal verification failed. See logs and annotations above."
             exit 1
           else
             echo "[VERDICT] All formal assertions and non-vacuity covers PASSED successfully!"
