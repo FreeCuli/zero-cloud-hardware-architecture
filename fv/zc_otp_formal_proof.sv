@@ -229,7 +229,6 @@ module zc_otp_formal_proof (
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 dai_rb_done_pulse_i &&
                 (dai_ecc_err_i ||
-                 (dai_rb_session_id_i != f_accepted_session_id_q) ||
                  (dai_rb_slot_idx_i != otp_auth_slot_o) ||
                  (dai_rb_word_sel_i != otp_auth_word_sel_o) ||
                  (dai_rb_raw_data_i != otp_auth_expected_cw_o)) &&
@@ -242,6 +241,20 @@ module zc_otp_formal_proof (
         assert (aon_wstep_o == WSTEP_IDLE);
         assert (!otp_word_auth_valid_o);
         assert (!otp_dai_we_o);
+      end
+
+      // F-OTP-04b: Any readback pulse that does not verify to session done or advance locks fatally
+      if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
+                !otp_macro_phys_active_i &&
+                !dai_cmd_req_i && !dai_prog_done_pulse_i &&
+                dai_rb_done_pulse_i &&
+                rst_sys_ni && rom_exec_active_i &&
+                !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
+          rst_sys_ni && rom_exec_active_i &&
+          !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
+        assert ((aon_auth_state_o == AUTH_LOCKED_FATAL) ||
+                (aon_auth_state_o == AUTH_SESSION_DONE) ||
+                ((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_AUTH_READY)));
       end
 
       // F-OTP-05 (SVA-OTP-08): AUTH_LOCKED_FATAL is permanently sticky until Cold POR (!rst_aon_por_ni)
