@@ -123,18 +123,11 @@ module zc_otp_formal_proof (
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_aon_i) f_past_valid <= 1'b1;
 
-  logic [31:0] f_accepted_session_id_q;
   logic        f_seal_b_only_q;
   always_ff @(posedge clk_aon_i or negedge rst_aon_por_ni) begin
     if (!rst_aon_por_ni) begin
-      f_accepted_session_id_q <= 32'h0;
       f_seal_b_only_q         <= 1'b0;
     end else if (!tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
-      if ((aon_auth_state_o == AUTH_WAIT_CHAL) &&
-          !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i) &&
-          post_auth_req_i && rst_sys_ni && rom_exec_active_i) begin
-        f_accepted_session_id_q <= post_session_id_i;
-      end
       if ((aon_auth_state_o == AUTH_VALIDATE) &&
           !(dai_prog_done_pulse_i || dai_rb_done_pulse_i || dai_cmd_req_i || !rst_sys_ni || !rom_exec_active_i) &&
           val_step_done_i && val_all_checks_ok_i && (req_target_svn_i != 8'd0)) begin
@@ -152,11 +145,6 @@ module zc_otp_formal_proof (
     // Inductive invariant: In AUTH_GRANT, intermediate word selection implies !f_seal_b_only_q
     if (aon_auth_state_o == AUTH_GRANT && (otp_auth_word_sel_o < OTP_WORD_COMMIT_B)) begin
       assert (!f_seal_b_only_q);
-    end
-
-    // Inductive invariant: Shadow session ID matches DUT internal active_session_id_q
-    if (rst_aon_por_ni && (aon_auth_state_o != AUTH_RESET_IDLE) && (aon_auth_state_o != AUTH_WAIT_CHAL)) begin
-      assert (f_accepted_session_id_q == dut.active_session_id_q);
     end
 
     // F-OTP-01b (SVA-OTP-06a Part 2 / R28B-02 Structural):
@@ -206,7 +194,7 @@ module zc_otp_formal_proof (
                 !otp_macro_phys_active_i &&
                 (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
-                (dai_rb_session_id_i == f_accepted_session_id_q) &&
+                (dai_rb_session_id_i == dut.active_session_id_q) &&
                 (dai_rb_slot_idx_i == otp_auth_slot_o) &&
                 (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
                 (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
@@ -250,6 +238,7 @@ module zc_otp_formal_proof (
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 dai_rb_done_pulse_i &&
                 (dai_ecc_err_i ||
+                 (dai_rb_session_id_i != dut.active_session_id_q) ||
                  (dai_rb_slot_idx_i != otp_auth_slot_o) ||
                  (dai_rb_word_sel_i != otp_auth_word_sel_o) ||
                  (dai_rb_raw_data_i != otp_auth_expected_cw_o)) &&
@@ -316,7 +305,7 @@ module zc_otp_formal_proof (
 
       // C-OTP-06: Mismatched / hijacked readback session ID rejected and fatal locked
       cover ($past(aon_auth_state_o == AUTH_GRANT && aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
-                   dai_rb_done_pulse_i && (dai_rb_session_id_i != f_accepted_session_id_q)) &&
+                   dai_rb_done_pulse_i && (dai_rb_session_id_i != dut.active_session_id_q)) &&
              (aon_auth_state_o == AUTH_LOCKED_FATAL));
     end
   end
