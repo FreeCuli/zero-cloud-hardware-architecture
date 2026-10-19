@@ -75,7 +75,11 @@ jobs:
         run: |
           set -o pipefail
           echo "### Formal Proof: SPI 3-Layer Firewall" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; write_smt2 -wires spi_formal.smt2" 2>&1 | tee yosys_spi.log
+          if ! yosys -p "read_verilog -sv -formal rtl/zc_spi_flash_firewall.sv fv/zc_spi_formal_proof.sv; prep -top zc_spi_formal_proof -flatten; async2sync; opt; write_smt2 -wires spi_formal.smt2" 2>&1 | tee yosys_spi.log; then
+            ERR=$(tail -n 12 yosys_spi.log | tr '\n' ' ')
+            echo "::error title=Yosys SPI Error::$ERR"
+            exit 1
+          fi
           echo "#### SPI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           yosys-smtbmc -s z3 -m zc_spi_formal_proof -t 20 spi_formal.smt2 2>&1 | tee spi_bmc.log >> $GITHUB_STEP_SUMMARY || true
@@ -89,7 +93,11 @@ jobs:
         run: |
           set -o pipefail
           echo "### Formal Proof: OBI Subordinate Bridge" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; write_smt2 -wires obi_formal.smt2" 2>&1 | tee yosys_obi.log
+          if ! yosys -p "read_verilog -sv -formal rtl/zc_obi_subordinate_bridge.sv fv/zc_obi_formal_proof.sv; prep -top zc_obi_formal_proof -flatten; async2sync; opt; write_smt2 -wires obi_formal.smt2" 2>&1 | tee yosys_obi.log; then
+            ERR=$(tail -n 12 yosys_obi.log | tr '\n' ' ')
+            echo "::error title=Yosys OBI Error::$ERR"
+            exit 1
+          fi
           echo "#### OBI BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           yosys-smtbmc -s z3 -m zc_obi_formal_proof -t 20 obi_formal.smt2 2>&1 | tee obi_bmc.log >> $GITHUB_STEP_SUMMARY || true
@@ -103,7 +111,11 @@ jobs:
         run: |
           set -o pipefail
           echo "### Formal Proof: OTP Authorization FSM" >> $GITHUB_STEP_SUMMARY
-          yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; write_smt2 -wires otp_formal.smt2" 2>&1 | tee yosys_otp.log
+          if ! yosys -p "read_verilog -sv -formal rtl/zc_aon_post_auth_ctrl.sv fv/zc_otp_formal_proof.sv; prep -top zc_otp_formal_proof -flatten; async2sync; opt; write_smt2 -wires otp_formal.smt2" 2>&1 | tee yosys_otp.log; then
+            ERR=$(tail -n 12 yosys_otp.log | tr '\n' ' ')
+            echo "::error title=Yosys OTP Error::$ERR"
+            exit 1
+          fi
           echo "#### OTP BMC (depth 20)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           yosys-smtbmc -s z3 -m zc_otp_formal_proof -t 20 otp_formal.smt2 2>&1 | tee otp_bmc.log >> $GITHUB_STEP_SUMMARY || true

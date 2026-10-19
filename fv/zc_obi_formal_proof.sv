@@ -70,6 +70,19 @@ module zc_obi_formal_proof (
   initial f_past_valid = 1'b0;
   always_ff @(posedge clk_i) f_past_valid <= 1'b1;
 
+  logic f_phys_req_active_q;
+  always_ff @(posedge clk_i or negedge rst_por_ni) begin
+    if (!rst_por_ni) begin
+      f_phys_req_active_q <= 1'b0;
+    end else begin
+      case ({periph_phys_req_o && periph_phys_gnt_i, periph_phys_rvalid_i})
+        2'b10:   f_phys_req_active_q <= 1'b1;
+        2'b01:   f_phys_req_active_q <= 1'b0;
+        default: f_phys_req_active_q <= f_phys_req_active_q;
+      endcase
+    end
+  end
+
   always_comb begin
     if (!f_past_valid) assume (!rst_por_ni);
 
@@ -97,17 +110,17 @@ module zc_obi_formal_proof (
       end
 
       // F-OBI-02a (SVA-L0-10b / Part 1): Orphan response in ST_IDLE is never forwarded to CPU on arrival cycle
-      if (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
+      if (rst_sys_ni && (bridge_state_o == ST_IDLE) && f_phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) begin
         assert (!host_rvalid_o);
       end
 
       // F-OBI-02b (SVA-L0-10b / Part 2): Strictly normative - Cycle following orphan response drain in ST_IDLE
-      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o)) begin
-        assert (!dut.phys_req_active_q);
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && f_phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o)) begin
+        assert (!f_phys_req_active_q);
       end
 
       // F-OBI-02c (SVA-L0-10b / Part 3): No delayed synthetic or stale rvalid on cycle following orphan drain
-      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) &&
+      if ($past(rst_sys_ni && (bridge_state_o == ST_IDLE) && f_phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o) &&
           rst_sys_ni && !host_req_i) begin
         assert (!host_rvalid_o);
       end
@@ -167,7 +180,7 @@ module zc_obi_formal_proof (
       cover ($past(rst_sys_ni) && rst_sys_ni && $past(host_rvalid_o && (bridge_state_o == ST_WAIT_RVALID)));
 
       // C-OBI-02: Orphan physical response silent drain in ST_IDLE
-      cover (rst_sys_ni && (bridge_state_o == ST_IDLE) && dut.phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o);
+      cover (rst_sys_ni && (bridge_state_o == ST_IDLE) && f_phys_req_active_q && periph_phys_rvalid_i && !periph_phys_req_o);
 
       // C-OBI-03: Normal CPU wait state without orphan activation
       cover (rst_sys_ni && (bridge_state_o == ST_WAIT_RVALID) && !orphan_drain_active_o && (drain_wdog_cnt_o == 10'd0));
