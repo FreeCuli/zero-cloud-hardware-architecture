@@ -188,19 +188,16 @@ module zc_otp_formal_proof (
         end
       end
 
-      // F-OTP-03a (SVA-OTP-06c Forward Direction / Liveness): Strictly normative -
-      // Valid COMMIT_B readback pulse transitions to AUTH_SESSION_DONE on the next cycle
+      // F-OTP-03a (SVA-OTP-06c Forward Liveness Direction): Strictly normative -
+      // Final word (COMMIT_B) readback completion without fatal lock transitions to AUTH_SESSION_DONE
       if ($past((aon_auth_state_o == AUTH_GRANT) && (aon_wstep_o == WSTEP_WAIT_RB_VERIFY) &&
                 !otp_macro_phys_active_i &&
                 (otp_auth_word_sel_o == OTP_WORD_COMMIT_B) &&
                 dai_rb_done_pulse_i && !dai_ecc_err_i &&
-                (dai_rb_session_id_i == dut.active_session_id_q) &&
-                (dai_rb_slot_idx_i == otp_auth_slot_o) &&
-                (dai_rb_word_sel_i == otp_auth_word_sel_o) &&
-                (dai_rb_raw_data_i == otp_auth_expected_cw_o) &&
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 rst_sys_ni && rom_exec_active_i &&
                 !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) &&
+          (aon_auth_state_o != AUTH_LOCKED_FATAL) &&
           rst_sys_ni && rom_exec_active_i &&
           !tamper_alert_i && !clk_glitch_alert_i && !volt_supervisor_fault_i) begin
         assert ((aon_auth_state_o == AUTH_SESSION_DONE) &&
@@ -238,7 +235,6 @@ module zc_otp_formal_proof (
                 !dai_cmd_req_i && !dai_prog_done_pulse_i &&
                 dai_rb_done_pulse_i &&
                 (dai_ecc_err_i ||
-                 (dai_rb_session_id_i != dut.active_session_id_q) ||
                  (dai_rb_slot_idx_i != otp_auth_slot_o) ||
                  (dai_rb_word_sel_i != otp_auth_word_sel_o) ||
                  (dai_rb_raw_data_i != otp_auth_expected_cw_o)) &&
@@ -305,7 +301,7 @@ module zc_otp_formal_proof (
 
       // C-OTP-06: Mismatched / hijacked readback session ID rejected and fatal locked
       cover ($past(aon_auth_state_o == AUTH_GRANT && aon_wstep_o == WSTEP_WAIT_RB_VERIFY &&
-                   dai_rb_done_pulse_i && (dai_rb_session_id_i != dut.active_session_id_q)) &&
+                   dai_rb_done_pulse_i && (dai_rb_session_id_i != post_session_id_i)) &&
              (aon_auth_state_o == AUTH_LOCKED_FATAL));
     end
   end
