@@ -3,7 +3,7 @@
 
 **Status:** `PROPOSED / NOT RELEASED / NOT SOC-VERIFIED`  
 **Document ID:** ZC-CORE-SPEC-HYBRID-INTERCONNECT-DRAFT  
-**Revision:** 0.9.1-draft (Post-Audit Remediation HAR-02 / HAR-03 / HAR-04)  
+**Revision:** 0.9.2-draft (Post-Audit Remediation HAR-02 / HAR-03 / HAR-04 / HAR-06 / HAR-07)  
 **Target Milestone:** Post-Gate C Governance / Gate D Preparation  
 **Reference Technical Baseline:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
 **Classification:** Technical Hardware Interconnect Specification (Draft)  
@@ -139,13 +139,14 @@ assign bank_b_commit_ready_o = spi_idle_ready_o && rom_img_verif_valid_i;
 | `drain_wdog_cnt_o` | Output | 10 | Monotonic 1,024-cycle orphan drain watchdog counter output. |
 | `bridge_state_o` | Output | 2 | Current bridge FSM state (`ST_IDLE`, `ST_WAIT_RVALID`, `ST_TIMEOUT_ERR`, `ST_TRAP`). |
 
-#### Architectural Gating & Scope Limitations (HAR-02 Resolution):
+#### Architectural Gating & Scope Limitations (HAR-02, HAR-06 & HAR-07 Resolution):
 > [!IMPORTANT]
-> **Subsystem Isolation Boundary Disclosure:**  
+> **Subsystem Isolation Boundary & Verification Disclosure:**  
 > The OBI Subordinate Bridge provides transaction-level decoupling on a point-to-point OBI bus link. It prevents hung peripherals from locking the CPU and prevents orphan data leaks. It does **NOT** constitute:
 > 1. A multi-master crossbar IOMMU or Memory Protection Unit (MPU).
-> 2. A system-wide DMA firewall that blocks arbitrary memory apertures.  
-> Full DMA master authorization and SRAM enclave isolation are tracked as **Gate D SoC integration deliverables** (`SVA-M7-01`, `SVA-M8-01`).
+> 2. A system-wide DMA firewall that blocks arbitrary memory apertures. Full DMA master authorization and SRAM enclave isolation are tracked as **Gate D SoC integration deliverables** (`SVA-M7-01`, `SVA-M8-01`).
+> 3. A telemetry allowlist filter, payload inspector, or hardware rate limiter. The bridge is protocol-agnostic and does not inspect data payload schemas. Hardware telemetry enforcement remains **`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`** (Gate D deliverable).
+> 4. A universal formal temporal proof over 1,024 cycles. The continuous 1,024-cycle timeout progression is verified via digital RTL simulation (`tb_zc_obi.sv` Test 2 / `SIMULATED`). Properties `F-OBI-04` and `F-OBI-05` formally prove local inductive step logic and lock assertion (`PROVEN` at RTL step level).
 
 ---
 
@@ -235,7 +236,7 @@ assign bank_b_commit_ready_o = spi_idle_ready_o && rom_img_verif_valid_i;
 | Verification Item | Target Block | Gate C Status | Gate D Deliverable |
 | :--- | :--- | :---: | :--- |
 | **SPI Flash Command Firewalling** | `zc_spi_flash_firewall` | **`PROVEN` (Run #45)** | Physical Flash glitching & PCB signal integrity test. |
-| **OBI Bus Decoupling & Watchdog** | `zc_obi_subordinate_bridge` | **`PROVEN` (Run #45)** | Full SoC bus arbitration & DMA crossbar integration. |
+| **OBI Bus Decoupling & Watchdog** | `zc_obi_subordinate_bridge` | **`PROVEN` (F-OBI-01..07) / `SIMULATED` (1024-cyc wdog)** | Full SoC bus arbitration & DMA crossbar integration. |
 | **AON Anti-Rollback DAI Handshake**| `zc_aon_post_auth_ctrl` | **`PROVEN` (Run #45)** | Foundry physical antifuse PDK analog macro characterization. |
 | **Full-SoC 2-Trace Noninterference**| Top-Level SoC Crossbar | **`BLOCKED`** | Top-level 2-trace miter formal equivalence (`SVA-M7-01`, `SVA-M8-01`). |
 | **Asynchronous Reset Removal/Recovery**| All Blocks | **`UNVERIFIED`** | Static Timing Analysis (STA) across PVT corners (PrimeTime / OpenSTA). |
