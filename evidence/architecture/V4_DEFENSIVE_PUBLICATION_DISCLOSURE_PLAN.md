@@ -8,6 +8,12 @@
 **Target Prior-Art Claim Family:** `ZC-CORE-008: Hardware-Enforced Bus Isolation & Secure Inbound Update Firewall`  
 **Reference Technical Baseline:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
 **Governance Level:** Intellectual Property & Prior-Art Defense Strategy  
+**Cross-References:**
+- `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md`
+- `evidence/legal/V4_LICENSE_SCOPE_AND_RIGHTS_MATRIX.md`
+- `docs/rfc/ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md`
+- `docs/rfc/ZC-CORE-V4-TRADEMARK-AND-CONFORMANCE-RFC.md`
+- `docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md`  
 
 ---
 
@@ -125,7 +131,8 @@ To comply fully with independent audit directive **HAR-12 / P1**, the defensive 
    FreeCuli's corporate strategy is formally confirmed: FreeCuli intentionally elects the **Defensive Prior-Art Publication route under CERN-OHL-S v2.0 and Zenodo DOI**, rather than proprietary patent monopoly prosecution. This strategy:
    - Maximizes global ecosystem adoption and eliminates patent acquisition and cross-border litigation expenses.
    - Creates a permanent, timestamped prior-art bar preventing third-party patent ambushes.
-   - Secures commercial revenue through B2B proprietary licensing exemptions under the strongly reciprocal provisions of CERN-OHL-S v2.0.
+   - Secures commercial revenue through B2B proprietary licensing exemptions under the strongly reciprocal provisions of CERN-OHL-S v2.0 (Route B) solely for FreeCuli-owned reference source code.
+   - Guarantees full freedom to operate for independent clean-room implementations of the abstract methodology, which owe zero royalties and are not subject to copyleft or commercial licensing demands.
 3. **Counsel Verification Scope:**  
    Accordingly, the role of the IP counsel review checkpoint is NOT to deliberate patent prosecution, but to verify that the technical disclosure satisfies legal enablement and claim structure requirements (35 U.S.C. § 102, EPC Art. 54) to maximize the defensive strength and international admissibility of the prior-art disclosure.
 4. **Publication Authorization:**  

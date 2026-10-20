@@ -205,13 +205,36 @@ Below is the exhaustive, file-by-file specification covering every Markdown docu
 
 ### 2.5 Supporting, Licensing & Architecture Documents
 
-#### 13. `CONTRIBUTING.md`, `SECURITY.md`, `DUAL-LICENSING.md`, `zero-cloud-dual-licensing.md`, `zero-cloud-core-brand-and-trademark-policy.md`
-* **Current Version & Purpose:** Community guidelines, security vulnerability reporting, CERN-OHL-S / commercial dual-licensing, and trademark usage.
-* **Disposition:** **`PRESERVE (IMMUTABLE)`**.
-* **Rationale:** These documents govern project administration, licensing legalities, and vulnerability disclosure; they are independent of profile bifurcation and require no technical changes for v4.0.0.
-* **Migration Phase:** **N/A (Preserved)**.
+#### 13. `LICENSE` & `zero-cloud-dual-licensing.md` (and alias `DUAL-LICENSING.md`)
+* **Current Version & Purpose:** v3.3.0-rc2 baseline; dual-licensing terms, open-source obligations, and commercial exemption clauses.
+* **Disposition:** **`PRESERVE HISTORICAL BASELINE (v3.3.0-rc2) / PROPOSE V4 SUCCESSOR`**.
+* **Rationale:** As identified in `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md` (Findings L-01, L-02, L-03), legacy text contains legal overreaches regarding abstract methodology scope and entity discrimination. To preserve historical audit integrity and Zenodo DOI provenance, the root v3.3.0-rc2 files remain untouched in this branch. The normative successor is proposed via `docs/rfc/ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md`.
+* **Exact Proposed Normative Change in v4 Successor:**
+  - Scope CERN-OHL-S v2.0 reciprocity strictly to FreeCuli-authored covered RTL and schematics.
+  - Reaffirm absolute freedom for independent clean-room implementations (zero royalties, zero copyleft).
+  - Eliminate commercial entity discrimination in Route A (OSD #5/#6 compliance).
+  - Clarify that Route B commercial exemptions apply strictly to FreeCuli-owned assets.
+* **Evidence References:** `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md`; `evidence/legal/V4_LICENSE_SCOPE_AND_RIGHTS_MATRIX.md`; `docs/rfc/ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md`.
+* **Migration Phase:** **Phase 5 (Legal & Licensing Successor Integration)**.
 
-#### 14. `Zero-Cloud-Smart-Home-Edge-AI-Architecture.md`
+#### 14. `zero-cloud-core-brand-and-trademark-policy.md`
+* **Current Version & Purpose:** v3.3.0-rc2 baseline; trademark usage and 4-tier conformance levels.
+* **Disposition:** **`PRESERVE HISTORICAL BASELINE (v3.3.0-rc2) / PROPOSE V4 SUCCESSOR`**.
+* **Rationale:** Legacy text commingled trademark licensing with copyright exemptions (Finding L-04). Root document is preserved as historical baseline; successor is proposed via `docs/rfc/ZC-CORE-V4-TRADEMARK-AND-CONFORMANCE-RFC.md`.
+* **Exact Proposed Normative Change in v4 Successor:**
+  - Formally decouple trademark licensing from hardware copyright paths (Route A vs Route B vs Clean-Room).
+  - Clarify FreeCuli's legal status as Scheme Owner, relying on ISO/IEC 17025 accredited third-party test reports.
+  - Retain 4-level conformance hierarchy and C1–C3 assurance profiles.
+* **Evidence References:** `docs/rfc/ZC-CORE-V4-TRADEMARK-AND-CONFORMANCE-RFC.md`.
+* **Migration Phase:** **Phase 5 (Legal & Licensing Successor Integration)**.
+
+#### 15. `CONTRIBUTING.md`, `SECURITY.md`, `CITATION.cff`
+* **Current Version & Purpose:** Contributor guidelines, security reporting, citation metadata.
+* **Disposition:** **`PRESERVE (IMMUTABLE)` for v3.x / `UPDATE (PHASED)` for v4.x migration**.
+* **Rationale:** Retain governance stability; harmonize `CITATION.cff` license tags with single canonical hardware license in v4.
+* **Migration Phase:** **Phase 5 (Legal & Licensing Successor Integration)**.
+
+#### 16. `Zero-Cloud-Smart-Home-Edge-AI-Architecture.md`
 * **Current Version & Purpose:** Informational application note.
 * **Disposition:** **`SUPERSEDE (ARCHIVE)`**.
 * **Rationale:** Deprecated early draft; content fully superseded by `docs/architecture/zc-core-security-profiles.md` and `RFC-ZC-CORE-0004-DRAFT`.
@@ -219,9 +242,9 @@ Below is the exhaustive, file-by-file specification covering every Markdown docu
 
 ---
 
-## 3. Phased Migration Execution Plan (4 Causal Phases)
+## 3. Phased Migration Execution Plan (5 Causal Phases)
 
-To ensure zero downtime, unbroken Git history, and complete auditability, the normative update will proceed in four strictly sequential, causal phases **ONLY AFTER** formal auditor and standards committee authorization:
+To ensure zero downtime, unbroken Git history, and complete auditability, the normative update will proceed in five strictly sequential, causal phases **ONLY AFTER** formal auditor and standards committee authorization:
 
 ```
 +---------------------------------------------------------------------------------------------------------+
@@ -247,6 +270,12 @@ To ensure zero downtime, unbroken Git history, and complete auditability, the no
 |     10. zero-cloud-core-defensive-publication.md (ZC-CORE-008 claim family)                             |
 |     11. zero-cloud-core-versioning-and-governance.md (v4.0.0 SemVer justification)                      |
 |     12. ZERO-CLOUD-RELEASE-MANIFEST.md (v4.0.0-rc1 pre-flight sign-off)                                 |
+|                                                                                                         |
+|   [ PHASE 5: LEGAL, LICENSING & TRADEMARK INTEGRATION ]                                                 |
+|     13. LICENSE (SPDX harmonization to CERN-OHL-S-2.0 & clean-room freedom guarantee)                    |
+|     14. zero-cloud-dual-licensing.md (Route A vs Route B non-discriminatory policy)                     |
+|     15. zero-cloud-core-brand-and-trademark-policy.md (Decoupled trademark licensing & 4-level model)     |
+|     16. CITATION.cff (Harmonized license metadata)                                                      |
 |                                                                                                         |
 +---------------------------------------------------------------------------------------------------------+
 ```
