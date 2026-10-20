@@ -117,14 +117,19 @@ To comply fully with independent audit directive **HAR-12 / P1**, the defensive 
 
 ---
 
-## 5. Mandatory Patent-Counsel Review Checkpoint
+## 5. FreeCuli IP Strategy Confirmation & Counsel Verification Checkpoint
 
-Prior to initiating any public disclosure, uploading documents to Zenodo, or minting a DOI:
-
-1. **Formal IP Strategy Review:** FreeCuli executive leadership and qualified patent attorneys / IP counsel must review the proposed `ZC-CORE-008` claim formulations.
-2. **Filing vs. Defense Determination:** Counsel must evaluate whether any aspect of `ZC-CORE-008` (e.g., the 3-layer SPI firewall status reconciliation or the AON OTP persistent fatal lock) warrants a prior provisional patent application before public disclosure.
-3. **Government Grant Coordination (TÜBİTAK):** The disclosure timing must be coordinated with TÜBİTAK project deliverables and Turkish Patent and Trademark Office (TÜRKPATENT) filing requirements to ensure full compliance with grant funding intellectual property clauses.
-4. **Written Authorization:** Public Zenodo publication is strictly blocked until written sign-off is granted by patent counsel.
+1. **Corporate Business Model & IP Strategy Determination:**  
+   FreeCuli operates under an open-source hardware and commercial dual-licensing business model. Having audited its grant agreements and project scope, FreeCuli confirms that it holds **no contractual obligations to file patent applications** (e.g., under TÜBİTAK or other funding programs).
+2. **Defensive Disclosure Election:**  
+   FreeCuli's corporate strategy is formally confirmed: FreeCuli intentionally elects the **Defensive Prior-Art Publication route under CERN-OHL-S v2.0 and Zenodo DOI**, rather than proprietary patent monopoly prosecution. This strategy:
+   - Maximizes global ecosystem adoption and eliminates patent acquisition and cross-border litigation expenses.
+   - Creates a permanent, timestamped prior-art bar preventing third-party patent ambushes.
+   - Secures commercial revenue through B2B proprietary licensing exemptions under the strongly reciprocal provisions of CERN-OHL-S v2.0.
+3. **Counsel Verification Scope:**  
+   Accordingly, the role of the IP counsel review checkpoint is NOT to deliberate patent prosecution, but to verify that the technical disclosure satisfies legal enablement and claim structure requirements (35 U.S.C. § 102, EPC Art. 54) to maximize the defensive strength and international admissibility of the prior-art disclosure.
+4. **Publication Authorization:**  
+   Public Zenodo publication and DOI registration proceed once IP counsel confirms the enablement and claim formatting of the disclosure package.
 
 ---
 

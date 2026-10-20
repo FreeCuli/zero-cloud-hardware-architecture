@@ -164,9 +164,9 @@ To resolve **HAR-10 / P1** and **HAR-12 / P1**, the development, governance, and
 |     - Technical Report & Patent Claim Family Disclosure (ZC-CORE-008)                                   |
 |     - Prior-Art Documentary Record: Verifiable public proof of technical content and public             |
 |       availability date to serve as documentary prior art (35 U.S.C. § 102, EPC Art. 54).              |
-|     - IP & Legal Limitations: Does NOT grant patent protection, does NOT guarantee worldwide patent     |
-|       invalidation across all jurisdictions, and does NOT establish patent application priority.        |
-|       Mandatory patent attorney / IP counsel review required prior to publication.                      |
+|     - IP & Legal Scope: FreeCuli confirms no mandatory patent commitments exist (e.g. TÜBİTAK);         |
+|       the corporate strategy intentionally selects the Defensive Prior-Art route under CERN-OHL-S v2.0   |
+|       and Zenodo DOI. Counsel review checkpoint verifies technical enablement and claim robustness.     |
 |     - Boundary: Does NOT require physical silicon tape-out! Design targets disclosed as specifications. |
 |                                                                                                         |
 |   [ MILESTONE 3: DIGITAL RTL & FULL-SOC VERIFICATION ]                                                  |
