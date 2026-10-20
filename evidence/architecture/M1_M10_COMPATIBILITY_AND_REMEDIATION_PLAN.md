@@ -3,64 +3,85 @@
 
 **Belge Kimliği:** ZC-CORE-EVIDENCE-M1-M10-COMPAT-PLAN-01  
 **Tarih:** 20 Ekim 2026  
-**Revizyon:** 1.0.0 (Hibrit Mimari Yönetişim İncelemesi)  
+**Revizyon:** 1.1.0 (Bağımsız Denetçi HAR-01..05 Bulguları Düzeltmesi)  
 **Hedef Depo:** `FreeCuli/zero-cloud-hardware-architecture`  
 **Çalışma Dalı:** `gate-c/formal-scope-audit`  
+**Teknik Referans Tabanı:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
 **Yönetişim Statüsü:** **Gate C: PARTIAL / QUALIFIED** | **Gate D: UNVERIFIED** | **DO NOT MERGE** | **RELEASE BLOCKED**  
+
+---
+
+> [!WARNING]
+> **YÖNETİŞİM VE KAPSAM BİLDİRİMİ (HAR-02 & HAR-05):**  
+> Bu belge, ZC-CORE normatif değişmezlerinin (M1–M10) **STRICT** ve **HYBRID** çalışma profilleri karşısındaki uyumluluk durumunu ve depodaki normatif belgelerin güncellenme planını belirler.  
+> Belgelerdeki teknik kapsam şişkinliğini önlemek amacıyla:
+> 1. **`DESIGN-COMPATIBLE`:** Mimari şartnamede tanımlanmış tasarım ilkesi ve hedefi.
+> 2. **`IMPLEMENTATION-VERIFIED (PARTIAL)`:** Gate C kapsamında açık kaynak araçlarla ($t=20$) formal olarak ispatlanan bağımsız RTL blokları (`zc_spi_flash_firewall`, `zc_obi_subordinate_bridge`, `zc_aon_post_auth_ctrl`).
+> 3. **`UNVERIFIED AT SOC/SILICON`:** Tüm SoC DMA izolasyonu, crossbar IOMMU, analog makro davranışları ve fiziksel yan kanal güvenceleri strictly **Gate D** kapsamındadır.
+> 4. Hiçbir dijital RTL bloğu (OBI köprüsü, watchdog veya SPI güvenlik duvarı) sistem genelinde bir DMA güvenlik duvarı veya SRAM erişim denetleyicisi olarak beyan edilemez.
 
 ---
 
 ## 1. M1–M10 Değişmezleri Uyumluluk Matrisi (STRICT vs. HYBRID)
 
-Tüm ZC-CORE metodolojisinin DNA'sını oluşturan M1–M10 kuralları, **STRICT** ve **HYBRID** profilleri karşısında bağımsız olarak test edilmiş ve dört kategoriden birine atanmıştır:
-- **`COMPATIBLE`:** Kural, profil altında hiçbir yoruma veya istisnaya gerek kalmadan %100 doğrudan geçerlidir.
-- **`CONDITIONAL`:** Kural geçerlidir; ancak profilin gereksinimlerini karşılamak için açıkça tanımlanmış donanım kısıtlamalarına ve sınır koşullarına bağlıdır.
-- **`CONFLICT`:** Profil ile kuralın lafzı veya mantığı arasında çözümsüz bir normatif çelişki vardır (Metodoloji veya Major-Version değişikliği gerektirir).
+Tüm ZC-CORE metodolojisinin temelini oluşturan M1–M10 kuralları, **STRICT** ve **HYBRID** profilleri karşısında bağımsız olarak değerlendirilmiş ve dört kategoriden birine atanmıştır:
+- **`COMPATIBLE`:** Kural, profil altında hiçbir istisnaya veya ilave yoruma gerek kalmadan %100 doğrudan geçerlidir.
+- **`CONDITIONAL`:** Kural geçerlidir; ancak açıkça tanımlanmış donanım kısıtlamalarına, sınır koşullarına veya harici güven varsayımlarına bağlıdır.
+- **`CONFLICT`:** Profil ile kuralın lafzı arasında normatif bir çelişki vardır (Metodoloji veya Major-Version değişikliği gerektirir).
 - **`UNRESOLVED`:** Donanım veya formal kanıt eksikliği nedeniyle geçerliliği henüz karara bağlanamamıştır.
 
-| Invariant ID | Normatif Değişmez Tanımı | STRICT Profil Uyumluluğu | HYBRID Profil Uyumluluğu | Normatif Değerlendirme & Koşul Şartı |
-| :--- | :--- | :---: | :---: | :--- |
-| **M1** | **Trusted Sensor Acquisition:** Ham sensör verisi (ses/görüntü) ASLA Güvenli Alanı terk edemez. | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** HYBRID profilde de ham sensör verisi yalnızca NPU/SRAM alanında tutulur; dışarı aktarımı donanım katmanında imkansızdır. |
-| **M2** | **Hardware-Enforced Domain Boundary:** Güvenli Alan ile Ağ/Kontrol Alanı arasındaki ayrım fiziksel olmalıdır (yazılımsal olamaz). | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** STRICT'te optokuplör/hava boşluğu; HYBRID'de ise Gate C'de doğrulanan OBI bridge ve SPI firewall donanım blokları fiziksel sınırı uygular. |
-| **M3** | **One-Way Information Flow:** Korunan veriler kesinlikle tek yönlü akmalıdır. Doğrulanmış güncelleme/kontrol trafiği ters yönde girebilir. | **`COMPATIBLE`** | **`CONDITIONAL`** | **Koşullu Uyum:** M3'ün mevcut metni *"Doğrulanmış kontrol düzlemi ve firmware güncelleme trafiği Güvenli Alana girebilir"* istisnasını tanır. Ancak HYBRID'de giden telemetrinin *"Semantic Result"* sınıfında kalması ve ham veri rekonstrüksiyonuna izin vermemesi şarttır. (Bkz. Bölüm 2 analizi). |
-| **M4** | **Reverse-Read Impossibility:** Ağ alanının Güvenli Alandan ham sensör ters-okuması (read-back) yapması donanımsal olarak imkansız olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** OBI Subordinate Bridge (`zc_obi_subordinate_bridge.sv`) orphan drain ve `ST_TRAP` sentetik hata mekanizması ile ters-okuma yollarını donanımsal olarak bloke eder. |
-| **M5** | **Control-Plane Isolation:** Güven sınırı veri yolunun yanı sıra reset, saat, güç, DMA ve debug hatlarını kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** Property `F-OBI-07` sıcak reset kilitlemesini ispatlamıştır; AON OTP controller sıcak reset altında kilitli kalır (`F-OTP-05`). |
-| **M6** | **Hardware-Rooted Execution Integrity:** Güvenli önyükleme ve güncelleme zinciri AI ağırlıklarını ve donanım envanterini kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** AON OTP SVN (Security Version Number) yazma controller'ı anti-rollback mekanizmasını donanımsal olarak garanti eder (`F-OTP-01a/b`). |
-| **M7** | **Raw-Data Lifetime Enforcement:** Ham verinin ömrü yalnızca yerel çıkarım (inference) döngüsüyle sınırlı olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** HYBRID profilde telemetri üretilse dahi ham veri çıkarım bittiği anda M8'e devredilir. |
-| **M8** | **Post-Inference Destruction/Zeroization:** Çıkarım biter bitmez tüm ham veri ve türetilmiş tensör kopyaları kalıcı olarak sıfırlanmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** Bellek sıfırlama (cryptographic zeroization / power-cut) her iki profilde de zorunludur. |
-| **M9** | **Complete Sensor Inventory:** Cihazdaki tüm gizlilik-hassas sensörler istisnasız aynı güvenli alana bağlı olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** | **Tam Uyumlu:** İkincil ağ mikrofonu yasağı her iki profilde de tavizsiz geçerlidir. |
-| **M10** | **Independent Conformance Evidence:** Uyumluluk iddiaları üretici beyanına değil, bağımsız ve ölçülebilir kanıtlara dayanmalıdır. | **`COMPATIBLE`** | **`CONDITIONAL`** | **Koşullu Uyum:** Gate C dijital formal kanıtları tamamlanmıştır (`PARTIAL / QUALIFIED`). Ancak HYBRID profilin fiziksel yan kanal ve covert channel güvencesi laboratuvar testine tabidir (**Gate D**). |
+### Konsolide Normatif Uyumluluk ve Kapsam Ayrıştırma Tablosu
+
+| Invariant ID | Normatif Değişmez Tanımı | STRICT Profil | HYBRID Profil (Tasarım Hedefi) | Uygulanmış RTL & Formal Kapsam (Gate C: PARTIAL) | Eksik Sistem & Fiziksel Kapsam (Gate D: UNVERIFIED) |
+| :--- | :--- | :---: | :---: | :--- | :--- |
+| **M1** | **Trusted Sensor Acquisition:** Ham sensör verisi (ses/görüntü) ASLA Güvenli Alanı terk edemez. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | M1 bir alan topolojisi kuralıdır; Gate C dijital RTL blokları sensör arayüzü değil, veri yolu ve bellek köprüsüdür. | Fiziksel PCB hat ayrımı, sensör paket tamper koruması, analog iz empedansı. |
+| **M2** | **Hardware-Enforced Domain Boundary:** Güvenli Alan ile Ağ Alanı ayrımı donanımsal olmalıdır (yazılımsal olamaz). | **`COMPATIBLE`** | **`CONDITIONAL`** *(Design-Compatible)* | `zc_obi_subordinate_bridge` (`F-OBI-01..07`) ve `zc_spi_flash_firewall` (`F-SPI-01..04`) ile veri yolu ve SPI katmanında donanımsal geçit kanıtlanmıştır. | Çok master'lı SoC crossbar DMA güvenlik duvarı, bellek yönetim birimi (IOMMU) ve PCB hava boşluğu analizi. |
+| **M3** | **One-Way Information Flow:** Korunan veriler kesinlikle tek yönlü akmalıdır. Doğrulanmış kontrol trafiği ters yönde girebilir. | **`COMPATIBLE`** | **`CONDITIONAL`** *(Normatif Karara Bağlı)* | OBI bridge öksüz işlem emilimi (`F-OBI-04/05/06`) ile ters yönde kilitlenme engellenmiş; SPI firewall (`F-SPI-01/02`) ile ters yazma kısıtlanmıştır. | Giden Class 3 telemetri için CTS Annex B karşılıklı bilgi üst sınırı ($I(X;Y) < \text{MI}_{\text{upper\_bound}}$) ve telsiz/EM yan kanal testleri. *(Bkz. Bölüm 2)*. |
+| **M4** | **Reverse-Read Impossibility:** Ağ alanının Güvenli Alandan ham sensör ters-okuması (read-back) yapması donanımsal olarak imkansız olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | `zc_obi_subordinate_bridge.sv` köprüsü, hedef çevre birimi arızasında veya kilitlenmesinde `ST_TRAP` sentetik hata verisi (`32'h0000_0000`) döndürerek okuma sızıntısını engeller (`F-OBI-04/05`). | Güvenli SRAM ve NPU kayıtlarının kötü niyetli bir SoC DMA master'ı tarafından doğrudan okunmasını engelleyen sistem düzeyinde crossbar koruması (`BLOCKED`). |
+| **M5** | **Control-Plane Isolation:** Güven sınırı veri yolunun yanı sıra reset, saat, güç, DMA ve debug hatlarını kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | OBI bridge sıcak reset (`rst_sys_ni`) altında host isteklerini sıfıra kilitler (`F-OBI-07`). AON OTP controller sıcak reset sırasında yetkilendirme kilidini korur (`F-OTP-05`). | Fiziksel saat/voltaj glitch enjeksiyonu laboratuvar testleri; asenkron reset kaldırılma/toparlanma (recovery/removal) Static Timing Analysis (STA). |
+| **M6** | **Hardware-Rooted Execution Integrity:** Güvenli önyükleme ve güncelleme zinciri AI ağırlıklarını ve donanım envanterini kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | `zc_aon_post_auth_ctrl.sv` 4-fazlı DAI el sıkışması (`F-OTP-02/03`), tek çevrimlik yetki tüketimi (`F-OTP-06`) ve SVN anti-rollback monotonluğunu (`F-OTP-01a/b`) donanımsal olarak garanti eder. | Harici Boot ROM kriptografik imza doğrulayıcısının doğruluğu (`rom_img_verif_valid_i` harici güven varsayımıdır); analog antifuse programlama şarj pompası ($V_{\text{PP}} > 1.8\,\text{V}$). |
+| **M7** | **Raw-Data Lifetime Enforcement:** Ham verinin ömrü yalnızca yerel çıkarım (inference) döngüsüyle sınırlı olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | **`BLOCKED`**: Çift izli formel noninterference miter (`fv/zc_m7_m8_ni_sva.sv`), tam SoC ve NPU netlist'i bulunmadığı için Gate C'de yürütülememiştir. | Yaşam döngüsü donanım sayacı, çıkarım sonu donanımsal kesme tetikleyicisi ve SoC seviyesinde doğrulama. |
+| **M8** | **Post-Inference Destruction/Zeroization:** Çıkarım biter bitmez tüm ham veri ve türetilmiş tensör kopyaları kalıcı olarak sıfırlanmalıdır. | **`COMPATIBLE`** | **`CONDITIONAL`** *(Fiziksel Kalıcılık Sınırı)* | **`BLOCKED`**: Dijital RTL düzeyinde SRAM sıfırlama mantığı tam SoC entegrasyonu beklemektedir. | Kriyojenik ve enerji kesintisi sonrası fiziksel hücre kalıcılık oranı ($R_{\text{rate}} \le 0.01\%$) testleri strictly Gate D laboratuvarına bırakılmıştır. |
+| **M9** | **Complete Sensor Inventory:** Cihazdaki tüm gizlilik-hassas sensörler istisnasız aynı güvenli alana bağlı olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | M9 bir sistem mimarisi kuralıdır; ağ alanında ikincil mikrofon veya kamera bulunması doğrudan uygunsuzluktur. | Fiziksel kart (PCB) X-ray taraması, BOM bileşen denetimi ve optik mikroskopi. |
+| **M10** | **Independent Conformance Evidence:** Uyumluluk iddiaları üretici beyanına değil, bağımsız ve ölçülebilir kanıtlara dayanmalıdır. | **`COMPATIBLE`** | **`CONDITIONAL`** *(HAR-05: Tüm Metin ve Tablolarda Tutarlı)* | Gate C kapsamındaki 3 dijital RTL bloğu açık kaynak formal araçlarla ($t=20$) ispatlanmıştır (`PARTIAL / QUALIFIED`). | HYBRID profilin fiziksel yan kanal, covert channel, glitch ve çip üzeri izolasyon güvenceleri Gate D akredite laboratuvar testlerine tabidir. |
 
 ---
 
-## 2. M3 ve Hibrit Bilgi Akışı Analizi: Major-Version Kararı
+## 2. M3 ve Hibrit Bilgi Akışı Analizi: Major-Version Yönetişimi (HAR-01)
 
-### Analiz:
-M3 değişmezi lafzı itibarıyla şunu söyler:
+### 2.1 Normatif Uyuşmazlık (Normative Friction)
+M3 değişmezi lafzı itibarıyla şunu şart koşar:
 > *"Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain through a physically verifiable unidirectional channel. Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain, provided it cannot create a raw-sensor read-back path or a reverse raw-sensor information channel."*
 
-- **STRICT Profil:** M3'ün orijinal tek yönlü donanım diyotu kuralıyla `%100 birebir` örtüşür.
-- **HYBRID Profil:** Giden telemetri (sistem sağlığı, hata kodları, kümülatif durum) bir "Raw-Sensor Information" DEĞİLDİR; M3'ün izin verdiği bir "Semantic Command / State" türevidir.
-- **Metodolojik Karar:** M1–M10 değişmezlerini değiştirmeye veya major-version kırmaya **gerek yoktur**.  
-  Bunun yerine: **`zc-core-security-profiles.md`** belgesinde, M3'ün HYBRID profil altındaki yorumu *"Giden telemetri kesinlikle M3 sınırları dahilindedir; çünkü yalnızca doğrulanmış semantik sınıf 3 verileri içerir ve ham sensör verisi taşınamaz"* şeklinde normatif olarak bağlanmalıdır.
+- **STRICT Profil:** M3'ün orijinal tek yönlü fiziksel donanım diyotu (optokuplör / hava boşluğu) şartıyla **%100 koşulsuz uyumludur**.
+- **HYBRID Profil:** Giden yönde Class 3 telemetri (cihaz sağlık durumu, hata kodları, kümülatif çalışma saati) dışarı aktarılır. Class 3 telemetri ham sensör verisi (Class 0) veya türetilmiş tensör (Class 1) içermemekle birlikte, aktarımın yapıldığı fiziksel arayüz (ör. OBI, Ethernet, Wi-Fi) çift yönlü bir veri yoludur.
+
+### 2.2 Major-Version Yönetişim Seçenekleri (Tek Taraflı Beyan Yasağı)
+Bağımsız denetçinin **HAR-01** direktifi gereğince, major-version gerekip gerekmediği yönünde tek taraflı bir hüküm verilmemiş; konu aşağıdaki iki meşru seçenek olarak bağımsız standartlar komitesinin onayına sunulmuştur:
+
+1. **Seçenek 1 (v3.x İçin Normatif Profil Eki — Normative Profile Annex):**  
+   M3 kuralının odağının *"korunan ham sensör verisi ve türetilmiş gösterimler"* olduğu kabul edilir. Class 3 telemetri matematiksel olarak ham veriye geri döndürülemez (non-reconstructible) olduğundan ve donanımsal hız sınırlamasına tabi tutulduğundan, HYBRID profil mevcut ZC-CORE v3.3.x mimarisine bir **Normatif Profil Eki** olarak eklenebilir. M1–M10 çekirdek metninde geriye dönük uyumsuz bir değişiklik yapılmaz.
+2. **Seçenek 2 (v4.0.0 İçin Major-Version RFC — Breaking Architectural Evolution):**  
+   Bağımsız denetçi veya standartlar konsorsiyumu, M3 metnindeki *"physically verifiable unidirectional channel"* ifadesinin telemetri dahil istisnasız *her türlü* bit akışını kapsadığını ve çift yönlü bir donanım ara bağlantısının bu ilkeyi lafzen bozduğunu değerlendirirse; HYBRID profil v3.x serisine dahil edilmeyecek, **ZC-CORE v4.0.0 RFC** olarak bağımsız bir ana sürüm paketi şeklinde sunulacaktır.
+3. **Yönetişim Hükmü:** Bu iki seçenek arasındaki nihai karar verilene kadar, M10 matrisinde ve tüm dokümanlarda HYBRID profil altındaki M3 statüsü kesinlikle **`CONDITIONAL`** olarak korunacaktır.
 
 ---
 
-## 3. Donanım İzolasyon Sınırları: Gate C İspatları vs. Sistem Gerçekliği
+## 3. Donanım İzolasyon Sınırları: Gate C İspatları vs. Sistem Gerçekliği (HAR-02 & HAR-04)
 
-Bağımsız denetçinin haklı uyarısı: *"RTL bloklarının doğrudan ağ işlemcisi izolasyonunu sağladığını iddia etmeyin."*
+RTL bloklarının yeteneklerinin sistem düzeyinde genel bir DMA güvenlik duvarı veya bellek denetleyicisi gibi yansıtılmasını engellemek için, aşağıdaki teknik sınırlar açıkça kayıt altına alınmıştır:
 
-| İncelenen Blok | Gate C'de İspatlanan Gerçek Sınır | Henüz İspatlanmamış / Sistem Seviyesi Risk (Gate D) |
-| :--- | :--- | :--- |
-| **`zc_spi_flash_firewall`** | RDSR1 status reconciliation (`SR1[1:0]==00`), frame completion on rising /CS with SCK=0, secondary fault gating (`fault_high_sec_i`). | Harici SPI Flash çipinin analog gecikmesi, bus contention (aynı anda iki master'ın sürmesi), PCB iz empedansı. |
-| **`zc_obi_subordinate_bridge`** | Tek çevrimlik yanıt teslimi, öksüz işlem emilimi (orphan drain), 1.024 çevrim watchdog timeout, ST_TRAP sentetik hata üretimi. | Çok master'lı SoC crossbar (Ibex + DMA + Ağ işlemcisi) arasındaki öncelik tahkisi ve PMP yetkilendirmesi (`BLOCKED`). |
-| **`zc_aon_post_auth_ctrl`** | 4-fazlı DAI handshake, tek çevrimlik grant tüketimi, kalıcı fatal kilitlenme, Hsiao parity eşleşmesi. | Fiziksel antifuse programlama şarj pompası ($V_{\text{PP}} > 1.8\,\text{V}$), analog pulse süresi, dökümhane makro hücresi (`UNVERIFIED`). |
+| İncelenen RTL Blok | Gate C'de İspatlanan Gerçek Sınırlar (Formal Proof Scope) | Harici Güven Varsayımları (Trust Assumptions) | İspatlanmamış Sistem & Fiziksel Riskler (Gate D Deliverables) |
+| :--- | :--- | :--- | :--- |
+| **`zc_spi_flash_firewall`** | - RDSR1 durum mutabakatı (`SR1[1:0] == 00`).<br>- SCK=0 iken yükselen /CS ile çerçeve tamamlama (`F-SPI-02`).<br>- İkincil hata durumunda donanımsal /CS deselect (`cs_n_flash_eff_o`).<br>- Bank B commit yetkilendirme kapısı (`bank_b_commit_ready_o`). | **HAR-04:** Kriptografik imza doğrulaması RTL içinde DEĞİLDİR. `rom_img_verif_valid_i` sinyalinin güvenilir bir Boot ROM motorundan geldiği harici bir güven varsayımıdır.<br>`bank_b_commit_ready_o = spi_idle_ready_o && rom_img_verif_valid_i`. | - Harici SPI Flash yongasının analog gecikmeleri.<br>- Eşzamanlı master çakışmaları (bus contention).<br>- PCB iletim hattı empedans bozulmaları ve glitch enjeksiyonu. |
+| **`zc_obi_subordinate_bridge`** | - Tek çevrimlik istek teslimi (`F-OBI-01`).<br>- Öksüz yanıt emilimi (orphan drain) (`F-OBI-06`).<br>- 1.024 çevrimlik donanımsal watchdog timeout (`F-OBI-04/05`).<br>- `ST_TRAP` sentetik hata verisi üretimi.<br>- Sıcak reset (`rst_sys_ni`) altında istek blokajı (`F-OBI-07`). | Gelen OBI ana isteklerinin geçerli bir CPU/DMA master'ından üretildiği varsayılır. | **HAR-02:** Bu blok bir SoC DMA güvenlik duvarı veya MPU DEĞİLDİR. Çok master'lı crossbar (Ibex + DMA + Ağ) üzerindeki adres erişim yetkilendirmesi sistem düzeyinde açık bir risktir (`BLOCKED`). |
+| **`zc_aon_post_auth_ctrl`** | - 4-fazlı DAI el sıkışma protokolü (`F-OTP-02/03`).<br>- Tek çevrimlik yetki tüketimi (`F-OTP-06`).<br>- Sıcak resette silinmeyen kalıcı fatal kilitlenme (`F-OTP-05`).<br>- Hsiao (22,16) kod sözcüğü parite denetimi (`F-OTP-04`).<br>- SVN anti-rollback monotonluğu (`F-OTP-01a/b`). | DAI arayüzünün fiziksel OTP analog makrosuna doğrudan bağlı olduğu ve harici hata sinyallerinin (`volt_supervisor_fault_i`, `tamper_alert_i`) doğru çalıştığı varsayılır. | - Fiziksel antifuse programlama şarj pompası ($V_{\text{PP}} > 1.8\,\text{V}$) analog darbe süresi.<br>- Dökümhane (foundry) OTP makro hücresi güvenilirliği ve veri saklama (retention) fiziği. |
 
 ---
 
 ## 4. Dosya Bazlı Mevcut Belge Güncelleme Planı (Remediation Plan)
 
-Bağımsız inceleme onayından sonra, mevcut 8 temel belge aşağıdaki plan doğrultusunda tek bir atomik commit ile güncellenecektir:
+Bağımsız denetçinin nihai onayından sonra, mevcut 8 temel normatif belge aşağıdaki plan doğrultusunda tek bir atomik commit ile güncellenecektir:
 
 ### 1. `README.md`
 - **Mevcut Durum:** Yalnızca tek yönlü donanım diyotlarını ve hava boşluğunu anlatıyor.
@@ -74,21 +95,21 @@ Bağımsız inceleme onayından sonra, mevcut 8 temel belge aşağıdaki plan do
 
 ### 3. `zero-cloud-core-scope-boundary.md`
 - **Mevcut Durum:** Bölüm 1.20'de genel telemetri izni var, detay yok.
-- **Değişiklik:** "İzin Verilen Hibrit Telemetri ve Bilgi Akışı Politikası" bölümü eklenecek. 5 veri sınıfı (Class 0..4) tanımlanacak; hız sınırlama ve sabit format kuralları yazılacak.
+- **Değişiklik:** "İzin Verilen Hibrit Telemetri ve Bilgi Akışı Politikası" bölümü eklenecek. 5 veri sınıfı (Class 0..4) tanımlanacak; hız sınırlama, epoch tabanlı gönderim ve sabit ikili format kuralları yazılacak.
 - **Normatif Etki:** Normatif Kapsam Sınırı.
 
 ### 4. `zero-cloud-core-attack-taxonomy.md`
 - **Mevcut Durum:** AT-001..AT-010 tanımlı; hibrit tehditler eksik.
 - **Değişiklik:** İki yeni saldırı sınıfı eklenecek:
-  - `AT-011: Telemetry Steganographic Covert Channel (Yan kanal modülasyonu)`
-  - `AT-012: Inbound Update Flash Desynchronization / Denial of Service`
+  - `AT-011: Telemetry Steganographic Covert Channel (Yan kanal modülasyonu ve bilgi sızdırma)`
+  - `AT-012: Inbound Update Flash Desynchronization / Denial of Service (SPI çerçeve bozma)`
 - **Normatif Etki:** Tehdit Modeli Genişletmesi.
 
 ### 5. `zero-cloud-core-conformance-test-specification.md`
 - **Mevcut Durum:** C1/C2/C3 laboratuvar seviyeleri var; STRICT/HYBRID profil testleri yok.
 - **Değişiklik:** İki yeni test prosedürü taslağı eklenecek:
-  - `FC-ZC-017: STRICT Profile Conformance Test (Zero Outbound Leakage)`
-  - `FC-ZC-018: HYBRID Profile Telemetry & Firewall Test (OBI/SPI Boundary Check)`
+  - `FC-ZC-017: STRICT Profile Conformance Test (Zero Outbound Leakage via Anechoic RF Audit)`
+  - `FC-ZC-018: HYBRID Profile Telemetry & Firewall Test (OBI/SPI Boundary Check & Mutual Information Bound)`
 - **Normatif Etki:** Test Şartnamesi Eklemesi (Gate D'de koşulacak).
 
 ### 6. `zero-cloud-core-implementation-coverage.md`
@@ -105,7 +126,7 @@ Bağımsız inceleme onayından sonra, mevcut 8 temel belge aşağıdaki plan do
 - **Mevcut Durum:** Claim Families ZC-CORE-001..007 (Eski tek yönlü iddialar).
 - **Değişiklik:** Yeni Claim Ailesi eklenecek:
   - **`ZC-CORE-008: Hardware-Enforced Bus Isolation & Secure Inbound Update Firewall`**  
-    (3-katmanlı SPI Flash Firewall, OBI Subordinate Bridge ile öksüz işlem emilimi ve AON OTP 4-fazlı DAI handshake buluşları claim-style metin olarak yazılacak).
+    (3-katmanlı SPI Flash Firewall, OBI Subordinate Bridge ile öksüz işlem emilimi ve AON OTP 4-fazlı DAI handshake buluşları claim-style patent savunma diliyle yazılacak).
 - **Çakışma Kontrolü:** ZC-CORE-001'den 007'ye kadar olan mevcut numaralandırma taranmış, `ZC-CORE-008` numarasının boşta ve çakışmasız olduğu doğrulanmıştır.
 - **Normatif Etki:** Fikri Mülkiyet (Prior-Art) Savunma Genişlemesi.
 
@@ -113,6 +134,7 @@ Bağımsız inceleme onayından sonra, mevcut 8 temel belge aşağıdaki plan do
 
 ## 5. Değişiklik Disiplini ve Yönetişim Kontrolü
 
-1. Bu plandaki hiçbir değişiklik mevcut `zero-cloud-*.md` dosyalarına henüz uygulanmamıştır.
-2. Tüm mimari şartnameler `docs/architecture/` altında taslak (`PROPOSED / NOT RELEASED / NOT SOC-VERIFIED`) olarak hazırlanmıştır.
-3. Bağımsız denetçinin incelemesi ve onayı alındıktan sonra, yukarıdaki 8 dosya planlanan değişikliklerle senkronize edilecektir.
+1. Bu plandaki hiçbir değişiklik mevcut 14 temel normatif belgeye (`zero-cloud-*.md`, `README.md`, `ZERO-CLOUD-RELEASE-MANIFEST.md`) henüz uygulanmamıştır.
+2. Tüm mimari şartnameler `docs/architecture/` altında taslak (`PROPOSED / NOT RELEASED / NOT SOC-VERIFIED`) olarak tutulmaktadır.
+3. Çalışma strictly `gate-c/formal-scope-audit` dalında yürütülmektedir; ana dal (`main`) korunmaktadır.
+4. Bağımsız denetçinin bu düzeltmeler üzerindeki resmi onayı alınmadan ana normatif dokümanlarda hiçbir satır değiştirilmeyecektir.
