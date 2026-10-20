@@ -3,7 +3,7 @@
 
 **Status:** `PROPOSED / NOT RELEASED / NOT SOC-VERIFIED`  
 **Document ID:** ZC-CORE-SPEC-SECURITY-PROFILES-DRAFT  
-**Revision:** 0.9.2-draft (Post-Audit Remediation HAR-06 / HAR-07 / HAR-08)  
+**Revision:** 0.9.3-draft (Post-Audit Remediation HAR-06..HAR-10)  
 **Target Milestone:** Post-Gate C Governance / Gate D Preparation  
 **Reference Technical Baseline:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
 **Classification:** Architectural Security Specification (Draft)  
@@ -81,7 +81,7 @@ To maintain absolute technical precision, the specific controls governing outbou
 | **Deterministic Payload Encoder** | **`PROPOSED / NOT IMPLEMENTED`** | Static binary packetizer enforcing compile-time struct alignment, fixed field lengths, and zero-padding. | Gate D SoC Integration |
 | **Hardware Rate Limiter** | **`PROPOSED / NOT IMPLEMENTED`** | Hardware epoch timer enforcing discrete transmission windows (e.g., $\le 1$ packet / 60 s). | Gate D SoC Integration |
 | **Data-Origin Domain Isolation** | **`UNVERIFIED AT SOC LEVEL`** | System crossbar PMP / IOMMU blocking DMA masters from bridging Secure SRAM to Network FIFO. | Gate D SoC Integration |
-| **Covert-Channel Mutual Information Bound** | **`THEORETICAL TARGET / UNVERIFIED`** | Bound $I(\text{Class 3}; \text{Class 0}) < \text{MI}_{\text{upper\_bound}}$ verified under CTS Annex B RF/EM side-channel testing. | Gate D Lab Audit |
+| **Covert-Channel Mutual Information Bound** | **`THEORETICAL TARGET / UNVERIFIED`** | Bound $I(\text{Class 3}; \text{Class 0}) < \epsilon$ verified under CTS Annex B RF/EM side-channel testing. | Gate D Lab Audit |
 
 ---
 
@@ -102,31 +102,91 @@ The table below specifies the multidimensional information flow policy governing
 
 ---
 
-## 4. Normative Evaluation of Invariant M3 & Major-Version Decision Matrix (HAR-08)
+## 4. Invariant Analysis, M1/M3 Normative Friction & Governance (HAR-09 & HAR-10)
 
-### 4.1 The Normative Friction
-Invariant M3 states:
-> *"Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain through a physically verifiable unidirectional channel. Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain, provided it cannot create a raw-sensor read-back path or a reverse raw-sensor information channel."*
+### 4.1 Verbatim Comparison of Legacy Normative Invariants (HAR-09 Resolution)
+To identify the exact root cause of the normative friction, the foundational provisions of [`zero-cloud-core-methodology-invariants.md`](../../zero-cloud-core-methodology-invariants.md) are compared verbatim:
 
-- Under the **STRICT Profile**, M3 is satisfied unconditionally without normative friction.
-- Under the **HYBRID Profile**, outbound Class 3 telemetry is released across a physically bidirectional bus (OBI, Ethernet, Wi-Fi).
+1. **M1 (Trusted Sensor Acquisition):**
+   > *"Raw sensor data (audio/video) SHALL NEVER leave the Trusted Domain."*
+2. **M3 (One-Way Information Flow):**
+   > *"Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain through a physically verifiable unidirectional channel. Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain, provided it cannot create a raw-sensor read-back path or a reverse raw-sensor information channel."*
+3. **M4 (Reverse-Read Impossibility):**
+   > *"It MUST be physically or logically impossible for the Network/Control Domain to execute a functional reverse read (raw sensor read-back) from the Trusted Domain over a physical reverse channel. This is distinct from derived-data inference, reconstruction attacks, or side-channel leakage, which are mitigated by M1, M3, and M5."*
+4. **M8 (Post-Inference Destruction/Invalidation):**
+   > *"Once inference completes, all persistent and temporary copies of raw data SHALL become irreversibly unrecoverable (e.g., physically destroyed or cryptographically zeroized across all caching layers)."*
+5. **Composition Rule:**
+   > *"Sensor Acquisition → Trusted Local Inference → Controlled Semantic Release → Absolute Raw-Data Destruction → Network/Actuator Operation."*
 
-> [!IMPORTANT]
-> **Mathematical Non-Reconstructibility Status (HAR-08 Resolution):**  
-> The assumption that Class 3 telemetry cannot be inverted to reconstruct raw sensory data (Class 0) is currently an **UNPROVEN DESIGN HYPOTHESIS**. While discrete telemetry schemas are structurally independent of raw audio/video samples, formal mathematical proof that the mutual information $I(\text{Class 3}; \text{Class 0}) = 0$ has not been demonstrated. It SHALL NOT be asserted as a proven mathematical fact until evaluated under the CTS Annex B protocol in Gate D.
+### 4.2 The Normative Paradox / Drafting Friction
+A rigorous textual analysis exposes an inherent contradiction in the legacy v3.x formulation:
+- **The Paradox:** While **M1** categorically forbids raw sensory data from ever leaving the Trusted Domain (*"SHALL NEVER leave"*), and **M8** requires its absolute post-inference destruction, **M3** literally commands that *"Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain..."*.
+- **The Composition Intent:** In contrast, the **Composition Rule** clarifies the genuine architectural sequence: what is released outward is strictly **"Controlled Semantic Release"** (actuation states, sanitized results), while raw data undergoes **"Absolute Raw-Data Destruction"**.
+- **Audit Conclusion:** Legacy M3 suffered from conflated drafting, mistakenly stating that raw-sensor information flows outward, when the methodology's true intent was to permit outward flow *only* for sanitized semantic outputs. Neither STRICT nor HYBRID profiles can resolve this legacy friction by mere interpretation. It requires a formal, clean normative restatement.
 
-### 4.2 Major-Version Governance Decision Matrix
-Without unilaterally deciding the standard's evolution, the two viable options are presented below for independent standards consensus:
+### 4.3 Proposed Remediated M3 Contract (Candidate v4.0.0 RFC Formulation)
+To resolve HAR-09 cleanly without modifying the immutable v3.x baseline file, the following revised invariant contract is formulated for the v4.0.0 RFC:
+
+> #### Proposed Invariant Specification: `M3-RFC-REVISED`
+> 1. **Non-Egress of Protected Sensory Representations:**  
+>    Raw sensory data (Class 0) and unquantized intermediate representations, spectrograms, or neural embeddings (Class 1) SHALL NEVER cross the hardware Trust Boundary, strictly enforcing Invariants M1 and M8.
+> 2. **Unidirectional Outbound Semantic Release:**  
+>    Only discrete physical actuation commands (Class 2) and allowlisted, entropy-bounded semantic telemetry (Class 3) MAY flow outward from the Trusted Domain across a hardware-enforced isolation boundary.
+> 3. **Hardware-Gated Inbound Path:**  
+>    Authenticated inbound control-plane and firmware-update traffic MAY enter the Trusted Domain, provided it is mediated by hardware-level authorization gates (such as SPI Flash dual /CS firewalls and Boot ROM signature strobes) and cannot create a raw-sensor read-back path (M4) or execution hijack.
+> 4. **Physical Enforcement Stratification:**  
+>    - Under **`ZC-PROFILE-STRICT`**, semantic egress is physically unidirectional (hardware data diode / air-gap).
+>    - Under **`ZC-PROFILE-HYBRID`**, bidirectional physical bus links (e.g., OBI / SPI) are permitted ONLY when mediated by formally verified hardware bus firewalls with deterministic error trapping, bus orphan draining, and independent hardware rate limiting.
+
+---
+
+### 4.4 Decoupled Project Milestones (HAR-10 Resolution)
+To resolve **HAR-10 / P1**, the development, governance, and publication tracks are formally decoupled into four distinct, independent milestones:
+
+```
++---------------------------------------------------------------------------------------------------------+
+|                                    DECOUPLED PROJECT MILESTONES                                         |
++---------------------------------------------------------------------------------------------------------+
+|                                                                                                         |
+|   [ MILESTONE 1: GOVERNANCE & RFC ]                                                                     |
+|     - Architecture Specification, Threat Taxonomy (AT-011/012), M3-RFC-REVISED Draft                    |
+|     - Governance Consensus on Versioning Track (Option A vs. Option B)                                  |
+|     - Status: COMPLETE IN DRAFT DOCUMENTATION                                                           |
+|                                                                                                         |
+|   [ MILESTONE 2: DEFENSIVE PUBLICATION & PRIOR ART (Zenodo DOI) ]                                       |
+|     - Technical Report & Patent Claim Family Disclosure (ZC-CORE-008)                                   |
+|     - Prior-Art Date Stamp establishing global novelty and non-obviousness                              |
+|     - Pre-condition: Clear technical description and reproducible RTL (Gate C baseline eb3ed5a)        |
+|     - Boundary: Does NOT require physical silicon tape-out! Design targets disclosed as specifications. |
+|                                                                                                         |
+|   [ MILESTONE 3: DIGITAL RTL & FULL-SOC VERIFICATION ]                                                  |
+|     - Digital Formal Proofs: Gate C baseline eb3ed5a (F-SPI-01..04, F-OBI-01..07, F-OTP-01..06)        |
+|     - Digital Simulation: tb_zc_obi.sv 1,024-cycle watchdog timeout (SIMULATED)                        |
+|     - FPGA Synthesis & Multi-Master SoC Crossbar Integration (dual Ibex + NPU + DMA)                    |
+|                                                                                                         |
+|   [ MILESTONE 4: PHYSICAL SILICON COMPLIANCE & COMMERCIAL RELEASE (Gate D) ]                            |
+|     - ASIC Foundry Tape-out & Antifuse Analog Macro Characterization (Vpp > 1.8V)                       |
+|     - Physical Tamper & Laser Remanence Verification (R_rate <= 0.01%)                                  |
+|     - ISO 17025 Anechoic Chamber RF/EM Mutual Information Leakage Testing                               |
+|     - Commercial Product Release Sign-Off (DO NOT MERGE lifted)                                         |
+|                                                                                                         |
++---------------------------------------------------------------------------------------------------------+
+```
+
+---
+
+### 4.5 Major-Version Governance Decision Matrix
+Comparing the two governance alternatives across the decoupled milestones:
 
 | Evaluation Dimension | Option A: v3.x Normative Profile Annex | Option B: v4.0.0 Breaking Architecture RFC |
 | :--- | :--- | :--- |
-| **Normative M3 Interpretation** | M3 is interpreted as governing *protected raw-sensor data and derived embeddings* (Classes 0 & 1). Allowlisted Class 3 telemetry is treated as an authorized operational semantic exception. | Literal interpretation of M3: The phrase *"physically verifiable unidirectional channel"* prohibits any bidirectional transmission medium, regardless of data classification. |
-| **Mathematical Non-Reconstructibility** | Assumes the unproven hypothesis holds under strict schema clamping. | Replaces the assumption with a formal architectural contract explicitly defining bidirectional semantic boundaries. |
-| **Legacy STRICT Conformance** | Legacy v3.0–v3.3 devices remain 100% compliant as conforming to `ZC-PROFILE-STRICT`. | Forces architectural bifurcation: v3.x branch (STRICT only) vs v4.x branch (HYBRID + STRICT). |
-| **CTS (Conformance Test Suite) Impact** | CTS remains backwards-compatible; HYBRID compliance is tested via an optional addendum (CTS Annex B). | CTS must be restructured into modular profile suites (`CTS-Core`, `CTS-Strict`, `CTS-Hybrid`). |
-| **IP & Defensive Publication Scope** | Maintains existing ZC-CORE-001..007 patent defense claims; appends ZC-CORE-008 as a v3.x family extension. | Establishes a distinct v4.0.0 prior-art defense baseline with dedicated multi-master bus firewall claims. |
-| **Release & Governance Timeline** | Enables earlier publication under v3.4.0, but carries risk of normative dispute over literal unidirectional semantics. | Deferred until Gate D SoC tape-out and laboratory mutual information validation; maximum normative clarity. |
-| **Governance Status** | **`DECISION PENDING INDEPENDENT STANDARDS REVIEW`** | **`DECISION PENDING INDEPENDENT STANDARDS REVIEW`** |
+| **Normative M3 Alignment** | Attempts to reconcile the legacy M1/M3 drafting friction by treating Class 3 telemetry as an authorized exception under v3.x. | Directly adopts `M3-RFC-REVISED`, completely resolving the M1/M3 paradox without textual gymnastics. |
+| **Defensive Publication (Milestone 2)**| Published as an addendum to v3.3.x; carries risk that patent examiners interpret bidirectional bus as conflicting with v3.0 prior art. | **Clear Prior-Art Baseline:** Published as a major-version architectural leap (`v4.0.0 RFC`), securing clean priority for `ZC-CORE-008`. |
+| **Silicon Tape-out Dependency** | Decoupled; can be published prior to tape-out with explicit design target caveats. | Decoupled; RFC and defensive publication proceed immediately; commercial release awaits Milestone 4. |
+| **Legacy STRICT Compatibility** | Retains all v3.0–v3.3 devices under the same specification umbrella. | Preserves v3.3.0-rc2 as the pure immutable STRICT benchmark; forks v4.0.0 for hybrid systems. |
+| **CTS Conformance Testing** | Requires patching CTS v3 with an optional Annex B. | Introduces clean, modular test suites (`CTS-Core`, `CTS-Strict`, `CTS-Hybrid`). |
+| **Strategic Recommendation** | Feasible, but carries lingering normative ambiguity regarding the literal word *"unidirectional"*. | **RECOMMENDED (Auditor & Strategic Consensus):** Cleanest intellectual property and normative separation. |
+| **Governance Decision** | **`DECISION PENDING INDEPENDENT STANDARDS REVIEW`** | **`DECISION PENDING INDEPENDENT STANDARDS REVIEW`** |
 
 ---
 
@@ -136,10 +196,11 @@ The following guardrails represent architectural requirements for Gate D SoC int
 
 1. **Fixed Binary Schema (No Arbitrary Payloads):**  
    Telemetry payloads SHALL use static, compile-time verified binary structures. Variable-length strings, raw hex dumps, or unconstrained error logs are strictly prohibited.
-2. **Entropy Clamping & Mutual Information Bound:**  
-   Outbound telemetry SHALL conform to the operational statistical leakage bound:
-   $$I(X; Y) < \text{MI}_{\text{upper\_bound}}$$
-   evaluated under the CTS Annex B protocol.
+2. **Mutual Information Statistical Leakage Bound:**  
+   Outbound telemetry under the HYBRID profile SHALL satisfy the formal statistical non-leakage constraint:
+   $$\max_{\mathcal{A} \in \mathcal{M}_{\text{threat}}} I(S_{\text{raw}}; T_{\text{out}} \mid \mathcal{O}_{\text{side-channel}}) \le \epsilon_{\text{acceptable}}$$
+   where $S_{\text{raw}}$ is the raw sensor data distribution, $T_{\text{out}}$ is the outbound telemetry stream, $\mathcal{O}_{\text{side-channel}}$ represents observable physical emissions, $\mathcal{M}_{\text{threat}}$ is the defined non-invasive physical threat model, and $\epsilon_{\text{acceptable}}$ is the certified upper bound evaluated under the CTS Annex B protocol.  
+   *(This constraint is an unproven design target pending Gate D accredited laboratory evaluation).*
 3. **Epoch-Quantised Rate Limiting:**  
    Telemetry packets SHALL be dispatched on deterministic, clock-quantised epoch boundaries (e.g., exactly once per 60 seconds). Event-driven telemetry timing that varies synchronously with sensor activity is prohibited.
 4. **Physical Bus Decoupling (Implemented in Gate C):**  

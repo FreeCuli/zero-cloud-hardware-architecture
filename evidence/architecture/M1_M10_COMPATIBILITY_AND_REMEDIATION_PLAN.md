@@ -3,7 +3,7 @@
 
 **Belge Kimliği:** ZC-CORE-EVIDENCE-M1-M10-COMPAT-PLAN-01  
 **Tarih:** 20 Ekim 2026  
-**Revizyon:** 1.2.0 (Bağımsız Denetçi HAR-06..08 Bulguları Düzeltmesi)  
+**Revizyon:** 1.3.0 (Bağımsız Denetçi HAR-09..10 Bulguları Düzeltmesi)  
 **Hedef Depo:** `FreeCuli/zero-cloud-hardware-architecture`  
 **Çalışma Dalı:** `gate-c/formal-scope-audit`  
 **Teknik Referans Tabanı:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
@@ -12,7 +12,7 @@
 ---
 
 > [!WARNING]
-> **YÖNETİŞİM VE KAPSAM BİLDİRİMİ (HAR-02, HAR-06, HAR-07 & HAR-08):**  
+> **YÖNETİŞİM VE KAPSAM BİLDİRİMİ (HAR-02, HAR-06..HAR-10):**  
 > Bu belge, ZC-CORE normatif değişmezlerinin (M1–M10) **STRICT** ve **HYBRID** çalışma profilleri karşısındaki uyumluluk durumunu ve depodaki normatif belgelerin güncellenme planını belirler.  
 > Belgelerdeki teknik kapsam şişkinliğini önlemek ve denetçi bulgularını tam olarak kapatmak amacıyla:
 > 1. **`DESIGN-COMPATIBLE`:** Mimari şartnamede tanımlanmış tasarım ilkesi ve hedefi.
@@ -20,7 +20,8 @@
 > 3. **`UNVERIFIED AT SOC/SILICON`:** Tüm SoC DMA izolasyonu, crossbar IOMMU, analog makro davranışları ve fiziksel yan kanal güvenceleri strictly **Gate D** kapsamındadır.
 > 4. **HAR-06 Kanıt Ayrımı:** OBI 1.024 çevrimlik watchdog timeout davranışı `tb_zc_obi.sv` Test 2 ile dijital RTL simülasyonu seviyesinde doğrulanmıştır (`SIMULATED`). `F-OBI-04` ve `F-OBI-05` ise 1024 çevrimin tamamının tek bir temporal ispatı değil, yerel RTL adım endüksiyonu (step-induction) ve kilitlenme bayrağı assertion ispatlarıdır (`PROVEN` at local RTL step level).
 > 5. **HAR-07 Telemetri Donanım Sınırı:** Mevcut Gate C RTL bloklarında telemetri veri sınıflandırıcısı, izin listesi denetleyicisi, paket kodlayıcı veya donanımsal hız sınırlayıcı BULUNMAMAKTADIR. Bu mekanizmalar mevcut RTL'de uygulanmış olmayıp, Gate D SoC entegrasyonu için önerilen sistem gereksinimidir (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`).
-> 6. **HAR-08 Sürümleme Kararı:** M3'ün normatif yorumu konusunda Seçenek A (v3.x Normatif Profil Eki) ve Seçenek B (v4.0.0 RFC) karşılaştırmalı karar matrisi sunulmuş; Class 3 telemetrinin tersine çevrilemezliği kanıtlanmış bir gerçek değil, bir tasarım hipotezi (`UNPROVEN DESIGN HYPOTHESIS`) olarak tanımlanmış ve nihai karar bağımsız standartlar incelemesine bırakılmıştır (`DECISION PENDING`).
+> 6. **HAR-09 Normatif Çelişki:** M1'in ham veriyi kesinlikle yasaklaması ile eski M3 metninin ham verinin dışarı akmasını ifade etmesi arasındaki tarihsel yazım çelişkisi belgelenmiş; çözüm olarak `M3-RFC-REVISED` sözleşmesi sunulmuştur.
+> 7. **HAR-10 Kilometre Taşı Ayrıştırması:** Mimari RFC, Savunma Amaçlı Zenodo Yayını (Prior-Art), FPGA/SoC Doğrulaması ve Silikon Teyp-out (Gate D) birbirinden tamamen bağımsız 4 aşama olarak tanımlanmıştır. Savunma amaçlı yayın için silikon üretimi şart koşulmamıştır.
 
 ---
 
@@ -38,43 +39,88 @@ Tüm ZC-CORE metodolojisinin temelini oluşturan M1–M10 kuralları, **STRICT**
 | :--- | :--- | :---: | :---: | :--- | :--- |
 | **M1** | **Trusted Sensor Acquisition:** Ham sensör verisi (ses/görüntü) ASLA Güvenli Alanı terk edemez. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | M1 bir alan topolojisi kuralıdır; Gate C dijital RTL blokları sensör arayüzü değil, veri yolu ve bellek köprüsüdür. | Fiziksel PCB hat ayrımı, sensör paket tamper koruması, analog iz empedansı. |
 | **M2** | **Hardware-Enforced Domain Boundary:** Güvenli Alan ile Ağ Alanı ayrımı donanımsal olmalıdır (yazılımsal olamaz). | **`COMPATIBLE`** | **`CONDITIONAL`** *(Design-Compatible)* | `zc_obi_subordinate_bridge` (`F-OBI-01..07`) ve `zc_spi_flash_firewall` (`F-SPI-01..04`) ile veri yolu ve SPI katmanında donanımsal geçit kanıtlanmıştır. | Çok master'lı SoC crossbar DMA güvenlik duvarı, bellek yönetim birimi (IOMMU) ve PCB hava boşluğu analizi. |
-| **M3** | **One-Way Information Flow:** Korunan veriler kesinlikle tek yönlü akmalıdır. Doğrulanmış kontrol trafiği ters yönde girebilir. | **`COMPATIBLE`** | **`CONDITIONAL`** *(Normatif Karara Bağlı - HAR-08)* | OBI bridge öksüz işlem emilimi (`F-OBI-06`) ve sentetik hata (`F-OBI-04/05` step) ile ters yönde kilitlenme engellenmiş; SPI firewall (`F-SPI-01/02`) ile yetkisiz yazma kısıtlanmıştır. **UYARI (HAR-07):** OBI bridge telemetri filtreleme, izin listesi veya hız sınırlaması YAPMAZ (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`). | Class 3 telemetri için donanımsal allowlist filtresi ve hız sınırlayıcı IP (Gate D SoC entegrasyonu). CTS Annex B karşılıklı bilgi üst sınırı ($I(X;Y) < \text{MI}_{\text{upper\_bound}}$) laboratuvar testi. *(Bkz. Bölüm 2)*. |
+| **M3** | **One-Way Information Flow:** Korunan veriler kesinlikle tek yönlü akmalıdır. Doğrulanmış kontrol trafiği ters yönde girebilir. | **`COMPATIBLE`** | **`CONDITIONAL`** *(Normatif Karara Bağlı - HAR-08/09)* | OBI bridge öksüz işlem emilimi (`F-OBI-06`) ve sentetik hata (`F-OBI-04/05` step) ile ters yönde kilitlenme engellenmiş; SPI firewall (`F-SPI-01/02`) ile yetkisiz yazma kısıtlanmıştır. **UYARI (HAR-07):** OBI bridge telemetri filtreleme, izin listesi veya hız sınırlaması YAPMAZ (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`). | Class 3 telemetri için donanımsal allowlist filtresi ve hız sınırlayıcı IP (Gate D SoC entegrasyonu). CTS Annex B istatistiksel karşılıklı bilgi üst sınırı ($I(S_{\text{raw}}; T_{\text{out}}) \le \epsilon$) laboratuvar testi. *(Bkz. Bölüm 2)*. |
 | **M4** | **Reverse-Read Impossibility:** Ağ alanının Güvenli Alandan ham sensör ters-okuması (read-back) yapması donanımsal olarak imkansız olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | `zc_obi_subordinate_bridge.sv` köprüsü, hedef çevre birimi arızasında veya kilitlenmesinde `ST_TRAP` sentetik hata verisi (`32'h0000_0000`) döndürerek okuma sızıntısını engeller (`F-OBI-04/05` step özellikleri `PROVEN`; 1024 çevrimlik sürekli kilitlenme `tb_zc_obi.sv` Test 2 ile `SIMULATED`). | Güvenli SRAM ve NPU kayıtlarının kötü niyetli bir SoC DMA master'ı tarafından doğrudan okunmasını engelleyen sistem düzeyinde crossbar koruması (`BLOCKED`). |
 | **M5** | **Control-Plane Isolation:** Güven sınırı veri yolunun yanı sıra reset, saat, güç, DMA ve debug hatlarını kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | OBI bridge sıcak reset (`rst_sys_ni`) altında host isteklerini sıfıra kilitler (`F-OBI-07`). AON OTP controller sıcak reset sırasında yetkilendirme kilidini korur (`F-OTP-05`). | Fiziksel saat/voltaj glitch enjeksiyonu laboratuvar testleri; asenkron reset kaldırılma/toparlanma (recovery/removal) Static Timing Analysis (STA). |
 | **M6** | **Hardware-Rooted Execution Integrity:** Güvenli önyükleme ve güncelleme zinciri AI ağırlıklarını ve donanım envanterini kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | `zc_aon_post_auth_ctrl.sv` 4-fazlı DAI el sıkışması (`F-OTP-02/03`), tek çevrimlik yetki tüketimi (`F-OTP-06`) ve SVN anti-rollback monotonluğunu (`F-OTP-01a/b`) donanımsal olarak garanti eder. | Harici Boot ROM kriptografik imza doğrulayıcısının doğruluğu (`rom_img_verif_valid_i` harici güven varsayımıdır); analog antifuse programlama şarj pompası ($V_{\text{PP}} > 1.8\,\text{V}$). |
 | **M7** | **Raw-Data Lifetime Enforcement:** Ham verinin ömrü yalnızca yerel çıkarım (inference) döngüsüyle sınırlı olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | **`BLOCKED`**: Çift izli formel noninterference miter (`fv/zc_m7_m8_ni_sva.sv`), tam SoC ve NPU netlist'i bulunmadığı için Gate C'de yürütülememiştir. | Yaşam döngüsü donanım sayacı, çıkarım sonu donanımsal kesme tetikleyicisi ve SoC seviyesinde doğrulama. |
 | **M8** | **Post-Inference Destruction/Zeroization:** Çıkarım biter bitmez tüm ham veri ve türetilmiş tensör kopyaları kalıcı olarak sıfırlanmalıdır. | **`COMPATIBLE`** | **`CONDITIONAL`** *(Fiziksel Kalıcılık Sınırı)* | **`BLOCKED`**: Dijital RTL düzeyinde SRAM sıfırlama mantığı tam SoC entegrasyonu beklemektedir. | Kriyojenik ve enerji kesintisi sonrası fiziksel hücre kalıcılık oranı ($R_{\text{rate}} \le 0.01\%$) testleri strictly Gate D laboratuvarına bırakılmıştır. |
-| **M9** | **Complete Sensor Inventory:** Cihazdaki tüm gizlilik-hassas sensörler istisnasız aynı güvenli alana bağlı olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | M9 bir sistem mimarisi kuralıdır; ağ alanında ikincil mikrofon veya kamera bulunması doğrudan uygunsuzluktur. | Fiziksel kart (PCB) X-ray taraması, BOM bileşen denetimi ve optik mikroskopi. |
+| **M9** | **Complete Sensor Inventory:** Cihazdaki tüm gizlilik-hassas sensörler istisnasız aynı gizli alana bağlı olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | M9 bir sistem mimarisi kuralıdır; ağ alanında ikincil mikrofon veya kamera bulunması doğrudan uygunsuzluktur. | Fiziksel kart (PCB) X-ray taraması, BOM bileşen denetimi ve optik mikroskopi. |
 | **M10** | **Independent Conformance Evidence:** Uyumluluk iddiaları üretici beyanına değil, bağımsız ve ölçülebilir kanıtlara dayanmalıdır. | **`COMPATIBLE`** | **`CONDITIONAL`** *(HAR-05: Tüm Metin ve Tablolarda Tutarlı)* | Gate C kapsamındaki 3 dijital RTL bloğu açık kaynak formal araçlarla ($t=20$) ispatlanmıştır (`PARTIAL / QUALIFIED`). | HYBRID profilin fiziksel yan kanal, covert channel, glitch ve çip üzeri izolasyon güvenceleri Gate D akredite laboratuvar testlerine tabidir. |
 
 ---
 
-## 2. M3 ve Hibrit Bilgi Akışı Analizi: Major-Version Karar Matrisi (HAR-08)
+## 2. M1/M3 Normatif Çelişki Analizi ve Sürümleme Karar Matrisi (HAR-09 & HAR-10)
 
-### 2.1 Normatif Uyuşmazlık (Normative Friction)
-M3 değişmezi lafzı itibarıyla şunu şart koşar:
-> *"Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain through a physically verifiable unidirectional channel. Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain, provided it cannot create a raw-sensor read-back path or a reverse raw-sensor information channel."*
+### 2.1 Orijinal Metinlerin Birebir Karşılaştırması ve Normatif Sürtüşme (HAR-09)
+Mevcut [`zero-cloud-core-methodology-invariants.md`](../../zero-cloud-core-methodology-invariants.md) belgesindeki ilgili maddeler birebir incelendiğinde:
 
-- **STRICT Profil:** M3'ün orijinal tek yönlü fiziksel donanım diyotu (optokuplör / hava boşluğu) şartıyla **%100 koşulsuz uyumludur**.
-- **HYBRID Profil:** Giden yönde Class 3 telemetri (cihaz sağlık durumu, hata kodları, kümülatif çalışma saati) dışarı aktarılır. Aktarımın yapıldığı fiziksel arayüz (ör. OBI, Ethernet, Wi-Fi) çift yönlü bir veri yoludur.
+1. **M1 (Trusted Sensor Acquisition):**
+   > *"Raw sensor data (audio/video) SHALL NEVER leave the Trusted Domain."*
+2. **M3 (One-Way Information Flow):**
+   > *"Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain through a physically verifiable unidirectional channel. Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain, provided it cannot create a raw-sensor read-back path or a reverse raw-sensor information channel."*
+3. **M4 (Reverse-Read Impossibility):**
+   > *"It MUST be physically or logically impossible for the Network/Control Domain to execute a functional reverse read (raw sensor read-back) from the Trusted Domain over a physical reverse channel..."*
+4. **M8 (Post-Inference Destruction/Invalidation):**
+   > *"Once inference completes, all persistent and temporary copies of raw data SHALL become irreversibly unrecoverable (e.g., physically destroyed or cryptographically zeroized across all caching layers)."*
+5. **Composition Rule:**
+   > *"Sensor Acquisition → Trusted Local Inference → Controlled Semantic Release → Absolute Raw-Data Destruction → Network/Actuator Operation."*
 
-### 2.2 Matematiksel Tersine Mühendislik / Geri Oluşturulamazlık Hipotezi (HAR-08 Uyarısı)
-> [!IMPORTANT]
-> **Matematiksel Geri Oluşturulamazlık Statüsü:**  
-> Class 3 telemetrinin ham sensör verisini (Class 0) yeniden oluşturamayacağı (non-reconstructible) varsayımı, şu aşamada bir **KANITLANMAMIŞ TASARIM HİPOTEZİDİR (`UNPROVEN DESIGN HYPOTHESIS`)**.  
-> Ayrık telemetri şemaları yapısal olarak ham ses/video örneklerinden bağımsız tasarlanmış olsa da, karşılıklı bilginin sıfır olduğu ($I(\text{Class 3}; \text{Class 0}) = 0$) henüz formal veya deneysel olarak ispatlanmamıştır. Bu iddia, Gate D kapsamındaki CTS Annex B laboratuvar testleri tamamlanmadan kesinleşmiş bir matematiksel kanıt olarak sunulamaz.
+#### Normatif Çelişki / Yazım Hatası Analizi:
+- **Çelişki:** M1 açıkça ham sensör verisinin Güvenli Alanı ASLA terk edemeyeceğini (`SHALL NEVER leave`) ve M8 çıkarım biter bitmez tüm kopyalarının geri döndürülemez biçimde yok edileceğini emrederken; eski M3 metni lafzı itibarıyla *"Protected raw-sensor information and derived representations SHALL flow strictly from the Trusted Domain to the Network Domain..."* diyerek korunan ham verinin Ağ Alanına akacağını söylemektedir!
+- **Asıl Amaç (Composition Rule):** Belgenin kendi içindeki Composition Rule ise gerçek mimari akışı netleştirir: Dışarıya yalnızca **"Controlled Semantic Release"** (Class 2 komutlar, Class 3 telemetri) akar; ham veri ise **"Absolute Raw-Data Destruction"** aşamasında silinir.
+- **Sonuç:** Bu durum, eski ZC-CORE metinlerinde var olan tarihsel bir yazım ve ifade hatasıdır (conflated drafting). HYBRID profilini bu çelişki yokmuş gibi eski metnin üzerine inşa etmek hukuki ve teknik açıdan sakıncalıdır. Bu çelişkiyi çözmek için düzeltilmiş bir normatif sözleşme zorunludur.
 
-### 2.3 Kapsamlı Karar Etki Matrisi (Decision Impact Matrix)
-Bağımsız denetçinin ve standartlar komitesinin değerlendirmesine sunulan iki normatif yol haritası aşağıda karşılaştırılmıştır:
+---
 
-| Değerlendirme Boyutu | Seçenek A: v3.x Normatif Profil Eki (Normative Profile Annex) | Seçenek B: v4.0.0 Kırıcı Mimari RFC (Breaking Architecture RFC) |
+### 2.2 Önerilen Düzeltilmiş M3 Sözleşmesi (`M3-RFC-REVISED`)
+Mevcut v3.x değişmezler belgesine dokunulmaksızın, v4.0.0 RFC taslağı için hazırlanan düzeltilmiş normatif sözleşme şöyledir:
+
+> #### Düzeltilmiş M3 Değişmezi: `M3-RFC-REVISED`
+> 1. **Korunan Sensör Verisinin Dışarı Çıkış Yasağı:**  
+>    Ham sensör verisi (Class 0) ve türetilmiş tensör/embedding gösterimleri (Class 1), M1 ve M8 ilkeleri uyarınca Güven Sınırını KESİNLİKLE terk edemez.
+> 2. **Tek Yönlü Semantik Çıkış İzni:**  
+>    Yalnızca yerel çıkarım sonucu üretilen doğrulanmış ayrık fiziksel çalıştırma komutları (Class 2) ve donanımsal olarak hız sınırlı, sabit şemalı sistem telemetrisi (Class 3) donanımsal bir geçit üzerinden dışarı akabilir.
+> 3. **Donanım Denetimli Ters Giriş (Inbound):**  
+>    Doğrulanmış kontrol düzlemi ve firmware güncelleme trafiği, donanımsal güvenlik duvarları (SPI dual /CS ve Boot ROM imza doğrulaması) üzerinden Güvenli Alana girebilir; ancak hiçbir koşulda ters-okuma (M4) veya ham veri sızdırma yolu oluşturamaz.
+> 4. **Fiziksel Enforcement Ayrımı:**  
+>    - **STRICT Profil:** Çıkış kesinlikle tek yönlü fiziksel bir donanım diyotu (optokuplör / hava boşluğu) ile sağlanır.  
+>    - **HYBRID Profil:** Çift yönlü fiziksel veri yolları (OBI / SPI) ancak formal olarak doğrulanmış veri yolu güvenlik duvarları (orphan drain, synthetic error trap) ve bağımsız donanımsal hız sınırlayıcılar aracılığıyla sınırlandırıldığında kabul edilir.
+
+---
+
+### 2.3 Bağımsız Dört Kilometre Taşının Ayrıştırılması (HAR-10)
+Gereksiz takvim kilitlenmelerini önlemek amacıyla, yayın, tescil, simülasyon ve üretim aşamaları 4 bağımsız kilometre taşına bölünmüştür:
+
+1. **Kilometre Taşı 1: Mimari Şartname ve RFC Yönetişimi (`GOVERNANCE-RFC`)**  
+   - STRICT ve HYBRID profillerinin, tehdit modelinin (`AT-011`, `AT-012`), ara bağlantı sözleşmelerinin ve `M3-RFC-REVISED` metninin dokümantasyon düzeyinde tamamlanması.  
+   - *Durum:* Taslak dokümanlar seviyesinde hazırdır. Donanım üretim bağımlılığı yoktur.
+2. **Kilometre Taşı 2: Savunma Amaçlı Teknik Yayın ve Fikrî Mülkiyet (Zenodo DOI / Prior-Art)**  
+   - ZC-CORE metodolojisi, düzeltilmiş M3 sözleşmesi ve `ZC-CORE-008` (Donanım Veri Yolu Güvenlik Duvarı ve İçe Güncelleme Mimarisi) buluşlarının DOI ile zaman damgalı tescili.  
+   - *Şart:* Yeterli teknik açıklık (enablement) ve yeniden üretilebilir dijital RTL kodları (Gate C baseline `eb3ed5a`).  
+   - *Sınır:* **Fiziksel silikon teyp-out gerektirmez.** Tasarım hedefleri dürüstçe mimari şartname olarak beyan edilir; silikon garantisi gibi sunulmaz.
+3. **Kilometre Taşı 3: Dijital FPGA ve Tam SoC Doğrulaması (`FPGA-SOC-GATE-C`)**  
+   - Gate C açık kaynak formal ispatları (`PROVEN`: `F-SPI-01..04`, `F-OBI-01..07`, `F-OTP-01..06`).  
+   - RTL dijital simülasyonları (`SIMULATED`: 1.024 çevrimlik OBI watchdog).  
+   - FPGA üzerinde çift çekirdekli Ibex CPU + NPU + DMA içeren tam SoC netlist doğrulaması.
+4. **Kilometre Taşı 4: Fiziksel Silikon Uygunluğu ve Ticari Sürüm (Gate D)**  
+   - Dökümhane (foundry) antifuse analog makro karakterizasyonu ($V_{\text{PP}} > 1.8\,\text{V}$).  
+   - Kriyojenik / enerji kesintisi SRAM kalıcılık analizi ($R_{\text{rate}} \le 0.01\%$).  
+   - Akredite ISO 17025 laboratuvarında RF yankısız oda EM yan kanal ve istatistiksel karşılıklı bilgi sızıntı testi:
+     $$\max_{\mathcal{A} \in \mathcal{M}_{\text{threat}}} I(S_{\text{raw}}; T_{\text{out}} \mid \mathcal{O}_{\text{side-channel}}) \le \epsilon_{\text{acceptable}}$$
+   - Ticari sürüm ve nihai onay (DO NOT MERGE kısıtlamasının kaldırılması).
+
+---
+
+### 2.4 Kapsamlı Sürümleme Karar Matrisi ve Stratejik Tavsiye
+
+| Değerlendirme Boyutu | Seçenek A: v3.x Normatif Profil Eki (Annex) | Seçenek B: v4.0.0 Kırıcı Mimari RFC (Breaking RFC) |
 | :--- | :--- | :--- |
-| **Normatif M3 Yorumu** | M3'ün korunan ham sensör verisi ve türetilmiş tensörleri (Class 0 ve 1) kapsadığı yorumlanır. İzinli Class 3 telemetri yetkilendirilmiş bir operasyonel istisna olarak kabul edilir. | M3'ün *"physically verifiable unidirectional channel"* lafzı katı yorumlanır; çift yönlü fiziksel aktarım kanalları veri sınıfına bakılmaksızın v3.x ile uyumsuz sayılır. |
-| **Geri Oluşturulamazlık Hipotezi** | Tasarım hipotezinin katı ikili şema ve hız sınırlama altında korunduğu varsayılır. | Hipoteze dayanmak yerine, çift yönlü semantik sınırları açıkça tanımlayan yeni bir mimari sözleşme oluşturulur. |
-| **Eski Cihazların Uygunluğu** | Mevcut STRICT cihazlar (v3.0–v3.3) geriye dönük tam uyumlu olarak `ZC-PROFILE-STRICT` altında tescilli kalır. | Mimari çatallanma (bifurcation) oluşur: v3.x dalı yalnızca STRICT, v4.x dalı ise HYBRID + STRICT olarak ikiye ayrılır. |
-| **CTS Test Paketi Etkisi** | CTS temel paketi bozulmaz; HYBRID uyumluluğu seçimli bir ek olarak (CTS Annex B) test paketine eklenir. | CTS baştan aşağı modüler profil paketlerine bölünür (`CTS-Core`, `CTS-Strict`, `CTS-Hybrid`). |
-| **Fikrî Mülkiyet (Prior-Art) Etkisi**| Mevcut ZC-CORE-001..007 patent savunma iddiaları korunur; `ZC-CORE-008` bir alt iddia ailesi olarak v3.x'e eklenir. | v4.0.0 için sıfırdan bağımsız bir patent savunma tabanı oluşturulur; çok master'lı veri yolu yangın duvarı bağımsız tescil edilir. |
-| **Sürümleme ve Yayın Takvimi** | v3.4.0 sürümü ile daha hızlı Zenodo yayını yapılabilir; ancak lafzi tek yönlülük kuralı normatif tartışma riski taşır. | Gate D SoC silikon üretimi ve laboratuvar karşılıklı bilgi ölçümü beklenir; azami normatif netlik sağlanır, yayın gecikir. |
+| **Normatif M3 Çözümü** | Eski M1/M3 metin sürtüşmesini yorum yoluyla aşmaya çalışır; lafzi çelişki tortusu kalır. | `M3-RFC-REVISED` sözleşmesini doğrudan yürürlüğe koyar; M1/M3 çelişkisini kökten temizler. |
+| **Zenodo Savunma Yayını (KM 2)** | v3.3.x ek yayını olarak yapılır; patent denetçilerinde eski tek yönlü v3.0 patentleriyle terminolojik çelişki riski doğurur. | **Tam Koruma:** v4.0.0 RFC olarak yayımlanır; `ZC-CORE-008` için tertemiz ve tartışmasız bir prior-art önceliği sağlar. Silikon üretimi beklemez. |
+| **Eski Cihazların Durumu** | Tüm v3.x cihazları aynı şemsiye altında tutar. | v3.3.0-rc2'yi katı ve değişmez STRICT standardı olarak dondurur; HYBRID'i v4.0.0 hattında temiz biçimde konumlandırır. |
+| **CTS Test Paketi** | CTS v3 paketine yama yapılır. | Modüler CTS paketleri kurulur (`CTS-Core`, `CTS-Strict`, `CTS-Hybrid`). |
+| **Stratejik Tavsiye (Denetçi Görüşü)** | Uygulanabilir; ancak lafzi tartışmalara açıktır. | **TAVSİYE EDİLEN:** En düşük hukuki ve fikrî mülkiyet riski taşıyan, en temiz mimari yoldur. |
 | **Yönetişim Kararı** | **`DECISION PENDING INDEPENDENT STANDARDS REVIEW`** | **`DECISION PENDING INDEPENDENT STANDARDS REVIEW`** |
 
 ---
@@ -93,7 +139,7 @@ RTL bloklarının yeteneklerinin sistem düzeyinde genel bir DMA güvenlik duvar
 
 ## 4. Dosya Bazlı Mevcut Belge Güncelleme Planı (Remediation Plan)
 
-Bağımsız denetçinin nihai onayından sonra, mevcut 8 temel normatif belge aşağıdaki plan doğrultusunda tek bir atomik commit ile güncellenecektir:
+Bağımsız denetçinin ve standartlar komitesinin nihai onayından sonra, mevcut 8 temel normatif belge aşağıdaki plan doğrultusunda tek bir atomik commit ile güncellenecektir:
 
 ### 1. `README.md`
 - **Mevcut Durum:** Yalnızca tek yönlü donanım diyotlarını ve hava boşluğunu anlatıyor.
@@ -149,4 +195,4 @@ Bağımsız denetçinin nihai onayından sonra, mevcut 8 temel normatif belge a�
 1. Bu plandaki hiçbir değişiklik mevcut 14 temel normatif belgeye (`zero-cloud-*.md`, `README.md`, `ZERO-CLOUD-RELEASE-MANIFEST.md`) henüz uygulanmamıştır.
 2. Tüm mimari şartnameler `docs/architecture/` altında taslak (`PROPOSED / NOT RELEASED / NOT SOC-VERIFIED`) olarak tutulmaktadır.
 3. Çalışma strictly `gate-c/formal-scope-audit` dalında yürütülmektedir; ana dal (`main`) korunmaktadır.
-4. Bağımsız denetçinin bu düzeltmeler üzerindeki resmi onayı alınmadan ve HAR-08 kararı netleşmeden ana normatif dokümanlarda hiçbir satır değiştirilmeyecektir.
+4. Bağımsız denetçinin bu düzeltmeler üzerindeki resmi onayı alınmadan ve HAR-08/09 kararı netleşmeden ana normatif dokümanlarda hiçbir satır değiştirilmeyecektir.
