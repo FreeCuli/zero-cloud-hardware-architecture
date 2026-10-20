@@ -3,7 +3,7 @@
 
 **Belge Kimliği:** ZC-CORE-EVIDENCE-M1-M10-COMPAT-PLAN-01  
 **Tarih:** 20 Ekim 2026  
-**Revizyon:** 1.3.0 (Bağımsız Denetçi HAR-09..10 Bulguları Düzeltmesi)  
+**Revizyon:** 1.4.0 (Bağımsız Denetçi HAR-11..13 Bulguları Düzeltmesi)  
 **Hedef Depo:** `FreeCuli/zero-cloud-hardware-architecture`  
 **Çalışma Dalı:** `gate-c/formal-scope-audit`  
 **Teknik Referans Tabanı:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
@@ -12,16 +12,16 @@
 ---
 
 > [!WARNING]
-> **YÖNETİŞİM VE KAPSAM BİLDİRİMİ (HAR-02, HAR-06..HAR-10):**  
+> **YÖNETİŞİM VE KAPSAM BİLDİRİMİ (HAR-02, HAR-06..HAR-13):**  
 > Bu belge, ZC-CORE normatif değişmezlerinin (M1–M10) **STRICT** ve **HYBRID** çalışma profilleri karşısındaki uyumluluk durumunu ve depodaki normatif belgelerin güncellenme planını belirler.  
 > Belgelerdeki teknik kapsam şişkinliğini önlemek ve denetçi bulgularını tam olarak kapatmak amacıyla:
 > 1. **`DESIGN-COMPATIBLE`:** Mimari şartnamede tanımlanmış tasarım ilkesi ve hedefi.
 > 2. **`IMPLEMENTATION-VERIFIED (PARTIAL)`:** Gate C kapsamında açık kaynak araçlarla ($t=20$) formal olarak ispatlanan bağımsız RTL blokları (`zc_spi_flash_firewall`, `zc_obi_subordinate_bridge`, `zc_aon_post_auth_ctrl`).
 > 3. **`UNVERIFIED AT SOC/SILICON`:** Tüm SoC DMA izolasyonu, crossbar IOMMU, analog makro davranışları ve fiziksel yan kanal güvenceleri strictly **Gate D** kapsamındadır.
 > 4. **HAR-06 Kanıt Ayrımı:** OBI 1.024 çevrimlik watchdog timeout davranışı `tb_zc_obi.sv` Test 2 ile dijital RTL simülasyonu seviyesinde doğrulanmıştır (`SIMULATED`). `F-OBI-04` ve `F-OBI-05` ise 1024 çevrimin tamamının tek bir temporal ispatı değil, yerel RTL adım endüksiyonu (step-induction) ve kilitlenme bayrağı assertion ispatlarıdır (`PROVEN` at local RTL step level).
-> 5. **HAR-07 Telemetri Donanım Sınırı:** Mevcut Gate C RTL bloklarında telemetri veri sınıflandırıcısı, izin listesi denetleyicisi, paket kodlayıcı veya donanımsal hız sınırlayıcı BULUNMAMAKTADIR. Bu mekanizmalar mevcut RTL'de uygulanmış olmayıp, Gate D SoC entegrasyonu için önerilen sistem gereksinimidir (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`).
-> 6. **HAR-09 Normatif Çelişki:** M1'in ham veriyi kesinlikle yasaklaması ile eski M3 metninin ham verinin dışarı akmasını ifade etmesi arasındaki tarihsel yazım çelişkisi belgelenmiş; çözüm olarak `M3-RFC-REVISED` sözleşmesi sunulmuştur.
-> 7. **HAR-10 Kilometre Taşı Ayrıştırması:** Mimari RFC, Savunma Amaçlı Zenodo Yayını (Prior-Art), FPGA/SoC Doğrulaması ve Silikon Teyp-out (Gate D) birbirinden tamamen bağımsız 4 aşama olarak tanımlanmıştır. Savunma amaçlı yayın için silikon üretimi şart koşulmamıştır.
+> 5. **HAR-07 & HAR-11 Uygulama Ayrımı:** Mevcut Gate C RTL bloklarında telemetri veri sınıflandırıcısı, izin listesi denetleyicisi, paket kodlayıcı veya donanımsal hız sınırlayıcı BULUNMAMAKTADIR. `M3-RFC-REVISED` içerisindeki gereksinimler geleceğe yönelik zorunlu mimari şartlardır (`SHALL`); mevcut RTL'de uygulanmış olmayıp, Gate D SoC entegrasyonu için önerilen sistem gereksinimidir (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`). Ayrıca Gate C yerel formal ispatları, uçtan uca HYBRID bilgi akışı noninterference kanıtı değildir.
+> 6. **HAR-12 Savunma Amaçlı Yayın ve Fikrî Mülkiyet Sınırları:** Zenodo teknik raporu, kamuya açıklanan teknik içeriği ve erişilebilirlik tarihini belgeleme (timestamped documentary prior art) amacını taşır. Otomatik bir patent hakkı, patent başvuru önceliği veya dünya çapında mutlak patent engeli garantisi SAĞLAMAZ. Yayın öncesi patent vekili / IP hukuk danışmanı incelemesi zorunludur.
+> 7. **HAR-13 Karşılıklı Bilgi Araştırma Hedefi:** Covert-channel istatistiksel karşılıklı bilgi denklemi ($\epsilon_{\text{target}}$) onaylanmış bir sertifikasyon eşiği değil, **`UNVERIFIED RESEARCH / VALIDATION TARGET`** niteliğindedir; tüm olası fiziksel sızıntı yollarının yokluğunu matematiksel olarak kanıtlamaz.
 
 ---
 
@@ -39,7 +39,7 @@ Tüm ZC-CORE metodolojisinin temelini oluşturan M1–M10 kuralları, **STRICT**
 | :--- | :--- | :---: | :---: | :--- | :--- |
 | **M1** | **Trusted Sensor Acquisition:** Ham sensör verisi (ses/görüntü) ASLA Güvenli Alanı terk edemez. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible)* | M1 bir alan topolojisi kuralıdır; Gate C dijital RTL blokları sensör arayüzü değil, veri yolu ve bellek köprüsüdür. | Fiziksel PCB hat ayrımı, sensör paket tamper koruması, analog iz empedansı. |
 | **M2** | **Hardware-Enforced Domain Boundary:** Güvenli Alan ile Ağ Alanı ayrımı donanımsal olmalıdır (yazılımsal olamaz). | **`COMPATIBLE`** | **`CONDITIONAL`** *(Design-Compatible)* | `zc_obi_subordinate_bridge` (`F-OBI-01..07`) ve `zc_spi_flash_firewall` (`F-SPI-01..04`) ile veri yolu ve SPI katmanında donanımsal geçit kanıtlanmıştır. | Çok master'lı SoC crossbar DMA güvenlik duvarı, bellek yönetim birimi (IOMMU) ve PCB hava boşluğu analizi. |
-| **M3** | **One-Way Information Flow:** Korunan veriler kesinlikle tek yönlü akmalıdır. Doğrulanmış kontrol trafiği ters yönde girebilir. | **`COMPATIBLE`** | **`CONDITIONAL`** *(Normatif Karara Bağlı - HAR-08/09)* | OBI bridge öksüz işlem emilimi (`F-OBI-06`) ve sentetik hata (`F-OBI-04/05` step) ile ters yönde kilitlenme engellenmiş; SPI firewall (`F-SPI-01/02`) ile yetkisiz yazma kısıtlanmıştır. **UYARI (HAR-07):** OBI bridge telemetri filtreleme, izin listesi veya hız sınırlaması YAPMAZ (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`). | Class 3 telemetri için donanımsal allowlist filtresi ve hız sınırlayıcı IP (Gate D SoC entegrasyonu). CTS Annex B istatistiksel karşılıklı bilgi üst sınırı ($I(S_{\text{raw}}; T_{\text{out}}) \le \epsilon$) laboratuvar testi. *(Bkz. Bölüm 2)*. |
+| **M3** | **One-Way Information Flow:** Korunan veriler kesinlikle tek yönlü akmalıdır. Doğrulanmış kontrol trafiği ters yönde girebilir. | **`COMPATIBLE`** | **`CONDITIONAL`** *(Normatif Karara Bağlı - HAR-08/09/11)* | OBI bridge öksüz işlem emilimi (`F-OBI-06`) ve sentetik hata (`F-OBI-04/05` step) ile ters yönde kilitlenme engellenmiş; SPI firewall (`F-SPI-01/02`) ile yetkisiz yazma kısıtlanmıştır. **UYARI (HAR-07/11):** OBI bridge telemetri filtreleme, izin listesi veya hız sınırlaması YAPMAZ (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`). Yerel formal ispatlar uçtan uca bilgi akışı noninterference kanıtı değildir. | Class 3 telemetri için donanımsal allowlist filtresi ve hız sınırlayıcı IP (Gate D SoC entegrasyonu). CTS Annex B istatistiksel karşılıklı bilgi üst sınırı ($I(S_{\text{raw}}; T_{\text{out}}) \le \epsilon_{\text{target}}$) araştırma testi. *(Bkz. Bölüm 2)*. |
 | **M4** | **Reverse-Read Impossibility:** Ağ alanının Güvenli Alandan ham sensör ters-okuması (read-back) yapması donanımsal olarak imkansız olmalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | `zc_obi_subordinate_bridge.sv` köprüsü, hedef çevre birimi arızasında veya kilitlenmesinde `ST_TRAP` sentetik hata verisi (`32'h0000_0000`) döndürerek okuma sızıntısını engeller (`F-OBI-04/05` step özellikleri `PROVEN`; 1024 çevrimlik sürekli kilitlenme `tb_zc_obi.sv` Test 2 ile `SIMULATED`). | Güvenli SRAM ve NPU kayıtlarının kötü niyetli bir SoC DMA master'ı tarafından doğrudan okunmasını engelleyen sistem düzeyinde crossbar koruması (`BLOCKED`). |
 | **M5** | **Control-Plane Isolation:** Güven sınırı veri yolunun yanı sıra reset, saat, güç, DMA ve debug hatlarını kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | OBI bridge sıcak reset (`rst_sys_ni`) altında host isteklerini sıfıra kilitler (`F-OBI-07`). AON OTP controller sıcak reset sırasında yetkilendirme kilidini korur (`F-OTP-05`). | Fiziksel saat/voltaj glitch enjeksiyonu laboratuvar testleri; asenkron reset kaldırılma/toparlanma (recovery/removal) Static Timing Analysis (STA). |
 | **M6** | **Hardware-Rooted Execution Integrity:** Güvenli önyükleme ve güncelleme zinciri AI ağırlıklarını ve donanım envanterini kapsamalıdır. | **`COMPATIBLE`** | **`COMPATIBLE`** *(Design-Compatible / Implementation-Verified)* | `zc_aon_post_auth_ctrl.sv` 4-fazlı DAI el sıkışması (`F-OTP-02/03`), tek çevrimlik yetki tüketimi (`F-OTP-06`) ve SVN anti-rollback monotonluğunu (`F-OTP-01a/b`) donanımsal olarak garanti eder. | Harici Boot ROM kriptografik imza doğrulayıcısının doğruluğu (`rom_img_verif_valid_i` harici güven varsayımıdır); analog antifuse programlama şarj pompası ($V_{\text{PP}} > 1.8\,\text{V}$). |
@@ -50,7 +50,7 @@ Tüm ZC-CORE metodolojisinin temelini oluşturan M1–M10 kuralları, **STRICT**
 
 ---
 
-## 2. M1/M3 Normatif Çelişki Analizi ve Sürümleme Karar Matrisi (HAR-09 & HAR-10)
+## 2. M1/M3 Normatif Çelişki Analizi ve Sürümleme Karar Matrisi (HAR-09..HAR-13)
 
 ### 2.1 Orijinal Metinlerin Birebir Karşılaştırması ve Normatif Sürtüşme (HAR-09)
 Mevcut [`zero-cloud-core-methodology-invariants.md`](../../zero-cloud-core-methodology-invariants.md) belgesindeki ilgili maddeler birebir incelendiğinde:
@@ -87,17 +87,25 @@ Mevcut v3.x değişmezler belgesine dokunulmaksızın, v4.0.0 RFC taslağı içi
 >    - **STRICT Profil:** Çıkış kesinlikle tek yönlü fiziksel bir donanım diyotu (optokuplör / hava boşluğu) ile sağlanır.  
 >    - **HYBRID Profil:** Çift yönlü fiziksel veri yolları (OBI / SPI) ancak formal olarak doğrulanmış veri yolu güvenlik duvarları (orphan drain, synthetic error trap) ve bağımsız donanımsal hız sınırlayıcılar aracılığıyla sınırlandırıldığında kabul edilir.
 
+> [!IMPORTANT]
+> **Uygulama Boşluğu Bildirimi (HAR-11 Çözümü):**  
+> `M3-RFC-REVISED` içerisindeki kurallar, ZC-CORE v4.0.0 HYBRID profili için **gelecekteki zorunlu mimari şartlardır (`SHALL` gereksinimi)**.  
+> Mevcut dijital RTL tabanında (`eb3ed5a` / Gate C):  
+> 1. Uygulanan RTL modülleri (`zc_obi_subordinate_bridge`, `zc_spi_flash_firewall`, `zc_aon_post_auth_ctrl`) yalnızca veri yolu seviyesinde protokol ayrıştırması, öksüz yanıt emilimi ve flash yetkilendirme geçidi sağlar; telemetri izin listesi denetimi, yük doğrulaması, donanımsal hız sınırlaması veya tüm SoC DMA yangın duvarı içermez. Bu eksik mekanizmalar strictly **`PROPOSED / NOT IMPLEMENTED OR UNVERIFIED`** durumundadır (Gate D SoC entegrasyonuna ertelenmiştir).  
+> 2. Gate C'deki yerel formal ispatlar (`F-SPI-01..04`, `F-OBI-01..07`, `F-OTP-01..06`) blok düzeyinde protokol kurallarını doğrular; tüm hibrit sistem genelinde uçtan uca bilgi akışı noninterference kanıtı DEĞİLDİR (`fv/zc_m7_m8_ni_sva.sv` altında `BLOCKED` durumdadır).
+
 ---
 
-### 2.3 Bağımsız Dört Kilometre Taşının Ayrıştırılması (HAR-10)
-Gereksiz takvim kilitlenmelerini önlemek amacıyla, yayın, tescil, simülasyon ve üretim aşamaları 4 bağımsız kilometre taşına bölünmüştür:
+### 2.3 Bağımsız Dört Kilometre Taşının Ayrıştırılması (HAR-10 & HAR-12)
+Gereksiz takvim kilitlenmelerini önlemek ve hukuki/fikrî mülkiyet sınırlarını tam olarak belirlemek amacıyla, süreç 4 bağımsız kilometre taşına bölünmüştür:
 
 1. **Kilometre Taşı 1: Mimari Şartname ve RFC Yönetişimi (`GOVERNANCE-RFC`)**  
    - STRICT ve HYBRID profillerinin, tehdit modelinin (`AT-011`, `AT-012`), ara bağlantı sözleşmelerinin ve `M3-RFC-REVISED` metninin dokümantasyon düzeyinde tamamlanması.  
    - *Durum:* Taslak dokümanlar seviyesinde hazırdır. Donanım üretim bağımlılığı yoktur.
-2. **Kilometre Taşı 2: Savunma Amaçlı Teknik Yayın ve Fikrî Mülkiyet (Zenodo DOI / Prior-Art)**  
+2. **Kilometre Taşı 2: Savunma Amaçlı Teknik Yayın ve Fikrî Mülkiyet (Zenodo DOI / Prior-Art - HAR-12)**  
    - ZC-CORE metodolojisi, düzeltilmiş M3 sözleşmesi ve `ZC-CORE-008` (Donanım Veri Yolu Güvenlik Duvarı ve İçe Güncelleme Mimarisi) buluşlarının DOI ile zaman damgalı tescili.  
-   - *Şart:* Yeterli teknik açıklık (enablement) ve yeniden üretilebilir dijital RTL kodları (Gate C baseline `eb3ed5a`).  
+   - *Belgeleme Niteliği:* Kamuya açıklanan teknik içeriğin ve kamuya erişilebilirlik tarihinin doğrulanabilir kanıtını oluşturur (35 U.S.C. § 102, EPC Madde 54 kapsamında dokümante edilmiş prior-art).  
+   - *Hukuki ve Fikrî Mülkiyet Sınırları:* **Otomatik bir patent koruması sağlamaz, patent başvuru önceliği oluşturmaz ve tüm dünya yargı alanlarında mutlak bir patent engeli garantisi vermez.** Ayrıca kamuya açıklama yapılması, buluş sahiplerinin mutlak yenilik (absolute novelty) arayan yargı bölgelerinde (EPC, PCT) sonradan patent başvurusu yapma hakkını tüketir. Bu nedenle yayından önce **patent vekili / IP hukuk danışmanı değerlendirmesi zorunludur**.  
    - *Sınır:* **Fiziksel silikon teyp-out gerektirmez.** Tasarım hedefleri dürüstçe mimari şartname olarak beyan edilir; silikon garantisi gibi sunulmaz.
 3. **Kilometre Taşı 3: Dijital FPGA ve Tam SoC Doğrulaması (`FPGA-SOC-GATE-C`)**  
    - Gate C açık kaynak formal ispatları (`PROVEN`: `F-SPI-01..04`, `F-OBI-01..07`, `F-OTP-01..06`).  
@@ -106,8 +114,8 @@ Gereksiz takvim kilitlenmelerini önlemek amacıyla, yayın, tescil, simülasyon
 4. **Kilometre Taşı 4: Fiziksel Silikon Uygunluğu ve Ticari Sürüm (Gate D)**  
    - Dökümhane (foundry) antifuse analog makro karakterizasyonu ($V_{\text{PP}} > 1.8\,\text{V}$).  
    - Kriyojenik / enerji kesintisi SRAM kalıcılık analizi ($R_{\text{rate}} \le 0.01\%$).  
-   - Akredite ISO 17025 laboratuvarında RF yankısız oda EM yan kanal ve istatistiksel karşılıklı bilgi sızıntı testi:
-     $$\max_{\mathcal{A} \in \mathcal{M}_{\text{threat}}} I(S_{\text{raw}}; T_{\text{out}} \mid \mathcal{O}_{\text{side-channel}}) \le \epsilon_{\text{acceptable}}$$
+   - Akredite ISO 17025 laboratuvarında RF yankısız oda EM yan kanal ve istatistiksel karşılıklı bilgi sızıntı araştırma testi:
+     $$\max_{\mathcal{A} \in \mathcal{M}_{\text{threat}}} I(S_{\text{raw}}; T_{\text{out}} \mid \mathcal{O}_{\text{side-channel}}) \le \epsilon_{\text{target}}$$
    - Ticari sürüm ve nihai onay (DO NOT MERGE kısıtlamasının kaldırılması).
 
 ---
@@ -117,7 +125,7 @@ Gereksiz takvim kilitlenmelerini önlemek amacıyla, yayın, tescil, simülasyon
 | Değerlendirme Boyutu | Seçenek A: v3.x Normatif Profil Eki (Annex) | Seçenek B: v4.0.0 Kırıcı Mimari RFC (Breaking RFC) |
 | :--- | :--- | :--- |
 | **Normatif M3 Çözümü** | Eski M1/M3 metin sürtüşmesini yorum yoluyla aşmaya çalışır; lafzi çelişki tortusu kalır. | `M3-RFC-REVISED` sözleşmesini doğrudan yürürlüğe koyar; M1/M3 çelişkisini kökten temizler. |
-| **Zenodo Savunma Yayını (KM 2)** | v3.3.x ek yayını olarak yapılır; patent denetçilerinde eski tek yönlü v3.0 patentleriyle terminolojik çelişki riski doğurur. | **Tam Koruma:** v4.0.0 RFC olarak yayımlanır; `ZC-CORE-008` için tertemiz ve tartışmasız bir prior-art önceliği sağlar. Silikon üretimi beklemez. |
+| **Zenodo Savunma Yayını (KM 2)** | v3.3.x ek yayını olarak yapılır; patent denetçilerinde eski tek yönlü v3.0 patentleriyle terminolojik çelişki riski doğurur. | **Dokümante Edilmiş Prior-Art Açıklaması:** v4.0.0 RFC olarak yayımlanır; `ZC-CORE-008` için v3.0 kayıtlarını bulandırmadan bağımsız bir prior-art açıklaması oluşturur. Silikon üretimi beklemez. |
 | **Eski Cihazların Durumu** | Tüm v3.x cihazları aynı şemsiye altında tutar. | v3.3.0-rc2'yi katı ve değişmez STRICT standardı olarak dondurur; HYBRID'i v4.0.0 hattında temiz biçimde konumlandırır. |
 | **CTS Test Paketi** | CTS v3 paketine yama yapılır. | Modüler CTS paketleri kurulur (`CTS-Core`, `CTS-Strict`, `CTS-Hybrid`). |
 | **Stratejik Tavsiye (Denetçi Görüşü)** | Uygulanabilir; ancak lafzi tartışmalara açıktır. | **TAVSİYE EDİLEN:** En düşük hukuki ve fikrî mülkiyet riski taşıyan, en temiz mimari yoldur. |
@@ -125,14 +133,24 @@ Gereksiz takvim kilitlenmelerini önlemek amacıyla, yayın, tescil, simülasyon
 
 ---
 
-## 3. Donanım İzolasyon Sınırları: Gate C İspatları vs. Sistem Gerçekliği (HAR-02, HAR-06 & HAR-07)
+### 2.5 Covert-Channel Karşılıklı Bilgi Araştırma Hedefi Statüsü (HAR-13)
+HYBRID telemetri sızıntı modelinde hedeflenen karşılıklı bilgi denklemi:
+$$\max_{\mathcal{A} \in \mathcal{M}_{\text{threat}}} I(S_{\text{raw}}; T_{\text{out}} \mid \mathcal{O}_{\text{side-channel}}) \le \epsilon_{\text{target}}$$
+> [!WARNING]
+> **Metrik Sınırları ve Doğrulama Durumu (HAR-13 Çözümü):**  
+> 1. **Onaylanmamış Araştırma Hedefi:** Sayısal hedef $\epsilon_{\text{target}}$, fiziksel örnekleme metodu, örneklem büyüklüğü, ölçüm protokolleri ve istatistiksel güven aralıkları ($1 - \alpha$) henüz standartlaştırılmamış bir **`UNVERIFIED RESEARCH / VALIDATION TARGET`** niteliğindedir. Onaylanmış bir ticari geçiş kriteri değildir.  
+> 2. **Kapsam Sınırı:** Kısıtlı bir saldırgan modeli ($\mathcal{M}_{\text{threat}}$) ve sınırlı bir gözlem kümesi ($\mathcal{O}$) altında karşılıklı bilginin sıfıra yakın bulunması, gerçek dünya koşullarındaki tüm olası fiziksel, donanımsal veya mantıksal covert-channel yollarının mutlak olarak ortadan kalktığını matematiksel olarak ispatlamaz.
+
+---
+
+## 3. Donanım İzolasyon Sınırları: Gate C İspatları vs. Sistem Gerçekliği (HAR-02, HAR-06..HAR-11)
 
 RTL bloklarının yeteneklerinin sistem düzeyinde genel bir DMA güvenlik duvarı, bellek denetleyicisi veya telemetri filtresi gibi yansıtılmasını engellemek için, aşağıdaki teknik sınırlar açıkça kayıt altına alınmıştır:
 
 | İncelenen RTL Blok | Gate C'de İspatlanan Gerçek Sınırlar (Formal Proof Scope & Simulation) | Harici Güven Varsayımları (Trust Assumptions) | İspatlanmamış Sistem, Telemetri & Fiziksel Riskler (Gate D Deliverables) |
 | :--- | :--- | :--- | :--- |
 | **`zc_spi_flash_firewall`** | - RDSR1 durum mutabakatı (`SR1[1:0] == 00`).<br>- SCK=0 iken yükselen /CS ile çerçeve tamamlama (`F-SPI-02`).<br>- İkincil hata durumunda donanımsal /CS deselect (`cs_n_flash_eff_o`).<br>- Bank B commit yetkilendirme kapısı (`bank_b_commit_ready_o`). | **HAR-04:** Kriptografik imza doğrulaması RTL içinde DEĞİLDİR. `rom_img_verif_valid_i` sinyalinin güvenilir bir Boot ROM motorundan geldiği harici bir güven varsayımıdır.<br>`bank_b_commit_ready_o = spi_idle_ready_o && rom_img_verif_valid_i`. | - Harici SPI Flash yongasının analog gecikmeleri.<br>- Eşzamanlı master çakışmaları (bus contention).<br>- PCB iletim hattı empedans bozulmaları ve glitch enjeksiyonu. |
-| **`zc_obi_subordinate_bridge`** | - Tek çevrimlik istek teslimi (`F-OBI-01`).<br>- Öksüz yanıt emilimi (orphan drain) (`F-OBI-06`).<br>- Sıcak reset (`rst_sys_ni`) altında istek blokajı (`F-OBI-07`).<br>- `ST_TRAP` sentetik hata verisi üretimi.<br>- **HAR-06 Kanıt Sınıflandırması:** 1.024 çevrimlik kesintisiz watchdog timeout davranışı `tb_zc_obi.sv` Test 2 ile dijital RTL simülasyonu seviyesinde doğrulanmıştır (`SIMULATED`). `F-OBI-04` ve `F-OBI-05` ise 1024 çevrimin tamamının tek bir temporal ispatı değil, yerel RTL adım endüksiyonu (step-induction) ve kilitlenme bayrağı assertion ispatlarıdır (`PROVEN` at local RTL step level). | Gelen OBI ana isteklerinin geçerli bir CPU/DMA master'ından üretildiği varsayılır. | - **HAR-07 Donanım Sınırı:** Bu blok telemetri filtreleme, izin listesi denetimi veya hız sınırlaması YAPMAZ (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`). OBI köprüsü yalnızca bus protokolü seviyesinde ayrıştırma sağlar.<br>- **HAR-02 Donanım Sınırı:** Bu blok bir SoC DMA güvenlik duvarı veya MPU DEĞİLDİR. Çok master'lı crossbar üzerindeki bellek erişim yetkilendirmesi açık bir sistem riskidir (`BLOCKED`). |
+| **`zc_obi_subordinate_bridge`** | - Tek çevrimlik istek teslimi (`F-OBI-01`).<br>- Öksüz yanıt emilimi (orphan drain) (`F-OBI-06`).<br>- Sıcak reset (`rst_sys_ni`) altında istek blokajı (`F-OBI-07`).<br>- `ST_TRAP` sentetik hata verisi üretimi.<br>- **HAR-06 Kanıt Sınıflandırması:** 1.024 çevrimlik kesintisiz watchdog timeout davranışı `tb_zc_obi.sv` Test 2 ile dijital RTL simülasyonu seviyesinde doğrulanmıştır (`SIMULATED`). `F-OBI-04` ve `F-OBI-05` ise 1024 çevrimin tamamının tek bir temporal ispatı değil, yerel RTL adım endüksiyonu (step-induction) ve kilitlenme bayrağı assertion ispatlarıdır (`PROVEN` at local RTL step level). | Gelen OBI ana isteklerinin geçerli bir CPU/DMA master'ından üretildiği varsayılır. | - **HAR-07 & HAR-11 Donanım Sınırı:** Bu blok telemetri filtreleme, izin listesi denetimi veya hız sınırlaması YAPMAZ (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`). OBI köprüsü yalnızca bus protokolü seviyesinde ayrıştırma sağlar. Gate C yerel ispatları uçtan uca noninterference ispatı değildir.<br>- **HAR-02 Donanım Sınırı:** Bu blok bir SoC DMA güvenlik duvarı veya MPU DEĞİLDİR. Çok master'lı crossbar üzerindeki bellek erişim yetkilendirmesi açık bir sistem riskidir (`BLOCKED`). |
 | **`zc_aon_post_auth_ctrl`** | - 4-fazlı DAI el sıkışma protokolü (`F-OTP-02/03`).<br>- Tek çevrimlik yetki tüketimi (`F-OTP-06`).<br>- Sıcak resette silinmeyen kalıcı fatal kilitlenme (`F-OTP-05`).<br>- Hsiao (22,16) kod sözcüğü parite denetimi (`F-OTP-04`).<br>- SVN anti-rollback monotonluğu (`F-OTP-01a/b`). | DAI arayüzünün fiziksel OTP analog makrosuna doğrudan bağlı olduğu ve harici hata sinyallerinin (`volt_supervisor_fault_i`, `tamper_alert_i`) doğru çalıştığı varsayılır. | - Fiziksel antifuse programlama şarj pompası ($V_{\text{PP}} > 1.8\,\text{V}$) analog darbe süresi.<br>- Dökümhane (foundry) OTP makro hücresi güvenilirliği ve veri saklama (retention) fiziği. |
 
 ---
@@ -195,4 +213,4 @@ Bağımsız denetçinin ve standartlar komitesinin nihai onayından sonra, mevcu
 1. Bu plandaki hiçbir değişiklik mevcut 14 temel normatif belgeye (`zero-cloud-*.md`, `README.md`, `ZERO-CLOUD-RELEASE-MANIFEST.md`) henüz uygulanmamıştır.
 2. Tüm mimari şartnameler `docs/architecture/` altında taslak (`PROPOSED / NOT RELEASED / NOT SOC-VERIFIED`) olarak tutulmaktadır.
 3. Çalışma strictly `gate-c/formal-scope-audit` dalında yürütülmektedir; ana dal (`main`) korunmaktadır.
-4. Bağımsız denetçinin bu düzeltmeler üzerindeki resmi onayı alınmadan ve HAR-08/09 kararı netleşmeden ana normatif dokümanlarda hiçbir satır değiştirilmeyecektir.
+4. Bağımsız denetçinin bu düzeltmeler üzerindeki resmi onayı alınmadan ve HAR-08..13 kararları netleşmeden ana normatif dokümanlarda hiçbir satır değiştirilmeyecektir.

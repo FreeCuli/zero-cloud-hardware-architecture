@@ -3,7 +3,7 @@
 
 **Status:** `PROPOSED / NOT RELEASED / NOT SOC-VERIFIED`  
 **Document ID:** ZC-CORE-SPEC-SECURITY-PROFILES-DRAFT  
-**Revision:** 0.9.3-draft (Post-Audit Remediation HAR-06..HAR-10)  
+**Revision:** 0.9.4-draft (Post-Audit Remediation HAR-11..HAR-13)  
 **Target Milestone:** Post-Gate C Governance / Gate D Preparation  
 **Reference Technical Baseline:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
 **Classification:** Architectural Security Specification (Draft)  
@@ -72,7 +72,7 @@ To prevent scope inflation, an explicit distinction is maintained throughout thi
 * **Critical Boundary Caveat:** The implemented OBI and SPI firewalls protect specific bus protocols and Flash update paths; they do **not** replace a system-wide IOMMU or multi-master crossbar firewall across the entire SoC (which remains a Gate D requirement).
 * **Applicability:** Commercial smart appliances, fleet-managed commercial Edge-AI devices, connected industrial sensors requiring remote health monitoring.
 
-### 2.3 Status of Telemetry Enforcement Controls in Current RTL (HAR-07 Resolution)
+### 2.3 Status of Telemetry Enforcement Controls in Current RTL (HAR-07 & HAR-11 Resolution)
 To maintain absolute technical precision, the specific controls governing outbound Class 3 telemetry in the HYBRID profile are categorized by their implementation status:
 
 | Security Control | Current RTL Status (Gate C Baseline `eb3ed5a`) | Target Mechanism & Architectural Requirement | Verification Milestone |
@@ -81,7 +81,7 @@ To maintain absolute technical precision, the specific controls governing outbou
 | **Deterministic Payload Encoder** | **`PROPOSED / NOT IMPLEMENTED`** | Static binary packetizer enforcing compile-time struct alignment, fixed field lengths, and zero-padding. | Gate D SoC Integration |
 | **Hardware Rate Limiter** | **`PROPOSED / NOT IMPLEMENTED`** | Hardware epoch timer enforcing discrete transmission windows (e.g., $\le 1$ packet / 60 s). | Gate D SoC Integration |
 | **Data-Origin Domain Isolation** | **`UNVERIFIED AT SOC LEVEL`** | System crossbar PMP / IOMMU blocking DMA masters from bridging Secure SRAM to Network FIFO. | Gate D SoC Integration |
-| **Covert-Channel Mutual Information Bound** | **`THEORETICAL TARGET / UNVERIFIED`** | Bound $I(\text{Class 3}; \text{Class 0}) < \epsilon$ verified under CTS Annex B RF/EM side-channel testing. | Gate D Lab Audit |
+| **Covert-Channel Mutual Information Bound** | **`UNVERIFIED RESEARCH TARGET`** | Bound $I(\text{Class 3}; \text{Class 0}) < \epsilon$ evaluated under CTS Annex B RF/EM side-channel testing. | Gate D Lab Audit |
 
 ---
 
@@ -138,10 +138,17 @@ To resolve HAR-09 cleanly without modifying the immutable v3.x baseline file, th
 >    - Under **`ZC-PROFILE-STRICT`**, semantic egress is physically unidirectional (hardware data diode / air-gap).
 >    - Under **`ZC-PROFILE-HYBRID`**, bidirectional physical bus links (e.g., OBI / SPI) are permitted ONLY when mediated by formally verified hardware bus firewalls with deterministic error trapping, bus orphan draining, and independent hardware rate limiting.
 
+> [!IMPORTANT]
+> **Implementation Gap Disclosure (HAR-11 Resolution):**  
+> The clauses in `M3-RFC-REVISED` represent **future mandatory architectural strictures (`SHALL` requirements)** for any device seeking ZC-CORE v4.0.0 HYBRID compliance.  
+> In the current digital RTL baseline (`eb3ed5a` / Gate C):
+> 1. The implemented RTL modules (`zc_obi_subordinate_bridge`, `zc_spi_flash_firewall`, `zc_aon_post_auth_ctrl`) provide local bus-level decoupling, orphan draining, and flash gating; they do **NOT** implement telemetry allowlisting, payload inspection, hardware rate limiting, or full-SoC DMA firewalling. These missing controls remain strictly **`PROPOSED / NOT IMPLEMENTED OR UNVERIFIED`** (tracked for Gate D SoC integration).
+> 2. The local formal proofs in Gate C (`F-SPI-01..04`, `F-OBI-01..07`, `F-OTP-01..06`) prove block-level protocol invariants; they do **NOT** constitute end-to-end information-flow noninterference proofs across the entire hybrid architecture (which remains `BLOCKED` under `fv/zc_m7_m8_ni_sva.sv`).
+
 ---
 
-### 4.4 Decoupled Project Milestones (HAR-10 Resolution)
-To resolve **HAR-10 / P1**, the development, governance, and publication tracks are formally decoupled into four distinct, independent milestones:
+### 4.4 Decoupled Project Milestones (HAR-10 & HAR-12 Resolution)
+To resolve **HAR-10 / P1** and **HAR-12 / P1**, the development, governance, and publication tracks are formally decoupled into four distinct, independent milestones:
 
 ```
 +---------------------------------------------------------------------------------------------------------+
@@ -155,8 +162,11 @@ To resolve **HAR-10 / P1**, the development, governance, and publication tracks 
 |                                                                                                         |
 |   [ MILESTONE 2: DEFENSIVE PUBLICATION & PRIOR ART (Zenodo DOI) ]                                       |
 |     - Technical Report & Patent Claim Family Disclosure (ZC-CORE-008)                                   |
-|     - Prior-Art Date Stamp establishing global novelty and non-obviousness                              |
-|     - Pre-condition: Clear technical description and reproducible RTL (Gate C baseline eb3ed5a)        |
+|     - Prior-Art Documentary Record: Verifiable public proof of technical content and public             |
+|       availability date to serve as documentary prior art (35 U.S.C. § 102, EPC Art. 54).              |
+|     - IP & Legal Limitations: Does NOT grant patent protection, does NOT guarantee worldwide patent     |
+|       invalidation across all jurisdictions, and does NOT establish patent application priority.        |
+|       Mandatory patent attorney / IP counsel review required prior to publication.                      |
 |     - Boundary: Does NOT require physical silicon tape-out! Design targets disclosed as specifications. |
 |                                                                                                         |
 |   [ MILESTONE 3: DIGITAL RTL & FULL-SOC VERIFICATION ]                                                  |
@@ -181,7 +191,7 @@ Comparing the two governance alternatives across the decoupled milestones:
 | Evaluation Dimension | Option A: v3.x Normative Profile Annex | Option B: v4.0.0 Breaking Architecture RFC |
 | :--- | :--- | :--- |
 | **Normative M3 Alignment** | Attempts to reconcile the legacy M1/M3 drafting friction by treating Class 3 telemetry as an authorized exception under v3.x. | Directly adopts `M3-RFC-REVISED`, completely resolving the M1/M3 paradox without textual gymnastics. |
-| **Defensive Publication (Milestone 2)**| Published as an addendum to v3.3.x; carries risk that patent examiners interpret bidirectional bus as conflicting with v3.0 prior art. | **Clear Prior-Art Baseline:** Published as a major-version architectural leap (`v4.0.0 RFC`), securing clean priority for `ZC-CORE-008`. |
+| **Defensive Publication (Milestone 2)**| Published as an addendum to v3.3.x; carries risk that patent examiners interpret bidirectional bus as conflicting with v3.0 prior art. | **Clear Prior-Art Baseline:** Published as a major-version architectural proposal (`v4.0.0 RFC`), establishing clean documentary prior-art disclosure for `ZC-CORE-008` without muddling v3.0 records. |
 | **Silicon Tape-out Dependency** | Decoupled; can be published prior to tape-out with explicit design target caveats. | Decoupled; RFC and defensive publication proceed immediately; commercial release awaits Milestone 4. |
 | **Legacy STRICT Compatibility** | Retains all v3.0–v3.3 devices under the same specification umbrella. | Preserves v3.3.0-rc2 as the pure immutable STRICT benchmark; forks v4.0.0 for hybrid systems. |
 | **CTS Conformance Testing** | Requires patching CTS v3 with an optional Annex B. | Introduces clean, modular test suites (`CTS-Core`, `CTS-Strict`, `CTS-Hybrid`). |
@@ -196,11 +206,14 @@ The following guardrails represent architectural requirements for Gate D SoC int
 
 1. **Fixed Binary Schema (No Arbitrary Payloads):**  
    Telemetry payloads SHALL use static, compile-time verified binary structures. Variable-length strings, raw hex dumps, or unconstrained error logs are strictly prohibited.
-2. **Mutual Information Statistical Leakage Bound:**  
-   Outbound telemetry under the HYBRID profile SHALL satisfy the formal statistical non-leakage constraint:
-   $$\max_{\mathcal{A} \in \mathcal{M}_{\text{threat}}} I(S_{\text{raw}}; T_{\text{out}} \mid \mathcal{O}_{\text{side-channel}}) \le \epsilon_{\text{acceptable}}$$
-   where $S_{\text{raw}}$ is the raw sensor data distribution, $T_{\text{out}}$ is the outbound telemetry stream, $\mathcal{O}_{\text{side-channel}}$ represents observable physical emissions, $\mathcal{M}_{\text{threat}}$ is the defined non-invasive physical threat model, and $\epsilon_{\text{acceptable}}$ is the certified upper bound evaluated under the CTS Annex B protocol.  
-   *(This constraint is an unproven design target pending Gate D accredited laboratory evaluation).*
+2. **Covert-Channel Mutual Information (Unverified Research / Validation Target - HAR-13):**  
+   The theoretical objective for statistical non-leakage under the HYBRID profile is formulated as:
+   $$\max_{\mathcal{A} \in \mathcal{M}_{\text{threat}}} I(S_{\text{raw}}; T_{\text{out}} \mid \mathcal{O}_{\text{side-channel}}) \le \epsilon_{\text{target}}$$
+   where $S_{\text{raw}}$ is the raw sensor data distribution, $T_{\text{out}}$ is the outbound telemetry stream, $\mathcal{O}_{\text{side-channel}}$ represents observable physical emissions, $\mathcal{M}_{\text{threat}}$ is a constrained non-invasive physical threat model, and $\epsilon_{\text{target}}$ is an unapproved, target statistical bound.  
+   > [!WARNING]
+   > **Metric Limitations & Research Status (HAR-13 Resolution):**  
+   > 1. **Unapproved Metric:** The numerical value of $\epsilon_{\text{target}}$, the physical sampling methodology, sample size, measurement protocols, and statistical confidence intervals ($1 - \alpha$) are unapproved research objectives pending Gate D / CTS Annex B standardization. This equation is an **`UNVERIFIED RESEARCH / VALIDATION TARGET`**, not an approved or certified pass/fail acceptance criterion.  
+   > 2. **Scope Limitation:** A statistical mutual information metric bounded within a constrained model does NOT mathematically or physically prove the absolute absence of all conceivable side-channel avenues, hardware bugs, or covert leakage mechanisms across real-world physical operating conditions.
 3. **Epoch-Quantised Rate Limiting:**  
    Telemetry packets SHALL be dispatched on deterministic, clock-quantised epoch boundaries (e.g., exactly once per 60 seconds). Event-driven telemetry timing that varies synchronously with sensor activity is prohibited.
 4. **Physical Bus Decoupling (Implemented in Gate C):**  
