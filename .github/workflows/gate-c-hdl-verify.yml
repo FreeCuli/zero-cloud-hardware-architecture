@@ -160,7 +160,7 @@ jobs:
           echo "[BLOCKED] Concurrent SVA sequence operators (throughout, [->1], ##[1:49152]) and 2-trace full-SoC M7/M8 miter require commercial SVA formal tools (JasperGold / VC Formal) and top-level NPU/SRAM RTL."
           echo "[SEE] evidence/gate-c/MODELING_LIMITS.md for detailed modeling boundaries."
 
-      - name: Step 6 - Auxiliary PowerShell Mathematical & Structural Check (19/19)
+      - name: Step 6 - Auxiliary PowerShell Mathematical & Structural Check (20/20)
         shell: pwsh
         run: |
           ./scripts/verify_gate_b_rev28d.ps1
