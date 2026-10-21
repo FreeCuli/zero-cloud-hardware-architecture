@@ -40,7 +40,7 @@ To preserve historical audit integrity while preparing the codebase for v4.0.0, 
 ## 3. Analysis & Harmonization Sequence
 
 ### 3.1. Primary Legal Faultline: Methodology vs. Expression (NC-01 & NC-02)
-The greatest risk to FreeCuli's commercial viability and community trust was the conflation of the *abstract security standard* with the *concrete reference RTL files*. 
+The greatest risk to FreeCuli's commercial viability and community trust was the conflation of the *abstract security standard* with the *concrete reference RTL files*.
 - In intellectual property law, FreeCuli cannot own or license the general concept of "putting a data diode between a sensor processor and a network chip". Anyone can build that from scratch.
 - What FreeCuli **does own** is the concrete SystemVerilog source code in `rtl/zc_aon_post_auth_ctrl.sv`, `rtl/zc_obi_subordinate_bridge.sv`, `rtl/zc_spi_flash_firewall.sv`, and `rtl/zc_otp_pkg.sv`.
 - By establishing this exact boundary, FreeCuli:
