@@ -7,6 +7,9 @@
 **Location:** `evidence/audit/V4_NORMATIVE_CONFLICT_MATRIX.md`
 **Governance Status:** `DRAFT CONFLICT MATRIX / INFORMATIONAL / NOT RATIFIED`
 **Related Documents:**
+- `zero-cloud-core-methodology-invariants.md` (Legacy Baseline Invariants)
+- `zero-cloud-dual-licensing.md` (Legacy Baseline Policy File)
+- `docs/rfc/ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md` (v4 Successor RFC)
 - `evidence/audit/V4_STRATEGIC_IP_INDEPENDENT_AUDIT.md`
 - `evidence/audit/V4_LICENSE_AND_RIGHTS_RISK_REGISTER.md`
 - `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md`

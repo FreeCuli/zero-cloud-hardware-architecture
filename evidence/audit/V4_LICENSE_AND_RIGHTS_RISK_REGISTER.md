@@ -7,10 +7,13 @@
 **Location:** `evidence/audit/V4_LICENSE_AND_RIGHTS_RISK_REGISTER.md`
 **Governance Status:** `DRAFT RISK REGISTER / AUDIT BASELINE / NOT RATIFIED`
 **Related Documents:**
+- `zero-cloud-dual-licensing.md` (Legacy Baseline Policy File)
+- `zero-cloud-core-methodology-invariants.md` (Legacy Baseline Invariants)
+- `docs/rfc/ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md` (v4 Successor RFC)
 - `evidence/audit/V4_STRATEGIC_IP_INDEPENDENT_AUDIT.md`
+- `evidence/audit/V4_NORMATIVE_CONFLICT_MATRIX.md`
 - `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md`
 - `evidence/legal/V4_LICENSE_SCOPE_AND_RIGHTS_MATRIX.md`
-- `docs/rfc/ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md`
 
 ---
 
@@ -31,7 +34,7 @@ Risks are classified into four severity tiers:
 | Risk ID | Asset / Document Location | Severity | Category | Description of Legal / Commercial Risk | Evidentiary Basis in Repo | Probability & Impact | Proposed Mitigation | Verification Status |
 | :---: | :--- | :---: | :--- | :--- | :--- | :---: | :--- | :---: |
 | **LRR-01** | `LICENSE:17-22; zero-cloud-dual-licensing.md:17` | **CRITICAL** | Phantom Asset / False Representation | Claims CERN-OHL-S covers PCB/Gerber files; zero CAD/Gerber exist in git | git log --all --full-history returns 0 CAD/PCB files | High Prob / Severe Impact (Destroys credibility; false prior art) | Remove PCB/Gerber claims; scope license strictly to rtl/*.sv | **VERIFIED FACT** |
-| **LRR-02** | `LICENSE:39-41; zero-cloud-dual-licensing.md:36-38` | **HIGH** | Scope Overreach / Copyright Misuse | Claims compliant devices MUST buy commercial license; copyright cannot protect methods | Contradicts 17 U.S.C. 102(b), TRIPS Art. 9.2, invariants.md Section 4 | High Prob / High Impact (Chills adoption; legally unenforceable) | Affirm absolute freedom for clean-room implementations in Dual-Licensing RFC | **VERIFIED FACT** |
+| **LRR-02** | `LICENSE:39-41; zero-cloud-dual-licensing.md:36-38` | **HIGH** | Scope Overreach / Copyright Misuse | Claims compliant devices MUST buy commercial license; copyright cannot protect methods | Contradicts 17 U.S.C. 102(b), TRIPS Art. 9.2, `zero-cloud-core-methodology-invariants.md:4` | High Prob / High Impact (Chills adoption; legally unenforceable) | Affirm freedom for clean-room in Dual-Licensing RFC Section 3.3 | **VERIFIED FACT** |
 | **LRR-03** | `zero-cloud-dual-licensing.md:14-23` | **HIGH** | Open Source Definition (OSD) Breach | Restricts Route A to non-commercial; demands commercial entities buy Route B | Violates OSD #5, OSD #6, and CERN-OHL-S v2.0 Section 3.1 | High Prob / High Impact (Invalidates open-source claims; antitrust exposure) | Open Route A unconditionally to commercial entities willing to reciprocate source | **VERIFIED FACT** |
 | **LRR-04** | `LICENSE:1,24-28; CITATION.cff:12` | **MEDIUM** | Phantom License Header / Mismatch | Claims composite CERN-OHL-S-2.0 AND AGPL-3.0-or-later; scanners flag AGPL | Exact grep reveals zero AGPL code in entire repository | Med Prob / High Impact (Enterprise legal departments block repository) | Clarify in v4 successor that hardware repository is 100% CERN-OHL-S-2.0 | **VERIFIED FACT** |
 | **LRR-05** | `rtl/*.sv, fv/*.sv, tb/*.sv` | **LOW** | Provenance & Chain of Title | Author headers cite Standards Org; founder reports sole development | 100% of commits to rtl/ authored by yemekyarismasi; 0 3rd-party code | Low Prob / Low Impact (Administrative clarification only) | Retain founder representation in audit; obtain formal attestation if needed | **ATTEST-01 COMPLETED** |
