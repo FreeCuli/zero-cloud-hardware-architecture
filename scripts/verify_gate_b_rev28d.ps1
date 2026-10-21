@@ -4,15 +4,13 @@
 # Script: scripts/verify_gate_b_rev28d.ps1
 # Description:
 #   Automated verification script for Gate B Rev. 28 - Rev. 28D:
-#   1. Exhaustive (22,16) Hsiao SECDED d_min = 4 and parity equation consistency check against rtl/zc_otp_pkg.sv
-#   2. Exhaustive 4,080 (slot k=0..15, SVN v=1..255) codeword weight histogram (w_H,min = 8) & zero-collision check
-#      for WORD_SVN, WORD_COMMIT_A (M_A = 17*k + 0x5A), and WORD_COMMIT_B (M_B = 29*k + 0x3C)
-#   3. Cycle-accurate golden behavioral verification of:
-#      - OTP 4-phase DAI handshake (normal 0->1->2, recovery 2-only, single-use grant consumption, and fatal lock)
-#      - SPI 3-layer event separation (04h WRDI stay-in-reset, 05h RDSR1 reconciliation, and ROM verifier gating)
-#      - OBI 1,024-cycle orphan watchdog progression under continuous !rst_sys_ni / ST_TIMEOUT_ERR and
-#        Rev. 28D ST_TRAP synthetic error response under subsys_dead_locked_q == 1'b1
-#   4. Static RTL & SVA structural/syntax integrity check across rtl/*.sv and fv/*.sv
+#   1. Exhaustive (22,16) Hsiao SECDED d_min = 4 and dynamically parsed parity equation verification against rtl/zc_otp_pkg.sv
+#   2. Exhaustive 4,080 (slot k=0..15, SVN v=1..255) codeword weight histogram (w_H,min = 8), intra-pair isolation and domain analysis
+#   3. Auxiliary behavioral reference models (BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION; EDA simulation remains NOT RUN):
+#      - OTP 4-phase DAI handshake progression
+#      - SPI 3-layer event separation and ROM verifier gating rules
+#      - OBI orphan watchdog progression and ST_TRAP synthetic error response
+#   4. Static RTL and SVA structural/syntax integrity check across rtl/*.sv and fv/*.sv
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
@@ -84,25 +82,39 @@ function Encode22_Matrix([int]$d) {
   return (($p -shl 16) -bor $d)
 }
 
-function Encode22_ExplicitEq([int]$d) {
-  $b = New-Object int[] 16
-  for ($i = 0; $i -lt 16; $i++) { $b[$i] = ($d -shr $i) -band 1 }
-  $p0 = $b[0] -bxor $b[1] -bxor $b[2] -bxor $b[4] -bxor $b[5] -bxor $b[7] -bxor $b[10] -bxor $b[11] -bxor $b[13]
-  $p1 = $b[0] -bxor $b[1] -bxor $b[3] -bxor $b[4] -bxor $b[6] -bxor $b[8] -bxor $b[10] -bxor $b[12] -bxor $b[14]
-  $p2 = $b[0] -bxor $b[2] -bxor $b[3] -bxor $b[5] -bxor $b[6] -bxor $b[9] -bxor $b[11] -bxor $b[12] -bxor $b[15]
-  $p3 = $b[1] -bxor $b[2] -bxor $b[3] -bxor $b[7] -bxor $b[8] -bxor $b[9] -bxor $b[13] -bxor $b[14] -bxor $b[15]
-  $p4 = $b[4] -bxor $b[5] -bxor $b[6] -bxor $b[7] -bxor $b[8] -bxor $b[9]
-  $p5 = $b[10] -bxor $b[11] -bxor $b[12] -bxor $b[13] -bxor $b[14] -bxor $b[15]
-  $p = $p0 -bor ($p1 -shl 1) -bor ($p2 -shl 2) -bor ($p3 -shl 3) -bor ($p4 -shl 4) -bor ($p5 -shl 5)
+# Dynamically parse p[0]..p[5] parity equations directly from rtl/zc_otp_pkg.sv
+$otpPkgFile = Join-Path $RepoRoot "rtl\zc_otp_pkg.sv"
+$otpPkgContent = Get-Content $otpPkgFile -Raw
+$parsed_equations = @{}
+$parse_ok = $true
+for ($p_idx = 0; $p_idx -lt 6; $p_idx++) {
+  if ($otpPkgContent -match "p\[$p_idx\]\s*=\s*([^;]+);") {
+    $rhs = $matches[1]
+    $d_matches = [regex]::Matches($rhs, "d\[(\d+)\]")
+    $parsed_equations[$p_idx] = @($d_matches | ForEach-Object { [int]$_.Groups[1].Value })
+  } else {
+    $parse_ok = $false
+  }
+}
+
+function Encode22_ParsedRtl([int]$d) {
+  $p = 0
+  for ($p_idx = 0; $p_idx -lt 6; $p_idx++) {
+    $bit_val = 0
+    foreach ($bit_pos in $parsed_equations[$p_idx]) {
+      $bit_val = $bit_val -bxor (($d -shr $bit_pos) -band 1)
+    }
+    $p = $p -bor ($bit_val -shl $p_idx)
+  }
   return (($p -shl 16) -bor $d)
 }
 
-$eq_match_ok = $true
+$eq_match_ok = $parse_ok
 for ($b = 0; $b -lt 16; $b++) {
   $unit = 1 -shl $b
-  if ((Encode22_Matrix $unit) -ne (Encode22_ExplicitEq $unit)) { $eq_match_ok = $false }
+  if ((Encode22_Matrix $unit) -ne (Encode22_ParsedRtl $unit)) { $eq_match_ok = $false }
 }
-Assert-Condition $eq_match_ok "T1.2_HSIAO_EXPLICIT_EQ_MATCH" "Explicit parity equations p[0]..p[5] in rtl/zc_otp_pkg.sv identically match H_data columns"
+Assert-Condition $eq_match_ok "T1.2_HSIAO_RTL_PARSED_EQ_MATCH" "Dynamically parsed f_hsiao_parity6 p[0..5] equations in rtl/zc_otp_pkg.sv identically match H_data matrix across all 16 basis vectors"
 
 # ----------------------------------------------------------------------
 # TEST 2: Exhaustive 4,080 (k,v) Seal Non-Collision & Weight Histograms
@@ -188,7 +200,7 @@ Assert-Condition ($svaOtp.Contains("bind zc_aon_post_auth_ctrl zc_otp_sva") -and
 Assert-Condition ($rtlObi.Contains("assign host_req_ready_o  = rst_sys_ni &&") -and $rtlObi.Contains("assign periph_phys_req_o = rst_sys_ni &&") -and $svaObi.Contains("a_obi_warm_reset_blocks_req_and_ready")) "T3.8_RTL_OBI_WARM_RESET_GATING_GCR01" "rtl/zc_obi_subordinate_bridge.sv and fv/zc_obi_sva.sv gate host_req_ready_o and periph_phys_req_o with rst_sys_ni (GCR-01)"
 
 # ----------------------------------------------------------------------
-# TEST 4: Cycle-Accurate Behavioral Trace Verification of RTL Contracts
+# TEST 4: Behavioral Algorithmic Reference Models (NOT RTL SIMULATION)
 # ----------------------------------------------------------------------
 # T4.1: OTP 4-Phase Normal (0->1->2), Single-Use Grant Consumption, Recovery (2-only), and Fatal Lock
 $otp_normal_trace_ok = $true
@@ -223,7 +235,7 @@ $otp_rec_wstep = "WSTEP_WAIT_RB_VERIFY"
 if ($otp_rec_seal_b -and ($otp_rec_word -eq 2)) {
   $otp_rec_state = "AUTH_SESSION_DONE"; $otp_rec_wstep = "WSTEP_IDLE"; $otp_rec_grant = $false
 }
-Assert-Condition ($otp_normal_trace_ok -and ($otp_state -eq "AUTH_SESSION_DONE") -and ($otp_rec_state -eq "AUTH_SESSION_DONE") -and (-not $otp_rec_grant)) "T4.1_OTP_4PHASE_FSM_STRUCTURAL_REF_MODEL" "Auxiliary PowerShell Behavioral FSM Reference Model (Normal 0->1->2 and Recovery 2-only state progression)"
+Assert-Condition ($otp_normal_trace_ok -and ($otp_state -eq "AUTH_SESSION_DONE") -and ($otp_rec_state -eq "AUTH_SESSION_DONE") -and (-not $otp_rec_grant)) "T4.1_OTP_4PHASE_FSM_BEHAVIORAL_REF_MODEL" "[BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION] Auxiliary PowerShell reference FSM (Normal 0->1->2 and Recovery 2-only progression)"
 
 # T4.2: SPI 3-Layer Event Separation (04h WRDI stay-in-reset, 05h RDSR1 reconciliation, and rom_img_verif_valid_i gating)
 $spi_state = "UPD_UNSYNC_RESET"
@@ -236,7 +248,7 @@ if (($spi_state -eq "UPD_UNSYNC_RESET") -and (-not $fault_sec) -and ($sr1_low2 -
 $spi_idle_ready = ($spi_state -eq "UPD_IDLE") -and (-not $fault_sec)
 $commit_ready_without_verif = $spi_idle_ready -and $false
 $commit_ready_with_verif    = $spi_idle_ready -and $true
-Assert-Condition ($stay_in_reset_after_wrdi -and $spi_idle_ready -and (-not $commit_ready_without_verif) -and $commit_ready_with_verif) "T4.2_SPI_3LAYER_RECONCILE_AND_VERIF_GATE" "04h WRDI stays in UPD_UNSYNC_RESET, fresh 05h RDSR1(2'b00) enters UPD_IDLE, and bank_b_commit_ready_o requires rom_img_verif_valid_i"
+Assert-Condition ($stay_in_reset_after_wrdi -and $spi_idle_ready -and (-not $commit_ready_without_verif) -and $commit_ready_with_verif) "T4.2_SPI_3LAYER_BEHAVIORAL_REF_MODEL" "[BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION] SPI firewall 3-layer event separation and ROM verifier commit gating logic"
 
 # T4.3: OBI 1,024-Cycle Orphan Watchdog Progression under continuous !rst_sys_ni and Rev. 28D ST_TRAP Synthetic Error
 $phys_active = $true; $rst_sys_n = $false; $rvalid = $false
@@ -262,14 +274,14 @@ $trap_cycle_err    = $trap_cycle_rvalid
 $trap_cycle_rdata  = if ($trap_cycle_rvalid) { 0 } else { 0xDEAD }
 # Next cycle returns to ST_IDLE while keeping subsys_dead_locked_q == 1
 $obi_state_next = "ST_IDLE"
-Assert-Condition ($dead_locked -and ($wdog_cnt -eq 1023) -and $host_req_ready -and (-not $periph_phys_req) -and $trap_cycle_rvalid -and $trap_cycle_err -and ($trap_cycle_rdata -eq 0) -and ($obi_state_next -eq "ST_IDLE")) "T4.3_OBI_WDOG_1024_AND_ST_TRAP_SYNTH_ERR" "Orphan watchdog reaches 1023->subsys_dead_locked_q=1 under continuous !rst_sys_ni, and ST_TRAP returns 1-cycle synthetic error (rvalid=1, err=1, rdata=0) with periph_phys_req_o=0"
+Assert-Condition ($dead_locked -and ($wdog_cnt -eq 1023) -and $host_req_ready -and (-not $periph_phys_req) -and $trap_cycle_rvalid -and $trap_cycle_err -and ($trap_cycle_rdata -eq 0) -and ($obi_state_next -eq "ST_IDLE")) "T4.3_OBI_WDOG_1024_BEHAVIORAL_REF_MODEL" "[BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION] OBI orphan watchdog 1024-cycle count and ST_TRAP synthetic error response model"
 
 # T4.4 (GCR-01): OBI Warm Reset (!rst_sys_ni == 0) blocks periph_phys_req_o and host_req_ready_o even when host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0
 $gcr01_rst_sys_n = $false; $gcr01_state = "ST_IDLE"; $gcr01_host_req = $true; $gcr01_phys_gnt = $true
 $gcr01_phys_active = $false; $gcr01_orphan_act = $false; $gcr01_dead_locked = $false
 $gcr01_host_ready = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and ($gcr01_dead_locked -or ((-not $gcr01_phys_active) -and (-not $gcr01_orphan_act) -and $gcr01_phys_gnt))
 $gcr01_phys_req   = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and $gcr01_host_req -and (-not $gcr01_phys_active) -and (-not $gcr01_orphan_act) -and (-not $gcr01_dead_locked)
-Assert-Condition ((-not $gcr01_host_ready) -and (-not $gcr01_phys_req)) "T4.4_OBI_GCR01_WARM_RESET_BLOCKS_PHYS_REQ" "Under rst_sys_ni=0, state_q=ST_IDLE, host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0 -> periph_phys_req_o=0 and host_req_ready_o=0"
+Assert-Condition ((-not $gcr01_host_ready) -and (-not $gcr01_phys_req)) "T4.4_OBI_GCR01_WARM_RESET_REF_MODEL" "[BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION] OBI warm reset (!rst_sys_ni) blocking of physical requests and host-ready"
 
 # T4.5 (GCR-06): Automated source-level regression equivalence proof that non-formal production RTL
 # is normalized bit-for-bit identical to e57d16d and matches canonical SHA-256 (pre-synthesis source check)
