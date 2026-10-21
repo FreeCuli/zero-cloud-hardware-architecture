@@ -18,7 +18,7 @@
 > 1. Approval of this RFC draft authorizes architectural analysis only; it does **NOT** authorize modifying the 14 immutable v3.x normative documents in the repository root.
 > 2. The technical proofs achieved in Gate C (`PARTIAL / QUALIFIED`) verify local digital RTL IP blocks (`zc_spi_flash_firewall`, `zc_obi_subordinate_bridge`, `zc_aon_post_auth_ctrl`) under open-source tools ($t=20$). They do **NOT** prove full-SoC information-flow noninterference, general-purpose DMA firewalling, or physical silicon side-channel immunity.
 > 3. All physical silicon, SoC crossbar DMA isolation, and analog covert-channel bounds remain strictly **`Gate D (UNVERIFIED)`**.
-> 4. Current release state remains: **`DO NOT MERGE / RELEASE BLOCKED`**.
+> 4. Current normative standard status: **`DO NOT MERGE / RELEASE BLOCKED`** as a final ratified standard. (This restriction applies strictly to ratifying a final production standard; it does not restrict the publication or distribution of this document as an unratified architectural draft within the `v4.0.0-rc1` candidate release).
 
 ---
 
