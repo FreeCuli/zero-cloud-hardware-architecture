@@ -111,9 +111,8 @@ for ($p_idx = 0; $p_idx -lt 6; $p_idx++) {
   # Strip inline comments
   $rhs_clean = ($rhs_full -replace '//.*$', '').Trim()
 
-  # 3. Syntax validation: RHS must contain ONLY d[k] terms, '^', and whitespace
-  $remainder = $rhs_clean -replace 'd\[\d+\]', '' -replace '\^', '' -replace '\s+', ''
-  if ($remainder.Length -gt 0) {
+  # 3. Strict grammar validation: RHS must be a valid XOR expression chain: d[k] (^ d[k])*
+  if ($rhs_clean -notmatch '^\s*d\[\d+\](\s*\^\s*d\[\d+\])*\s*$') {
     $parse_ok = $false
     continue
   }
@@ -153,7 +152,7 @@ for ($b = 0; $b -lt 16; $b++) {
   $unit = 1 -shl $b
   if ((Encode22_Matrix $unit) -ne (Encode22_ParsedRtl $unit)) { $eq_match_ok = $false }
 }
-Assert-Condition $eq_match_ok "T1.2_HSIAO_RTL_PARSED_EQ_MATCH" "Validated exactly 1 f_hsiao_parity6 function in rtl/zc_otp_pkg.sv containing exactly 6 unique p[0..5] equations; extracted d[0..15] XOR terms identically match H_data columns across all 16 basis vectors"
+Assert-Condition $eq_match_ok "T1.2_HSIAO_RTL_PARSED_EQ_MATCH" "Validated 1 f_hsiao_parity6 function in rtl/zc_otp_pkg.sv with 6 strict XOR-chain p[0..5] equations; extracted d[0..15] terms identically match H_data columns across all 16 basis vectors"
 
 # ----------------------------------------------------------------------
 # TEST 2: Exhaustive 4,080 (k,v) Seal Non-Collision & Weight Histograms
