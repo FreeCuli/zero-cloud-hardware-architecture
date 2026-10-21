@@ -16,6 +16,7 @@
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
+Set-Location $RepoRoot
 $PassCount = 0
 $FailCount = 0
 
@@ -49,17 +50,31 @@ function PopCount([int]$v) {
   return $cnt
 }
 
-$dmin4_ok = $true
+$dmin_ge4 = $true
 for ($i = 0; $i -lt 22; $i++) {
-  if ($H_full[$i] -eq 0) { $dmin4_ok = $false }
+  if ($H_full[$i] -eq 0) { $dmin_ge4 = $false }
   for ($j = $i + 1; $j -lt 22; $j++) {
-    if (($H_full[$i] -bxor $H_full[$j]) -eq 0) { $dmin4_ok = $false }
+    if (($H_full[$i] -bxor $H_full[$j]) -eq 0) { $dmin_ge4 = $false }
     for ($l = $j + 1; $l -lt 22; $l++) {
-      if (($H_full[$i] -bxor $H_full[$j] -bxor $H_full[$l]) -eq 0) { $dmin4_ok = $false }
+      if (($H_full[$i] -bxor $H_full[$j] -bxor $H_full[$l]) -eq 0) { $dmin_ge4 = $false }
     }
   }
 }
-Assert-Condition $dmin4_ok "T1.1_HSIAO_DMIN_4" "All 22 columns of H_6x22 have no 1-, 2-, or 3-column XOR sum equal to 0 (strict SECDED d_min=4)"
+
+$zero4_combos = 0
+for ($i = 0; $i -lt 22; $i++) {
+  for ($j = $i + 1; $j -lt 22; $j++) {
+    for ($k = $j + 1; $k -lt 22; $k++) {
+      for ($l = $k + 1; $l -lt 22; $l++) {
+        if (($H_full[$i] -bxor $H_full[$j] -bxor $H_full[$k] -bxor $H_full[$l]) -eq 0) {
+          $zero4_combos++
+        }
+      }
+    }
+  }
+}
+$dmin_exact_4 = $dmin_ge4 -and ($zero4_combos -gt 0)
+Assert-Condition $dmin_exact_4 "T1.1_HSIAO_DMIN_4" "H_6x22 has no 1-, 2-, 3-col XOR=0 (d_min >= 4) and exactly $zero4_combos 4-col XOR=0 combos (strict d_min = 4)"
 
 function Encode22_Matrix([int]$d) {
   $p = 0
@@ -97,6 +112,9 @@ $histSVN = @{8=0; 10=0; 12=0; 14=0}
 $histA   = @{8=0; 10=0; 12=0; 14=0}
 $histB   = @{8=0; 10=0; 12=0; 14=0}
 $minW = 99; $maxW = 0
+$dictSVN = @{}
+$dictA   = @{}
+$dictB   = @{}
 
 for ($k = 0; $k -lt 16; $k++) {
   $maskA = (17 * $k + 0x5A) -band 0xFF
@@ -113,9 +131,15 @@ for ($k = 0; $k -lt 16; $k++) {
     $nBB  = (-bnot $BB) -band 0xFF
     $dB   = ($BB -shl 8) -bor $nBB
 
+    # 1. Intra-pair mutual exclusivity (same (k, v) instance)
     if ($dA -eq $dB)   { $coll_AB++ }
     if ($dA -eq $dSVN) { $coll_ASVN++ }
     if ($dB -eq $dSVN) { $coll_BSVN++ }
+
+    # 2. Tracking unique words per family across all 4,080 instances
+    $dictSVN[$dSVN] = 1
+    $dictA[$dA]     = 1
+    $dictB[$dB]     = 1
 
     $wSVN = PopCount (Encode22_Matrix $dSVN)
     $wA   = PopCount (Encode22_Matrix $dA)
@@ -131,7 +155,13 @@ for ($k = 0; $k -lt 16; $k++) {
   }
 }
 
-Assert-Condition (($coll_AB -eq 0) -and ($coll_ASVN -eq 0) -and ($coll_BSVN -eq 0)) "T2.1_OTP_SEAL_ZERO_COLLISIONS" "Collisions across 4,080 (k,v) pairs: A==B:$coll_AB, A==SVN:$coll_ASVN, B==SVN:$coll_BSVN"
+$uniqSVN = $dictSVN.Keys.Count
+$uniqA   = $dictA.Keys.Count
+$uniqB   = $dictB.Keys.Count
+$intra_ok = ($coll_AB -eq 0) -and ($coll_ASVN -eq 0) -and ($coll_BSVN -eq 0)
+$domain_ok = ($uniqSVN -eq 255) -and ($uniqA -eq 256) -and ($uniqB -eq 256)
+
+Assert-Condition ($intra_ok -and $domain_ok) "T2.1_OTP_SEAL_COLLISION_AND_DOMAIN_AUDIT" "Intra-pair (same k,v) collisions: AB=0, ASVN=0, BSVN=0; unique words across all 4,080: SVN=255/255, CommitA=256/256, CommitB=256/256 (quantified cross-slot reuse)"
 Assert-Condition (($minW -eq 8) -and ($maxW -eq 14)) "T2.2_OTP_CODEWORD_WEIGHT_BOUNDS" "22-bit codeword Hamming weight range is [$minW..$maxW] (w_H,min = 8)"
 Assert-Condition (($histSVN[8] -eq 128) -and ($histSVN[10] -eq 1904) -and ($histSVN[12] -eq 1920) -and ($histSVN[14] -eq 128)) "T2.3_OTP_SVN_HISTOGRAM" "WORD_SVN histogram: w=8:$($histSVN[8]), w=10:$($histSVN[10]), w=12:$($histSVN[12]), w=14:$($histSVN[14])"
 Assert-Condition (($histA[8] -eq 127) -and ($histA[10] -eq 1914) -and ($histA[12] -eq 1911) -and ($histA[14] -eq 128)) "T2.4_OTP_SEAL_A_HISTOGRAM" "WORD_COMMIT_A histogram: w=8:$($histA[8]), w=10:$($histA[10]), w=12:$($histA[12]), w=14:$($histA[14])"
