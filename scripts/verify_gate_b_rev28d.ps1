@@ -82,16 +82,26 @@ function Encode22_Matrix([int]$d) {
   return (($p -shl 16) -bor $d)
 }
 
-# Strictly parse and validate p[0]..p[5] parity equations directly from rtl/zc_otp_pkg.sv
+# Strictly parse and validate p[0]..p[5] parity equations within f_hsiao_parity6 in rtl/zc_otp_pkg.sv
 $otpPkgFile = Join-Path $RepoRoot "rtl\zc_otp_pkg.sv"
 $otpPkgContent = Get-Content $otpPkgFile -Raw
 $parsed_equations = @{}
 $parse_ok = $true
 
+# 1. Verify that function f_hsiao_parity6 exists and occurs exactly once
+$fn_pattern = "(?s)function\s+automatic\s+logic\s+\[5:0\]\s+f_hsiao_parity6\s*\([^)]*\);(.*?)endfunction"
+$fn_matches = [regex]::Matches($otpPkgContent, $fn_pattern)
+if ($fn_matches.Count -ne 1) {
+  $parse_ok = $false
+  $fn_body = ""
+} else {
+  $fn_body = $fn_matches[0].Groups[1].Value
+}
+
 for ($p_idx = 0; $p_idx -lt 6; $p_idx++) {
-  # 1. Verify that each p[i] equation occurs exactly once
+  # 2. Verify that each p[i] equation occurs exactly once strictly inside f_hsiao_parity6 body
   $pattern = "(?m)^\s*p\[$p_idx\]\s*=\s*([^;]+);"
-  $p_matches = [regex]::Matches($otpPkgContent, $pattern)
+  $p_matches = [regex]::Matches($fn_body, $pattern)
   if ($p_matches.Count -ne 1) {
     $parse_ok = $false
     continue
@@ -101,14 +111,14 @@ for ($p_idx = 0; $p_idx -lt 6; $p_idx++) {
   # Strip inline comments
   $rhs_clean = ($rhs_full -replace '//.*$', '').Trim()
 
-  # 2. Syntax validation: RHS must contain ONLY d[k] terms, '^', and whitespace
+  # 3. Syntax validation: RHS must contain ONLY d[k] terms, '^', and whitespace
   $remainder = $rhs_clean -replace 'd\[\d+\]', '' -replace '\^', '' -replace '\s+', ''
   if ($remainder.Length -gt 0) {
     $parse_ok = $false
     continue
   }
 
-  # 3. Extract and bounds-check all d[k] indices (must be non-empty and in 0..15)
+  # 4. Extract and bounds-check all d[k] indices (must be non-empty and in 0..15)
   $d_matches = [regex]::Matches($rhs_clean, "d\[(\d+)\]")
   if ($d_matches.Count -eq 0) {
     $parse_ok = $false
@@ -143,7 +153,7 @@ for ($b = 0; $b -lt 16; $b++) {
   $unit = 1 -shl $b
   if ((Encode22_Matrix $unit) -ne (Encode22_ParsedRtl $unit)) { $eq_match_ok = $false }
 }
-Assert-Condition $eq_match_ok "T1.2_HSIAO_RTL_PARSED_EQ_MATCH" "RTL regex parser validated exactly 6 unique equations in rtl/zc_otp_pkg.sv; extracted d[0..15] XOR terms identically match H_data columns across all 16 basis vectors"
+Assert-Condition $eq_match_ok "T1.2_HSIAO_RTL_PARSED_EQ_MATCH" "Validated exactly 1 f_hsiao_parity6 function in rtl/zc_otp_pkg.sv containing exactly 6 unique p[0..5] equations; extracted d[0..15] XOR terms identically match H_data columns across all 16 basis vectors"
 
 # ----------------------------------------------------------------------
 # TEST 2: Exhaustive 4,080 (k,v) Seal Non-Collision & Weight Histograms
