@@ -82,19 +82,48 @@ function Encode22_Matrix([int]$d) {
   return (($p -shl 16) -bor $d)
 }
 
-# Dynamically parse p[0]..p[5] parity equations directly from rtl/zc_otp_pkg.sv
+# Strictly parse and validate p[0]..p[5] parity equations directly from rtl/zc_otp_pkg.sv
 $otpPkgFile = Join-Path $RepoRoot "rtl\zc_otp_pkg.sv"
 $otpPkgContent = Get-Content $otpPkgFile -Raw
 $parsed_equations = @{}
 $parse_ok = $true
+
 for ($p_idx = 0; $p_idx -lt 6; $p_idx++) {
-  if ($otpPkgContent -match "p\[$p_idx\]\s*=\s*([^;]+);") {
-    $rhs = $matches[1]
-    $d_matches = [regex]::Matches($rhs, "d\[(\d+)\]")
-    $parsed_equations[$p_idx] = @($d_matches | ForEach-Object { [int]$_.Groups[1].Value })
-  } else {
+  # 1. Verify that each p[i] equation occurs exactly once
+  $pattern = "(?m)^\s*p\[$p_idx\]\s*=\s*([^;]+);"
+  $p_matches = [regex]::Matches($otpPkgContent, $pattern)
+  if ($p_matches.Count -ne 1) {
     $parse_ok = $false
+    continue
   }
+
+  $rhs_full = $p_matches[0].Groups[1].Value
+  # Strip inline comments
+  $rhs_clean = ($rhs_full -replace '//.*$', '').Trim()
+
+  # 2. Syntax validation: RHS must contain ONLY d[k] terms, '^', and whitespace
+  $remainder = $rhs_clean -replace 'd\[\d+\]', '' -replace '\^', '' -replace '\s+', ''
+  if ($remainder.Length -gt 0) {
+    $parse_ok = $false
+    continue
+  }
+
+  # 3. Extract and bounds-check all d[k] indices (must be non-empty and in 0..15)
+  $d_matches = [regex]::Matches($rhs_clean, "d\[(\d+)\]")
+  if ($d_matches.Count -eq 0) {
+    $parse_ok = $false
+    continue
+  }
+
+  $indices = @()
+  foreach ($dm in $d_matches) {
+    $idx_val = [int]$dm.Groups[1].Value
+    if ($idx_val -lt 0 -or $idx_val -gt 15) {
+      $parse_ok = $false
+    }
+    $indices += $idx_val
+  }
+  $parsed_equations[$p_idx] = $indices
 }
 
 function Encode22_ParsedRtl([int]$d) {
@@ -109,12 +138,12 @@ function Encode22_ParsedRtl([int]$d) {
   return (($p -shl 16) -bor $d)
 }
 
-$eq_match_ok = $parse_ok
+$eq_match_ok = $parse_ok -and ($parsed_equations.Keys.Count -eq 6)
 for ($b = 0; $b -lt 16; $b++) {
   $unit = 1 -shl $b
   if ((Encode22_Matrix $unit) -ne (Encode22_ParsedRtl $unit)) { $eq_match_ok = $false }
 }
-Assert-Condition $eq_match_ok "T1.2_HSIAO_RTL_PARSED_EQ_MATCH" "Dynamically parsed f_hsiao_parity6 p[0..5] equations in rtl/zc_otp_pkg.sv identically match H_data matrix across all 16 basis vectors"
+Assert-Condition $eq_match_ok "T1.2_HSIAO_RTL_PARSED_EQ_MATCH" "RTL regex parser validated exactly 6 unique equations in rtl/zc_otp_pkg.sv; extracted d[0..15] XOR terms identically match H_data columns across all 16 basis vectors"
 
 # ----------------------------------------------------------------------
 # TEST 2: Exhaustive 4,080 (k,v) Seal Non-Collision & Weight Histograms
