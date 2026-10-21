@@ -8,6 +8,11 @@
 > [!NOTE]
 > **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE v4.0.0-rc1 Release Candidate (Pending Experimental Validation)** for all privacy-critical, server-independent autonomous AIoT and Edge AI hardware (Smart Home, Medical, Industrial, Defense).
 
+> [!NOTE]
+> **Architectural Profile Scope — STRICT:**
+> This document specifies the ZC-CORE reference architecture based on unidirectional hardware data paths and physical isolation. The V4 hybrid architecture proposal does not automatically alter the existing normative provisions of this document.
+> For hardware-gated bidirectional interfaces and their associated security boundaries, refer to the [security profiles specification](docs/architecture/zc-core-security-profiles.md), the [hybrid interconnect architecture](docs/architecture/zc-core-hybrid-interconnect.md), and the draft [V4 architecture RFC](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md). The proposals in these documents do not supersede the existing normative standard without the requisite formal ratifications.
+
 > [!IMPORTANT]
 > **LEGAL NOTICE: Separation of Technical Standard and Legal Licensing**
 > This document defines the strict **technical architecture and engineering properties** of the ZC-CORE methodology. For all legal licensing models, CERN-OHL-S v2.0 implications, patent retaliation clauses, and commercial exemption terms, refer strictly to the `zero-cloud-dual-licensing.md` document in this repository.

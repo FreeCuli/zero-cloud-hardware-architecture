@@ -12,6 +12,13 @@ This repository contains the **ZC-CORE v4.0.0-rc1 Release Candidate (Pending Exp
 
 By enforcing Physical Data Diodes, Trust Boundaries, and Hardware-Enforced Raw-Data Destruction / Invalidation (including power-cut, cryptographic zeroization, or independently validated equivalent mechanisms), this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It is designed to mitigate remote network-based raw-sensor extraction, including attacks originating from compromised network infrastructure, and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
 
+### Architectural Security Profiles & Boundary Scope
+In the context of the ZC-CORE v4.0.0-rc1 candidate preparation, two architectural profiles are considered: STRICT and HYBRID. V4 modifications concerning the HYBRID profile must be evaluated strictly within the framework of the draft/ratification status of the respective documents and the open verification boundaries of this release.
+
+> [!WARNING]
+> **Integration and Verification Boundary — Gate D: UNVERIFIED**
+> The RTL blocks, formal verification models, and simulation suites in this repository must be evaluated strictly within their specific test and model scopes. In particular, for `zc_aon_post_auth_ctrl`, clock domain crossing (CDC) transitions, asynchronous reset behaviors, and full-SoC integration are not yet verified at the physical silicon implementation level. This candidate release does not constitute a security guarantee for final silicon or a complete SoC.
+
 ## The Core Philosophy: Implementation Freedom & Methodological Consistency
 
 **1. Implementation Freedom & Methodological Consistency**
