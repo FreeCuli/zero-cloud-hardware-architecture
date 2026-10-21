@@ -11,30 +11,25 @@ However, we recognize that established AIoT Hardware Manufacturers (B2B)-whether
 
 To bridge this gap, FreeCuli operates under a **Dual-Licensing Model**.
 
-## 1. The Open Source Path (Free)
-If you are an academic institution, an independent developer, or an open-source hardware startup:
-You may implement the FreeCuli ZC-CORE hardware flow completely free of charge.
-**The Obligation:** Under the CERN-OHL-S v2.0 and AGPL-3.0 licenses, you **MUST** publish all of your Corresponding Source (including schematics, PCB layout source, BOM, and Gerber manufacturing files) and software source code to the public. If you do this, you owe us nothing.
+## 1. Route A: The Reciprocal Open Hardware Path
+Any organization or individual—including commercial enterprises, industrial manufacturers, academic institutions, and independent developers—is entitled to exercise licence rights under CERN-OHL-S-2.0, subject to all applicable terms of the licence, including the grant of rights (§2), distribution conditions (§3), and provisions governing making and Conveying Products and Complete Source (§1.8, §4).
 
-## 2. The Commercial Exemption Path (B2B License)
-If you are a commercial AIoT manufacturer (e.g., Bosch, Samsung, Aselsan, Siemens) who wants to utilize the FreeCuli ZC-CORE privacy standards without being forced to open-source your own proprietary trade secrets:
+## 2. Route B: The Elective Commercial License Path
+Commercial manufacturers wishing to integrate FreeCuli's reference RTL modules (`rtl/*.sv`) into proprietary ASICs or closed-source FPGA products without releasing derivative RTL under CERN-OHL-S-2.0 may negotiate an elective separate commercial license from FreeCuli.
+Scope & Limitations: Any Route B agreement is a contractually defined alternative licensing pathway strictly limited to source materials where FreeCuli holds licensing authority (which, in this repository, is grounded in the founder's factual representation ATTEST-01 over `rtl/*.sv`, not an independently verified chain of title) and to the express terms of that agreement. Route B does not provide an automatic blanket exemption for an entire multi-vendor product, does not license third-party IP or patents, does not retroactively alter, revoke, or extinguish any rights previously acquired or obligations previously incurred under CERN-OHL-S-2.0, and does not impose a compulsory levy on independent implementations.
 
-You **MUST** obtain a **Commercial Exemption License** from the FreeCuli Consortium Legal & Engineering Team before production.
+## 3. Patent Termination & Open Innovation Framework
+To foster open collaboration and protect the ecosystem, licensing of FreeCuli's covered hardware is subject to the patent non-aggression and termination provisions of applicable open licenses:
 
-### Commercial License Benefits:
-1. **Commercial Intellectual Property Exemption:** The commercial agreement grants permissions expressly defined by FreeCuli for the FreeCuli-controlled materials, exempting them from the standard copyleft obligations of CERN-OHL-S v2.0 and AGPL-3.0. Your proprietary components and trade secrets stay secret.
-2. **Certification & Trademark Use:** While the technical architecture is open under CERN-OHL-S v2.0, the `FreeCuli` and `ZC-CORE` trademarks are fiercely protected. The open-source license does NOT grant trademark usage rights. Only a commercial B2B agreement grants you the right to brand your product with the official `FreeCuli Certified: ZC-CORE` badges.
-3. **Ecosystem Integration:** Your devices become officially verified nodes within the respective AIoT ecosystem (e.g., APSNY for Smart Kitchens).
+- CERN-OHL-S-2.0 Patent Termination (§7.2): Under Section 7.2 of CERN-OHL-S-2.0, licence rights terminate as of the date such process is initiated if a licensee institutes patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that Covered Source or a Product constitutes direct or contributory patent infringement, or seeking any declaration that a patent licensed to You under this Licence is invalid or unenforceable. This summary notice does not alter, replace, or narrow the official terms of Section 7.2 of CERN-OHL-S-2.0.
+- Open Invention Network (OIN): FreeCuli is a participant in the Open Invention Network (OIN 2.0), supporting patent non-aggression across the Linux System environment. OIN membership provides cross-licensing protections within the scope of the defined Linux System; it does not constitute a patent grant, patent ownership deed, or universal patent immunity for all proprietary hardware components.
 
-## 3. Patent Retaliation Clause (Legal Protection)
-To protect open innovation, the licensing of the ZC-CORE methodology includes a strict **Patent Retaliation Clause**. 
+## 4. Intellectual Property Scope, Boundaries & Independent Conformance Notice
+FreeCuli claims copyright ownership over its original Register-Transfer Level source files (`rtl/*.sv`) and accompanying verification source (`tb/*.sv`, `fv/*.sv`), grounded in the founder's factual representation ATTEST-01 (which has not been verified through an independent external chain-of-title audit). These covered source files are licensed to the public under CERN-OHL-S-2.0. Under general copyright law principles, copyright protects specific creative expression, not abstract systems, architectural methodologies, or operational concepts:
 
-If any corporate entity, technology giant, or patent troll initiates patent infringement litigation against FreeCuli or any other compliant manufacturer utilizing this standard (claiming that the implementation of data diodes, volatile memory zeroization, or physical air-gaps as defined in the ZC-CORE standard infringes upon their patents), that entity's right to use the CERN-OHL-S v2.0 / ZC-CORE license is **subject to worldwide revocation under applicable license terms** (Subject to valid legal claims, applicable law, and specifically applying to FreeCuli-controlled IP). 
-
-Furthermore, as an official **Open Invention Network (OIN)** member, FreeCuli leverages cross-licensing and patent non-aggression agreements to protect the Linux System environment and embedded Edge AI spaces.
-
-## 4. Enforcement Notice
-A device found implementing the ZC-CORE physical isolation hardware locks (Data Diode/Cryptographic Zeroization) without a commercial license AND without open-sourcing its schematics may be subject to strict enforcement under applicable license obligations for violating the CERN-OHL-S v2.0 license obligations.
+- Independent Implementations: Developing an independent hardware implementation from functional specifications without copying FreeCuli's protected RTL source files does not, in itself, constitute copyright infringement of FreeCuli's RTL source code. This statement applies strictly and exclusively to FreeCuli's own RTL copyright claims.
+- Multi-Domain Rights Boundary: This notice does not grant a universal liability shield. Patent validity, third-party rights, contractual commitments, and trade secrets remain distinct legal inquiries to be evaluated under applicable law and specific factual circumstances.
+- Trademarks: Conformance to the functional methodology does not grant rights to display the "FreeCuli Certified™" trademark without separate trademark authorization.
 
 ### How to Apply
 To initiate the commercial licensing and compliance audit process, contact our engineering and legal team:

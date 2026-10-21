@@ -14,41 +14,73 @@ This repository operates under a strict Dual-Licensing Model, separating open-so
 1. SCOPE & ARTIFACT CLASSIFICATION MAPPING
 ----------------------------------------------------------------------
 
-A. HARDWARE DESIGNS & SCHEMATICS (SPDX: CERN-OHL-S-2.0)
-   - Scope: Reference PCB layouts, component placement, electrical schematics,
-     Gerber files, and hardware data diode interconnect topologies.
-   - Obligation: Strongly reciprocal copyleft. Any distribution of matching or
-     derivative physical designs requires publishing complete Corresponding
-     Source under CERN-OHL-S v2.0, unless covered by a Commercial Exemption.
+A. HARDWARE PRODUCTION RTL & VERIFICATION SOURCE (SPDX: CERN-OHL-S-2.0)
+   - Scope: Production Register-Transfer Level modules (`rtl/*.sv`), simulation testbenches
+     (`tb/*.sv`), and formal verification proof harnesses (`fv/*.sv`).
+   - Excluded / Unreleased: Reference PCB layouts, electrical CAD schematics, and Gerber
+     manufacturing files are not published in this repository and are not covered by this release.
+   - Governing Terms: Released under the CERN Open Hardware Licence Strongly Reciprocal
+     Version 2.0 (CERN-OHL-S-2.0). Licence permissions, conditions, and obligations—including
+     the grant of rights (§2), distribution conditions (§3), and provisions governing making
+     and Conveying Products (§4) and Complete Source (§1.8)—are governed strictly by all
+     applicable terms of CERN-OHL-S-2.0. This summary notice does not alter, replace, or narrow
+     any terms of the official licence.
 
-B. CONTROLLER SOFTWARE, FIRMWARE & SCRIPTS (SPDX: AGPL-3.0-or-later)
-   - Scope: All reference firmware drivers, NPU lifecycle hooks, evaluation scripts,
-     and CI validation tools provided by FreeCuli.
-   - Obligation: Strongly reciprocal copyleft across networks under GNU AGPL v3.0.
+B. VERIFICATION SCRIPTS & REPOSITORY TOOLING
+   - Script Tooling: The verification script `scripts/verify_gate_b_rev28d.ps1` currently carries
+     an internal SPDX-License-Identifier for CERN-OHL-S-2.0 as repository tooling. CI workflow
+     configurations (`.github/workflows/*.yml`) provide automation configuration.
+   - Software Boundary: Embedded controller software, companion firmware, and NPU driver hooks
+     are not included in this hardware repository. If companion software packages are released
+     in the future, they will be distributed in separate repositories under designated software licenses.
 
-C. NORMATIVE METHODOLOGY & SPECIFICATION DOCUMENTS (Open Standard / Prior Art)
-   - Scope: The RFC 2119 normative specifications (M1-M10 invariants, CTS,
-     Evidence Matrix, Defensive Publication, Attack Taxonomy).
-   - Standard Usage: Free for implementation verification and conformance evaluation.
-   - Conformance != Code Ownership: Implementing the standard grants FreeCuli
-     NO intellectual property rights over a manufacturer's proprietary design.
+C. NORMATIVE METHODOLOGY & SPECIFICATION DOCUMENTS
+   - Scope: Architectural specifications, conformance test specifications, and evidence
+     matrices (`zero-cloud-*.md`).
+   - Copyright Claim & Document Notices: FreeCuli claims copyright over the textual expression
+     of documentation files authored for this repository, which are governed by their respective
+     individual document notices (with core specifications displaying individual CERN-OHL-S-2.0 notices).
+     This copyright claim is not characterized as an independently verified legal determination.
+   - Functional Implementation Boundary: Reading and evaluating the specification text is permitted
+     under its applicable terms. Conforming to the functional methodology described in the
+     specifications does not convey to FreeCuli intellectual property rights over an implementer's
+     independently authored hardware designs.
 
 ----------------------------------------------------------------------
-2. COMMERCIAL EXEMPTION (B2B LICENSE)
+2. LICENSING PATHWAYS & COMMERCIAL EXEMPTIONS (ROUTE B)
 ----------------------------------------------------------------------
-Manufacturers seeking to build compliant Zero-Cloud appliances without
-releasing proprietary trade secrets, firmware, or silicon designs MUST
-execute a Commercial Exemption Agreement with FreeCuli prior to commercial distribution.
+FreeCuli defines two licensing pathways for its covered RTL source code:
 
-Commercial exemptions provide:
-  - Exemption from CERN-OHL-S v2.0 and AGPL-3.0 copyleft source-code release obligations.
-  - Authorized, licensed usage of official "FreeCuli Certified" trademarks.
-  - Verification & listing in the official FreeCuli Certificate Registry.
+Route A (Reciprocal Open Hardware):
+  Any organization or individual—commercial or non-commercial—may freely exercise licence
+  rights under CERN-OHL-S-2.0, subject to all applicable terms and conditions of the official
+  licence, including the grant of rights (§2), copyleft/distribution conditions (§3), and
+  obligations regarding making Products, Conveyance, and Complete Source (§1.8, §4).
+
+Route B (Elective Separate Commercial License):
+  Organizations seeking to incorporate FreeCuli's reference RTL designs into closed-source
+  products without releasing derivative RTL under CERN-OHL-S-2.0 may negotiate an elective,
+  separate commercial license with FreeCuli.
+  Scope & Limitations: Any Route B agreement is a contractually defined alternative licensing
+  pathway strictly limited to source materials where FreeCuli holds licensing authority (which,
+  in this repository, is grounded in the founder's factual representation ATTEST-01 over `rtl/*.sv`,
+  not an independently verified chain of title) and to the express terms of that agreement.
+  Route B does not provide an automatic blanket exemption for an entire multi-vendor product,
+  does not license third-party IP or patents, and does not retroactively alter, revoke, or extinguish
+  any rights previously acquired or obligations previously incurred under CERN-OHL-S-2.0.
+
+Independent Implementations & Intellectual Property Boundaries:
+  Independent development of hardware from functional specifications without copying
+  FreeCuli's protected RTL source does not, in itself, constitute copyright infringement of
+  FreeCuli's RTL source code. This statement applies strictly and exclusively to FreeCuli's
+  own RTL copyright claims. It does not provide a universal liability shield: third-party patent
+  validity, contractual commitments, trade secrets, and trademark designations ("FreeCuli Certified™")
+  remain distinct legal inquiries governed by applicable law and specific factual circumstances.
 
 ----------------------------------------------------------------------
 3. GOVERNING LEGAL DOCUMENTATION & CONTACT
 ----------------------------------------------------------------------
-For full definitions, patent retaliation terms, and trademark policies, see:
+For full definitions, patent termination terms, and trademark policies, see:
   - zero-cloud-dual-licensing.md
   - zero-cloud-core-brand-and-trademark-policy.md
 
