@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this methodology or reference architecture, please cite it as below."
 title: "ZC-CORE: Hardware-enforced, server-independent Zero-Cloud architecture methodology (Pending Experimental Validation)"
-version: 3.3.0-rc3
+version: 4.0.0-rc1
 date-released: "2026-10-21"
 authors:
   - name: "FreeCuli / ZC-CORE Contributors"

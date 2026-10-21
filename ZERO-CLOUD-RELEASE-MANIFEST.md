@@ -3,36 +3,36 @@
 This manifest records the cryptographic identity, publication metadata, and file integrity of the specified ZC-CORE release. The associated defensive publication is intended to establish publicly accessible technical prior art for the disclosed subject matter. This document does not constitute a patentability opinion. Legacy pointer documents (and LICENSE) are intentionally excluded from the canonical release hash set because they contain no normative content.
 
 ## Publication Metadata
-* **Release Version:** ZC-CORE v3.3.0-rc3 (Gate 4 Blueprint)
-* **Status:** Pending Experimental Validation (Gate 4 Laboratory Execution)
+* **Release Version:** ZC-CORE v4.0.0-rc1 (Gate 4 Blueprint / Hybrid Architecture)
+* **Status:** Pending Experimental Validation (Gate C HDL Formally Verified / Gate D Physical Silicon Pending)
 * **Date (UTC):** 2026-10-21
 * **Reference Concept DOI (Zenodo):** 10.5281/zenodo.22838473
 * **Standardization Level:** RFC 2119 Normative Stricture
 * **Repository:** FreeCuli/zero-cloud-hardware-architecture
-* **Git Tag: v3.3.0-rc3**
-* **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v3.3.0-rc3`
+* **Git Tag: v4.0.0-rc1**
+* **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v4.0.0-rc1`
 * **Release Artifact SHA-256:** *(to be computed and recorded upon generation of the immutable Zenodo archival tarball/zip using `sha256sum <zenodo_archive>`. This placeholder preserves cryptographic distinction between the Git tree state and the post-publication distribution artifact)*
 
 ## Cryptographic Evidence (SHA-256 Hashes)
 
 ### Canonical Normative and Supporting Documents
-The following hashes cover all canonical v3.3.0-rc3 normative and supporting documents listed in this manifest.
+The following hashes cover all canonical v4.0.0-rc1 normative and supporting documents listed in this manifest.
 
 ```text
-7993A432FF4B8890F7485390C651719E7517E2628D0BACBEBECFE0F71D0BEEB8  README.md
+59756E3FCF7D80DD2FCB107FAF9BCC89090D3523C619C234A3CEFBA63F70B864  README.md
 D2B25667917F4EAB9271FAC7B6DC2B472F86CCF5A8ECBA307B55D2C1D1EF7D42  ZC-CORE-CONFORMANCE-EVIDENCE-PACKAGE.md
-FF22F9B6189F0D19B60B6E811F700EA8BFA1413223ABF5584AAD4D01FCF48EC1  ZC-CORE-HARDWARE-FORENSIC-AUDIT-PROTOCOL.md
-5F248F022F2A242D7D25EE66A6824687B215E7B029B49120A54820A665ABA599  zero-cloud-core-attack-taxonomy.md
-51AE8738C4E5ECCC45F2E736151C59B8DDBBFC803F3DD344AEFAFD4537DAE3AA  zero-cloud-core-brand-and-trademark-policy.md
-D100BD071B9ED8EEA1C7DC83B78DA4F3A57E65640BC37FF59B57FD53F855440E  zero-cloud-core-conformance-evidence-matrix.md
-C4977A1E7B48F4FAC75F76FF60B13E4A71EF08E2D8C4D1AA6F3CC3864E4B6CCA  zero-cloud-core-conformance-test-specification.md
-A00BB6F6BBE247038F0BC802C2E8D6E90B5D1FB08A4BC7C68F8511F5DC9467A5  zero-cloud-core-defensive-publication.md
-D0B56132916A3020B15BEB337B0679F04426A779607B3EA6A9C5C30DAA69EC24  zero-cloud-core-implementation-coverage.md
-D754C24885E0C35C9E8056DE588100952DD15E345E5A047BF70568CF92308F63  zero-cloud-core-methodology-invariants.md
-ACA93657A8E79202DCB3E70F607E2065E20458826749DBD9D940626710E23A42  zero-cloud-core-scope-boundary.md
-D944FF4D56359039DE3B2900D01F839223A86AB667BA5AF887D1672E53C85745  zero-cloud-core-versioning-and-governance.md
-62F4ECEFCFBE4BB39ECC44F7E54E4EE43232F7B7EF2D1C3E0DB283FDA76A8F35  zero-cloud-dual-licensing.md
-32E484339AE7F4096C3A079CD1C2A37D567A4D8C5538CE87656E04B32468C6DE  zero-cloud-hardware-reference-architecture.md
+575ED5E3772E5A66923A81D5A997ED5271370E20D0AF9659AB68F1A8F86594EF  ZC-CORE-HARDWARE-FORENSIC-AUDIT-PROTOCOL.md
+E89A46325559F8E0CE6DFC056FBC73CED84656EC3D65DBB7C31BC8456C7125BB  zero-cloud-core-attack-taxonomy.md
+43632A26013E038DCC9FB63D8E97D3DA4889242D54E954A1B2C5E8571570AA63  zero-cloud-core-brand-and-trademark-policy.md
+B61D7C387FB89D5CDF6D52D8B789F15486FBC69977EA1D09D8205DD2B8AA2804  zero-cloud-core-conformance-evidence-matrix.md
+D2E437D36CF3C1C75C83C26F56DA7E7629D35342DA6384D51DDAB7D756A0041F  zero-cloud-core-conformance-test-specification.md
+59652359871D466DD341A3E38710FB486DCC92597A104F57E0F64F8C7F92CA02  zero-cloud-core-defensive-publication.md
+42D322868B7EE886EEA6F9623D4183BDBE6C8FF2BBB5E5212FFCDE3A7E70DA2A  zero-cloud-core-implementation-coverage.md
+1231F6F740B7F2C7E807E4328CDD7A2C2B214B843042E1BD9D3B03DC1D8F04B7  zero-cloud-core-methodology-invariants.md
+69F18D4C9DF8E03A60CC492FE009A81355F792A21B4E91BB95FE41F17914FE18  zero-cloud-core-scope-boundary.md
+FEF4B9A6752F8CDA8178005A8C2DA708AEA4FB64E4B55C21783A129A5CF908F6  zero-cloud-core-versioning-and-governance.md
+A48133C9434ABB4622A37B35D3E85FDD4EE44B387EABBC2C9EB1B2F0329E0215  zero-cloud-dual-licensing.md
+AAEA5E7B26DB5538C8A17CB95760E423E69218D871E45442DCB04C427A091A05  zero-cloud-hardware-reference-architecture.md
 ```
 
 ### Synthesizable RTL Reference Implementation (Route B)
