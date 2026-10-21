@@ -1,11 +1,11 @@
-# FREECULI ZC-CORE — v4.0.0 License & Rights Risk Register
+# FREECULI ZC-CORE  --  v4.0.0 License & Rights Risk Register
 
-**Document ID:** ZC-CORE-REG-RISK-01  
-**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology  
-**Target Release:** v4.0.0 Architecture & Licensing Transition  
-**Document Classification:** Legal Risk Register & Rights Audit  
-**Location:** `evidence/audit/V4_LICENSE_AND_RIGHTS_RISK_REGISTER.md`  
-**Governance Status:** `DRAFT RISK REGISTER / AUDIT BASELINE / NOT RATIFIED`  
+**Document ID:** ZC-CORE-REG-RISK-01
+**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology
+**Target Release:** v4.0.0 Architecture & Licensing Transition
+**Document Classification:** Legal Risk Register & Rights Audit
+**Location:** `evidence/audit/V4_LICENSE_AND_RIGHTS_RISK_REGISTER.md`
+**Governance Status:** `DRAFT RISK REGISTER / AUDIT BASELINE / NOT RATIFIED`
 **Related Documents:**
 - `evidence/audit/V4_STRATEGIC_IP_INDEPENDENT_AUDIT.md`
 - `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md`
@@ -50,13 +50,13 @@ Risks are classified into four severity tiers:
 - **Remediation:** In v4.0.0, eliminate all claims of published reference PCB Gerbers. Explicitly define that the published open hardware consists strictly of synthesizable SystemVerilog RTL modules (`rtl/*.sv`), formal proofs (`fv/*.sv`), and systems specifications.
 
 ### 3.2. LRR-02: Scope Overreach on the Abstract Methodology (High Risk)
-- **The Issue:** `LICENSE` lines 39–41 state: *"Manufacturers seeking to build compliant Zero-Cloud appliances without releasing proprietary trade secrets... MUST execute a Commercial Exemption Agreement with FreeCuli prior to commercial distribution."*
-- **Legal Fact:** Under 17 U.S.C. § 102(b), TRIPS Article 9.2, and EU Directive 2009/24/EC, copyright does NOT protect ideas, concepts, principles, or methodologies. A company that writes its own RTL and designs its own PCB to achieve M1–M10 compliance (clean-room engineering) does NOT infringe FreeCuli's copyright and cannot be forced to buy a commercial license.
+- **The Issue:** `LICENSE` lines 39-41 state: *"Manufacturers seeking to build compliant Zero-Cloud appliances without releasing proprietary trade secrets... MUST execute a Commercial Exemption Agreement with FreeCuli prior to commercial distribution."*
+- **Legal Fact:** Under 17 U.S.C. Section 102(b), TRIPS Article 9.2, and EU Directive 2009/24/EC, copyright does NOT protect ideas, concepts, principles, or methodologies. A company that writes its own RTL and designs its own PCB to achieve M1-M10 compliance (clean-room engineering) does NOT infringe FreeCuli's copyright and cannot be forced to buy a commercial license.
 - **Remediation:** `ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md` has already drafted the explicit Clean-Room Freedom Guarantee. When ratified, this will remediate LRR-02 completely.
 
 ### 3.3. LRR-03: Open Source Discrimination (OSD #5 & #6 Breach)
 - **The Issue:** Legacy text claims Route A is only for universities and open-source startups, while commercial companies must buy a commercial license.
-- **Legal Fact:** Under the Open Source Definition (OSD) and CERN-OHL-S v2.0 §3.1, anyone (including Fortune 500 corporations) has the right to use the open-source hardware for free, provided they comply with the copyleft source-sharing obligations.
+- **Legal Fact:** Under the Open Source Definition (OSD) and CERN-OHL-S v2.0 Section 3.1, anyone (including Fortune 500 corporations) has the right to use the open-source hardware for free, provided they comply with the copyleft source-sharing obligations.
 - **Remediation:** Reframe Route A as universally available to any commercial entity that is willing to share its derivative source code publicly under CERN-OHL-S v2.0. Route B is an elective commercial alternative, not a compulsory fee.
 
 ---
@@ -66,7 +66,7 @@ Risks are classified into four severity tiers:
 > **Ownership and Development History:** The founder represents that they are the sole developer and rights holder of ZC-CORE. The reviewed Git history is consistent with the founder's representation of sole development. This record documents the founder's representation and its comparison against the reviewed technical records.
 
 - [x] **ATTEST-01 (RTL Authorship Representation):** The founder represents that they are the sole developer and rights holder of ZC-CORE RTL modules (`rtl/*.sv`), testbenches, and technical specifications. The reviewed Git history (100% of commits to `rtl/` authored by `yemekyarismasi <ajibaoytun@gmail.com>`) is consistent with the founder's representation of sole development. This record documents the founder's representation and its comparison against the reviewed technical records; it is not characterized as an independent legal title deed.
-- [x] **ATTEST-02 (Brand & Trademark Representation):** The brand marks `FreeCuli` and `ZC-CORE` serve as source identifiers under common-law ("™") principles, proprietary to the founder.
+- [x] **ATTEST-02 (Brand & Trademark Representation):** The brand marks `FreeCuli` and `ZC-CORE` serve as source identifiers under common-law ("(TM)") principles, proprietary to the founder.
 
 ---
-*End of V4_LICENSE_AND_RIGHTS_RISK_REGISTER.md — Prepared for FreeCuli Architecture & Governance Review.*
+*End of V4_LICENSE_AND_RIGHTS_RISK_REGISTER.md  --  Prepared for FreeCuli Architecture & Governance Review.*
