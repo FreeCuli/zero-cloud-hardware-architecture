@@ -1,4 +1,4 @@
-SPDX-License-Identifier: (CERN-OHL-S-2.0 AND AGPL-3.0-or-later)
+SPDX-License-Identifier: CERN-OHL-S-2.0
 
 ======================================================================
 FREECULI ZC-CORE ARCHITECTURAL SPECIFICATION & METHODOLOGY
@@ -8,7 +8,7 @@ DUAL-LICENSING FRAMEWORK & CANONICAL LICENSE NOTICE
 Copyright (c) 2026 Oytun Ciba (FreeCuli Consortium)
 All rights reserved.
 
-This repository operates under a strict Dual-Licensing Model, separating open-source community rights from commercial exemptions. The SPDX composite identifier `(CERN-OHL-S-2.0 AND AGPL-3.0-or-later)` at the repository root does NOT apply uniformly to all files. Instead, it describes a composite model where specific artifact classes are governed by specific licenses, as defined below:
+This repository operates under a strict Dual-Licensing Model, separating open-source community rights from commercial exemptions. The governing open hardware license for all hardware source code, verification harnesses, and technical specifications published in this repository is CERN-OHL-S-2.0. Specific artifact classes and licensing pathways are defined below:
 
 ----------------------------------------------------------------------
 1. SCOPE & ARTIFACT CLASSIFICATION MAPPING
@@ -32,7 +32,8 @@ B. VERIFICATION SCRIPTS & REPOSITORY TOOLING
      configurations (`.github/workflows/*.yml`) provide automation configuration.
    - Software Boundary: Embedded controller software, companion firmware, and NPU driver hooks
      are not included in this hardware repository. If companion software packages are released
-     in the future, they will be distributed in separate repositories under designated software licenses.
+     in the future, they will be distributed in separate repositories under designated reciprocal
+     software licenses (such as GNU AGPL-3.0-or-later) or commercial agreements.
 
 C. NORMATIVE METHODOLOGY & SPECIFICATION DOCUMENTS
    - Scope: Architectural specifications, conformance test specifications, and evidence

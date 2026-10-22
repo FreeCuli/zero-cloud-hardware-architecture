@@ -5,11 +5,11 @@ The Hardware-Enforced, privacy-first hardware reference methodology for Server-I
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v4.0.0--rc1-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v4.0.0-rc1)
+[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v4.0.0--rc2-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v4.0.0-rc2)
 
 ## Overview & Shared Foundation
 
-This repository serves as the unified entry point for the **FreeCuli ZC-CORE v4.0.0-rc1 Release Candidate (Pending Experimental Validation)**. Originally pioneered as a smart-kitchen architecture (HFSCA), ZC-CORE has evolved into a universal, sector-agnostic methodology for designing autonomous smart devices that operate without mandatory centralized server or cloud dependency. As a member of the Open Invention Network (OIN), FreeCuli defends and promotes open-source hardware innovation.
+This repository serves as the unified entry point for the **FreeCuli ZC-CORE v4.0.0-rc2 Release Candidate (Pending Experimental Validation)**. Originally pioneered as a smart-kitchen architecture (HFSCA), ZC-CORE has evolved into a universal, sector-agnostic methodology for designing autonomous smart devices that operate without mandatory centralized server or cloud dependency. As a member of the Open Invention Network (OIN), FreeCuli defends and promotes open-source hardware innovation.
 
 ### The Foundational Security Axiom
 Across all implementations, ZC-CORE enforces one invariant principle: **Sensitive raw sensor data (audio PCM streams, raw camera frames, biometric signals) SHALL NOT leave the local hardware-enforced Trusted Processing Domain.**
@@ -44,7 +44,7 @@ Under the common ZC-CORE methodology umbrella, this repository hosts **two separ
     | - Unidirectional hardware data diode    |               | - Active SPI flash command firewall     |
     | - Zero outbound telemetry bits          |               | - Gated inbound OTA staging & commit    |
     | - Physical maintenance update paths     |               | - Goal: allowlisted outbound telemetry  |
-    | - Ratified normative standard (v3.x)    |               | - Candidate specification (v4.0.0-rc1)  |
+    | - Ratified normative standard (v3.x)    |               | - Candidate specification (v4.0.0-rc2)  |
     +-----------------------------------------+               +-----------------------------------------+
 ```
 
@@ -57,7 +57,7 @@ Under the common ZC-CORE methodology umbrella, this repository hosts **two separ
 | **Outbound Telemetry** | **Zero bits permitted.** No network interface exists on the trusted side of the diode. | **Architectural design target:** Conditional allowlisted telemetry (sanitized health metrics, status). *Note: Silicon rate-limiter and packetizer are not yet implemented in current RTL; deferred to Gate D SoC integration.* |
 | **Firmware Update (OTA)** | Physical socket, factory programming header, or physical jumper only. Remote OTA is impossible by design. | **Hardware-gated staging & commit:** Inbound write gating to Bank B via `zc_spi_flash_firewall.sv` and atomic OTP anti-rollback via `zc_aon_post_auth_ctrl.sv`. *Note: End-to-end transport protocol and Boot ROM integration remain architectural candidate proposals.* |
 | **Target Deployments** | Defense, medical implants, critical industrial infrastructure, high-assurance air-gapped sensors. | Commercial smart home appliances, fleet-managed commercial Edge-AI devices, connected industrial sensors. |
-| **Standardization Status** | **Ratified Normative Standard** (v3.x root specifications; fully frozen and active). | **Candidate Architecture Baseline** (`v4.0.0-rc1` release candidate; RFC-0004 unratified proposal). |
+| **Standardization Status** | **Ratified Normative Standard** (v3.x root specifications; fully frozen and active). | **Candidate Architecture Baseline** (`v4.0.0-rc2` release candidate; RFC-0004 unratified proposal). |
 
 ### Documented Common Components & Compatibility Relationship
 - **Shared Invariants:** Both architectures adhere to the core methodology invariants (M1, M2, M4, M6, M7, M8, M9, M10). Invariant M3 is strictly one-way for STRICT, while HYBRID specifies `M3-RFC-REVISED` as an unratified candidate adaptation for gated bidirectional coordination.
@@ -151,7 +151,7 @@ To maintain technical precision, implemented and verified silicon features are s
 - **[Academic Citation Metadata (`CITATION.cff`)](CITATION.cff):** Formal citation specification for academic and scientific publications.
 
 ### 🔐 Cryptographic Integrity & Release Anchors
-- **[ZC-CORE Release Manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`)](ZERO-CLOUD-RELEASE-MANIFEST.md):** Cryptographic SHA-256 seal covering exactly the 18 root artifacts (14 canonical normative & supporting specifications + 4 synthesizable RTL blocks) for candidate `v4.0.0-rc1`. *Scope notice: The 7 specifications in `hybrid-zero-cloud-edge-security-architecture/` constitute an independent candidate architecture suite and are deliberately not tracked in this 18-file root manifest; the 18/18 audit strictly verifies the root release baseline.*
+- **[ZC-CORE Release Manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`)](ZERO-CLOUD-RELEASE-MANIFEST.md):** Cryptographic SHA-256 seal covering exactly the 18 root artifacts (14 canonical normative & supporting specifications + 4 synthesizable RTL blocks) for candidate `v4.0.0-rc2`. *Scope notice: The 7 specifications in `hybrid-zero-cloud-edge-security-architecture/` constitute an independent candidate architecture suite and are deliberately not tracked in this 18-file root manifest; the 18/18 audit strictly verifies the root release baseline.*
 - **[Historical Release Manifest (`RELEASE-MANIFEST-v3.3.0-rc2.md`)](RELEASE-MANIFEST-v3.3.0-rc2.md):** Cryptographically archived state of previous release candidate.
 
 ### ⚖️ Legal Grounding & Licensing Terms
@@ -159,5 +159,5 @@ This repository employs a carefully differentiated legal structure to protect op
 - **Hardware Source Code & Synthesizable RTL (`rtl/`, `fv/`, `tb/`):** Licensed under the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal ([CERN-OHL-S-2.0](LICENSE))**.
 - **Normative Architectural Specifications & Documentation:** Governed by the open standard licensing terms set forth in [`zero-cloud-dual-licensing.md`](zero-cloud-dual-licensing.md).
 - **Commercial Dual-Licensing (Route B):** Commercial manufacturers desiring to implement proprietary closed-source ASICs/SoCs without reciprocal design disclosure may obtain a commercial exemption license.
-- **Patent Non-Aggression & Founder Attestation:** Backed by Open Invention Network (OIN) membership commitments and the founder's sworn non-aggression representation (`ATTEST-01`).
+- **Patent Non-Aggression & Authorship Representation:** Backed by Open Invention Network (OIN) membership commitments for open-source patent non-aggression, and the founder's sole authorship representation (`ATTEST-01`).
 - **Commercial Certification:** Industrial AIoT manufacturers seeking official certification and trademark usage rights for the #FreeCULI badge should consult [FreeCuli.com](https://freeculi.com).

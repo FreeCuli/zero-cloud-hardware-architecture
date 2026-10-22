@@ -3,7 +3,7 @@
 
 **Architecture Identifier:** `ZC-ARCH-HYBRID-V4`  
 **Standardization Status:** `PROPOSED / CANDIDATE SPECIFICATION / NOT RATIFIED AS FINAL STANDARD`  
-**Release Context:** Part of the `v4.0.0-rc1` Release Candidate Package (Pending Experimental Validation)  
+**Release Context:** Part of the `v4.0.0-rc2` Release Candidate Package (Pending Experimental Validation)
 **Historical Normative Baseline:** Preserves [`zero-cloud-core-methodology-invariants.md`](../zero-cloud-core-methodology-invariants.md) and [`zero-cloud-hardware-reference-architecture.md`](../zero-cloud-hardware-reference-architecture.md) as immutable STRICT reference
 **Classification:** Canonical Architecture Suite  
 
@@ -12,7 +12,7 @@
 > [!IMPORTANT]
 > **NORMATIVE BOUNDARY & GOVERNANCE NOTICE:**  
 > 1. **Architectural Coexistence:** The **Hybrid Zero-Cloud & Edge Security Architecture** specifies the formal extension of the FreeCuli Zero-Cloud Hardware Core (ZC-CORE) methodology to connected edge platforms requiring bidirectional network coordination. It does **NOT** repeal, replace, or retroactively amend the immutable v3.x normative standard or the STRICT profile.
-> 2. **Candidate Status:** The specifications in this directory are published as a candidate architectural baseline within the `v4.0.0-rc1` release candidate. They do **not** constitute an approved or ratified industry standard until formal standards committee ratification.
+> 2. **Candidate Status:** The specifications in this directory are published as a candidate architectural baseline within the `v4.0.0-rc2` release candidate. They do **not** constitute an approved or ratified industry standard until formal standards committee ratification.
 > 3. **Verification Boundary:** The digital RTL IP blocks (`zc_spi_flash_firewall`, `zc_obi_subordinate_bridge`, `zc_aon_post_auth_ctrl`, `zc_otp_pkg`) are verified via bounded formal proofs ($t=20$) and cycle-accurate RTL testbenches (Gate C). All full-SoC bus integration, clock-domain crossing (CDC) synchronizers, and physical silicon behaviors are strictly **`Gate D (UNVERIFIED)`**.
 
 ---
@@ -26,7 +26,7 @@ In the baseline **STRICT Profile (`ZC-PROFILE-STRICT`)**, this guarantee is enfo
 - Fleet management, uptime telemetry, and remote crash diagnostics are impossible.
 - Inter-processor coordination between an untrusted Network Co-Processor (Wi-Fi / BLE / Ethernet) and the local Edge AI core cannot execute.
 
-The **Hybrid Zero-Cloud & Edge Security Architecture** solves this operational challenge by establishing **hardware-gated bidirectional coordination**. Through dedicated, synthesizable silicon security firewalls, the architecture permits authenticated inbound firmware updates and allowlisted semantic telemetry while mathematically and logically preventing raw sensor read-back, execution hijacking, or covert channel exfiltration.
+The **Hybrid Zero-Cloud & Edge Security Architecture** addresses this operational challenge by introducing **hardware-gated bidirectional coordination**. At the block level, synthesizable silicon firewalls provide hardware gating for inbound firmware staging (`zc_spi_flash_firewall.sv`), bus decoupling and orphan transaction draining (`zc_obi_subordinate_bridge.sv`), and atomic anti-rollback OTP authorization (`zc_aon_post_auth_ctrl.sv`). Outbound semantic telemetry rate-limiting and end-to-end Boot ROM update agents are architectural design goals proposed in the V4 RFC and deferred to Gate D SoC integration, establishing architectural safeguards against raw sensor egress and execution hijacking without relying on unverified claims.
 
 ```
 +---------------------------------------------------------------------------------------------------------+

@@ -64,7 +64,7 @@ The **Hybrid Zero-Cloud & Edge Security Architecture** links all repository comp
 * **[`zero-cloud-core-versioning-and-governance.md`](../zero-cloud-core-versioning-and-governance.md):** SemVer rules, normative freeze process, and amendment rules.
 * **[`ZC-CORE-CONFORMANCE-EVIDENCE-PACKAGE.md`](../ZC-CORE-CONFORMANCE-EVIDENCE-PACKAGE.md):** Formal evidence package and sign-off records.
 * **[`ZC-CORE-HARDWARE-FORENSIC-AUDIT-PROTOCOL.md`](../ZC-CORE-HARDWARE-FORENSIC-AUDIT-PROTOCOL.md):** Forensic teardown protocol for physical devices.
-* **[`CITATION.cff`](../CITATION.cff):** Academic citation metadata (v4.0.0-rc1).
+* **[`CITATION.cff`](../CITATION.cff):** Academic citation metadata (v4.0.0-rc2).
 
 ### 2.3 Legal, Licensing & Cryptographic Manifests
 * **[`LICENSE`](../LICENSE):** Official CERN-OHL-S-2.0 legal text.

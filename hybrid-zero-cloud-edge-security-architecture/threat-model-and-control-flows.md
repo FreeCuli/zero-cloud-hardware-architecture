@@ -26,18 +26,18 @@ The architecture maps physical and logical threats to standardized attack classi
 
 | Attack Class ID | Adversarial Threat Description | Architectural Mitigation Mechanism | Implementation Status |
 | :--- | :--- | :--- | :---: |
-| **AT-001** | Optical / Acoustic Data Diode Reverse-Biasing | Hardware air-gap on sensor inputs; absence of physical reverse path. | **IMPLEMENTED (RTL & CTS)** |
-| **AT-002** | DMA-Based Sensor Memory Snooping | Physical domain separation; Network processor has no DMA access to sensor SRAM. | **PARTIAL (RTL) / UNVERIFIED (SOC)** |
-| **AT-003** | Microcontroller Firmware Hijack | Hardware-enforced Boot ROM execution check; OTP anti-rollback SVN locking. | **IMPLEMENTED (RTL & ROM)** |
-| **AT-004** | Crosstalk / Electromagnetic Trace Leakage | Physical PCB trace isolation (>80 dB attenuation under CTS Annex B). | **CTS LAB VERIFIED** |
-| **AT-005** | Actuator / Inference Command Tampering | Cryptographic message authentication on outbound actuation; rate limiting. | **ARCHITECTURAL PROPOSAL** |
-| **AT-006** | Side-Channel Timing Leakage on Inference | Hardware constant-time execution; M8 immediate memory zeroization. | **PARTIAL (RTL)** |
-| **AT-007** | Control-Plane Hijacking (Reset/Clock Injection) | Warm reset (`rst_sys_ni`) request gating in OBI bridge; AON permanent fatal lock. | **IMPLEMENTED (RTL `F-OBI-07`)** |
-| **AT-008** | Covert Channel Modulation on Derived Data | Entropy bounding and quantization of outbound semantic telemetry. | **ARCHITECTURAL PROPOSAL** |
-| **AT-009** | Sensor Direct-Connection Bypass | Mandatory complete sensor inventory (CTS FC-ZC-013/014); zero secondary sensors. | **CTS AUDIT ENFORCED** |
-| **AT-010** | Power-Analysis Inference Reconstruction (DPA) | Hardware decoupling capacitors and random execution jitter (Gate D target). | **Gate D (UNVERIFIED)** |
-| **AT-011 (RFC)**| Bus Exhaustion & Subordinate Starvation | 1024-cycle orphan watchdog; `ST_TRAP` synthetic error delivery. | **IMPLEMENTED (RTL `F-OBI-01`)** |
-| **AT-012 (RFC)**| Flash Write Exhaustion & Execution Hijack | Dual /CS hardware routing; Bank-B commit gating mediated by Boot ROM. | **IMPLEMENTED (RTL `F-SPI-04`)** |
+| **AT-001** | Direct Memory Read into isolated sensor domain | Hardware bus separation; OBI address decoding isolating sensor memory. | **PARTIAL (RTL) / Gate D (UNVERIFIED SoC)** |
+| **AT-002** | Direct Memory Access (DMA) Read of raw sensor buffers | Physical domain separation; Network processor has no DMA master path to sensor SRAM. | **Architectural Invariant / Gate D (UNVERIFIED SoC)** |
+| **AT-003** | Cache Residual Read (Cold-Boot / Warm-Boot) | Hardware memory zeroization (M8) upon reset or inference completion; Boot ROM verification. | **Architectural Goal / Gate D (UNVERIFIED)** |
+| **AT-004** | Shared Memory / IPC Leakage & Physical Trace Coupling | Physical SRAM domain separation; mailbox register isolation without shared sensor memory; radiated leakage benchmark target (<-80 dBm candidate threshold under CTS Annex B). | **Architectural Invariant / Gate D (UNVERIFIED)** |
+| **AT-005** | Debug / Trace Extraction via JTAG/SWD | Permanent debug port disabling via OTP eFuse lock bits; hardware debug isolation. | **Gate D (UNVERIFIED Physical Security)** |
+| **AT-006** | Peripheral Bridge Bypass into Trusted Domain | Dedicated point-to-point interconnect; peripheral firewall isolation. | **Architectural Invariant / Gate D (UNVERIFIED)** |
+| **AT-007** | Management Controller / Control-Plane Leakage | Warm reset (`rst_sys_ni`) request gating in OBI bridge (`F-OBI-07`); AON permanent fatal lock. | **IMPLEMENTED (RTL `F-OBI-07`)** |
+| **AT-008** | Reverse Channel Impossibility Bypass | Hardware-enforced unidirectional gating on sensor data path; absence of reverse read path. | **Architectural Invariant / Gate D (UNVERIFIED)** |
+| **AT-009** | Undocumented Interface (Hidden Sensor Path) | Complete sensor inventory inspection under CTS (FC-ZC-013/014); zero secondary unmediated sensor interfaces. | **CTS Audit Baseline** |
+| **AT-010** | AI Output / Metadata Leakage | Semantic payload quantization, bounding, and strict allowlisting of outbound telemetry (RFC-0004). | **Architectural Goal (RFC Proposal)** |
+| **AT-011 (RFC)**| Bus Exhaustion & Subordinate Starvation | 1024-cycle orphan watchdog; `ST_TRAP` synthetic error delivery (`F-OBI-05`, `F-OBI-06`). | **IMPLEMENTED (RTL `F-OBI-05`, `F-OBI-06`)** |
+| **AT-012 (RFC)**| Flash Write Exhaustion & Execution Hijack | Dual /CS hardware routing; Bank-B boundary containment; commit strobe gated until Boot ROM validation (`F-SPI-02`). | **IMPLEMENTED (RTL `F-SPI-01`..`F-SPI-04`)** |
 
 ---
 

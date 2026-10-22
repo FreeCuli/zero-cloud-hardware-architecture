@@ -1,25 +1,25 @@
 # Cryptographic Release Manifest
 
-This manifest records the cryptographic identity, publication metadata, and file integrity of the specified ZC-CORE release. The associated defensive publication is intended to establish publicly accessible technical prior art for the disclosed subject matter. This document does not constitute a patentability opinion. Legacy pointer documents (and LICENSE) are intentionally excluded from the canonical release hash set because they contain no normative content.
+This manifest records the cryptographic identity, publication metadata, and file integrity of the specified ZC-CORE release. The associated defensive publication is intended to establish publicly accessible technical prior art for the disclosed subject matter. This document does not constitute a patentability opinion. Technical pointer files (such as superseded legacy placeholders) and legal instruments (such as LICENSE) are intentionally excluded from the technical normative release hash set: LICENSE establishes the governing legal framework rather than technical normative engineering requirements, while legacy placeholders contain no normative content. The 18-artifact canonical manifest strictly seals the technical normative specifications and synthesizable silicon IP blocks.
 
 ## Publication Metadata
-* **Release Version:** ZC-CORE v4.0.0-rc1 (Gate 4 Blueprint / Hybrid Architecture)
+* **Release Version:** ZC-CORE v4.0.0-rc2 (Gate 4 Blueprint / Hybrid Architecture)
 * **Status:** Pending Experimental Validation (Gate C HDL Formally Verified / Gate D Physical Silicon Pending)
-* **Date (UTC):** 2026-10-21
+* **Date (UTC):** 2026-10-22
 * **Reference Concept DOI (Zenodo):** 10.5281/zenodo.22838473
 * **Standardization Level:** RFC 2119 Normative Stricture
 * **Repository:** FreeCuli/zero-cloud-hardware-architecture
-* **Git Tag: v4.0.0-rc1**
-* **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v4.0.0-rc1`
+* **Git Tag: v4.0.0-rc2**
+* **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v4.0.0-rc2`
 * **Release Artifact SHA-256:** *(to be computed and recorded upon generation of the immutable Zenodo archival tarball/zip using `sha256sum <zenodo_archive>`. This placeholder preserves cryptographic distinction between the Git tree state and the post-publication distribution artifact)*
 
 ## Cryptographic Evidence (SHA-256 Hashes)
 
 ### Canonical Normative and Supporting Documents
-The following hashes cover all canonical v4.0.0-rc1 normative and supporting documents listed in this manifest.
+The following hashes cover all canonical v4.0.0-rc2 normative and supporting documents listed in this manifest.
 
 ```text
-47ADC53CFE238E5306EBA265A4668AEAE7519719463B1E78A4372D62E7CCAD6A  README.md
+A818AA849DC7C6B24A11C14F87EB6FA68F72B475BED930F26178B40F834E51CE  README.md
 D2B25667917F4EAB9271FAC7B6DC2B472F86CCF5A8ECBA307B55D2C1D1EF7D42  ZC-CORE-CONFORMANCE-EVIDENCE-PACKAGE.md
 575ED5E3772E5A66923A81D5A997ED5271370E20D0AF9659AB68F1A8F86594EF  ZC-CORE-HARDWARE-FORENSIC-AUDIT-PROTOCOL.md
 E89A46325559F8E0CE6DFC056FBC73CED84656EC3D65DBB7C31BC8456C7125BB  zero-cloud-core-attack-taxonomy.md

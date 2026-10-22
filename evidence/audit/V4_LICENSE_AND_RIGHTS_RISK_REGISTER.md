@@ -17,6 +17,9 @@
 
 ---
 
+> [!NOTE]
+> **HISTORICAL AUDIT ARTIFACT:** This document represents a point-in-time legal and rights risk evaluation snapshot generated during prior internal audit reviews. It records the evaluation of legacy risks and remediation milestones leading up to the `v4.0.0-rc2` candidate release.
+
 ## 1. Executive Summary
 
 This register catalogs all document-specific licensing, ownership, sublicensing, and contractual risks identified across the FreeCuli repository. Each risk is evaluated based on verifiable facts from the codebase, legal implications under open-source and copyright jurisprudence, and corporate commercialization objectives.
