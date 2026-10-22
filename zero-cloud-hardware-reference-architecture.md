@@ -9,9 +9,9 @@
 > **Evolution of the Standard:** Originally pioneered as the HFSCA (Hands-Free Semantic Culinary Assistant) reference architecture for smart kitchens, this methodology has evolved into the universal **ZC-CORE v4.0.0-rc1 Release Candidate (Pending Experimental Validation)** for all privacy-critical, server-independent autonomous AIoT and Edge AI hardware (Smart Home, Medical, Industrial, Defense).
 
 > [!NOTE]
-> **Architectural Profile Scope — STRICT:**
-> This document specifies the ZC-CORE reference architecture based on unidirectional hardware data paths and physical isolation. The V4 hybrid architecture proposal does not automatically alter the existing normative provisions of this document.
-> For hardware-gated bidirectional interfaces and their associated security boundaries, refer to the [security profiles specification](docs/architecture/zc-core-security-profiles.md), the [hybrid interconnect architecture](docs/architecture/zc-core-hybrid-interconnect.md), and the draft [V4 architecture RFC](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md). The proposals in these documents do not supersede the existing normative standard without the requisite formal ratifications.
+> **Architectural Profile Scope — STRICT Profile:**
+> This document normatively specifies the ZC-CORE reference architecture based on unidirectional hardware data paths and physical isolation corresponding to the **STRICT Profile (`ZC-PROFILE-STRICT`)**. The V4 hybrid architecture proposal does not automatically alter or supersede the existing normative provisions of this document.
+> For hardware-gated bidirectional interfaces, firmware update paths, and telemetry boundaries, refer to the canonical [Hybrid Zero-Cloud & Edge Security Architecture](docs/hybrid-zero-cloud-edge-security-architecture/README.md) suite and the draft [V4 architecture RFC](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md). The proposals in those documents represent candidate specifications and do not supersede the existing normative standard without formal standards committee ratification.
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: Separation of Technical Standard and Legal Licensing**

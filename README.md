@@ -13,7 +13,9 @@ This repository contains the **ZC-CORE v4.0.0-rc1 Release Candidate (Pending Exp
 By enforcing Physical Data Diodes, Trust Boundaries, and Hardware-Enforced Raw-Data Destruction / Invalidation (including power-cut, cryptographic zeroization, or independently validated equivalent mechanisms), this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It is designed to mitigate remote network-based raw-sensor extraction, including attacks originating from compromised network infrastructure, and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
 
 ### Architectural Security Profiles & Boundary Scope
-In the context of the ZC-CORE v4.0.0-rc1 candidate preparation, two architectural profiles are considered: STRICT and HYBRID. V4 modifications concerning the HYBRID profile must be evaluated strictly within the framework of the draft/ratification status of the respective documents and the open verification boundaries of this release.
+In the context of the ZC-CORE v4.0.0-rc1 candidate preparation, two operational profiles are maintained:
+* **STRICT Profile (`ZC-PROFILE-STRICT`):** The normative physical air-gap and unidirectional hardware data diode baseline specified in [`zero-cloud-hardware-reference-architecture.md`](zero-cloud-hardware-reference-architecture.md).
+* **HYBRID Profile (`ZC-PROFILE-HYBRID`):** The candidate bidirectional coordination architecture enabling authenticated inbound OTA firmware updates and allowlisted telemetry via hardware firewalls, specified in the canonical [Hybrid Zero-Cloud & Edge Security Architecture](docs/hybrid-zero-cloud-edge-security-architecture/README.md) suite and draft [V4 architecture RFC](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md). HYBRID specifications do not supersede the root normative standard without formal ratification.
 
 > [!WARNING]
 > **Integration and Verification Boundary — Gate D: UNVERIFIED**
@@ -64,6 +66,10 @@ Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli
     * The rigid rules governing how the standard evolves, deprecates old methods, and manages change control.
 12. **[ZC-CORE Release Manifest (v4.0.0-rc1)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
     * The cryptographic SHA-256 seal of this release, binding all documents to a verifiable timeline.
+
+### 🔀 Candidate Architecture Suite (HYBRID Profile)
+13. **[Hybrid Zero-Cloud & Edge Security Architecture Suite](docs/hybrid-zero-cloud-edge-security-architecture/README.md)**
+    * The canonical specification suite for the candidate HYBRID profile, hardware firewalls, compatibility analysis, and implementation evidence.
 
 ## Commercial Certification
 Industrial AIoT manufacturers utilizing this architecture in proprietary hardware must acquire a B2B Certification and Trademark License to obtain the official FreeCuli certification and trademark usage rights for the #FreeCULI badge. See [FreeCuli.com](https://freeculi.com) for details.
