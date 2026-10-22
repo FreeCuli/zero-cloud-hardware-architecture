@@ -42,8 +42,8 @@ Under the common ZC-CORE methodology umbrella, this repository hosts **two separ
     +-----------------------------------------+               +-----------------------------------------+
     | - Complete physical air-gap             |               | - Hardware-gated bidirectional buses     |
     | - Unidirectional hardware data diode    |               | - Active SPI flash command firewall     |
-    | - Zero outbound telemetry bits          |               | - Inbound authenticated OTA updates     |
-    | - Physical maintenance update paths     |               | - Allowlisted outbound semantic telemetry|
+    | - Zero outbound telemetry bits          |               | - Gated inbound OTA staging & commit    |
+    | - Physical maintenance update paths     |               | - Goal: allowlisted outbound telemetry  |
     | - Ratified normative standard (v3.x)    |               | - Candidate specification (v4.0.0-rc1)  |
     +-----------------------------------------+               +-----------------------------------------+
 ```
@@ -54,8 +54,8 @@ Under the common ZC-CORE methodology umbrella, this repository hosts **two separ
 | :--- | :--- | :--- |
 | **Primary Objective** | Absolute physical data isolation for mission-critical, zero-trust, or air-gapped environments. | Secure operational coexistence with external networks for connected edge appliances and smart products. |
 | **Interconnect Topology** | Physical unidirectional data diode (optical isolator, TX-only serial line, or physical air-gap). | Hardware-gated bidirectional interconnects (`zc_obi_subordinate_bridge.sv`) and dual-bank SPI flash (`zc_spi_flash_firewall.sv`). |
-| **Outbound Telemetry** | **Zero bits permitted.** No network interface exists on the trusted side of the diode. | **Conditional allowlisted telemetry permitted** (sanitized device health metrics, status, error codes). |
-| **Firmware Update (OTA)** | Physical socket, factory programming header, or physical jumper only. Remote OTA is impossible by design. | Cryptographically validated inbound OTA via hardware SPI firewall, Boot ROM asymmetric verification, and OTP anti-rollback. |
+| **Outbound Telemetry** | **Zero bits permitted.** No network interface exists on the trusted side of the diode. | **Architectural design target:** Conditional allowlisted telemetry (sanitized health metrics, status). *Note: Silicon rate-limiter and packetizer are not yet implemented in current RTL; deferred to Gate D SoC integration.* |
+| **Firmware Update (OTA)** | Physical socket, factory programming header, or physical jumper only. Remote OTA is impossible by design. | **Hardware-gated staging & commit:** Inbound write gating to Bank B via `zc_spi_flash_firewall.sv` and atomic OTP anti-rollback via `zc_aon_post_auth_ctrl.sv`. *Note: End-to-end transport protocol and Boot ROM integration remain architectural candidate proposals.* |
 | **Target Deployments** | Defense, medical implants, critical industrial infrastructure, high-assurance air-gapped sensors. | Commercial smart home appliances, fleet-managed commercial Edge-AI devices, connected industrial sensors. |
 | **Standardization Status** | **Ratified Normative Standard** (v3.x root specifications; fully frozen and active). | **Candidate Architecture Baseline** (`v4.0.0-rc1` release candidate; RFC-0004 unratified proposal). |
 
@@ -126,19 +126,20 @@ The **Hybrid Zero-Cloud & Edge Security Architecture** extends the ZC-CORE metho
 * **[`rtl/zc_aon_post_auth_ctrl.sv`](rtl/zc_aon_post_auth_ctrl.sv):** Always-On power domain controller enforcing a 4-phase atomic Direct Access Interface (DAI) handshake and sticky session-mismatch lockout for OTP memory.
 * **[`rtl/zc_otp_pkg.sv`](rtl/zc_otp_pkg.sv):** Hsiao (22,16) SECDED encoding functions, state enums, and codeword generators ($d_{\min}=4$).
 
-### Verification Evidence & Known Technical Limitations
-* **Formally Verified (Gate C HDL Level):**
-  - Formal SVA properties verified under Yosys 0.33 / yosys-smtbmc / Z3 ($t=20$ $k$-induction) in [`fv/`](fv/).
-  - Cycle-accurate testbenches in [`tb/`](tb/) executed under Verilator and Icarus Verilog.
-  - Automated Gate B regression suite: [`scripts/verify_gate_b_rev28d.ps1`](scripts/verify_gate_b_rev28d.ps1) (20/20 PASS).
-* **Known Silicon Limitations — Gate D: UNVERIFIED:**
-  > [!WARNING]
-  > **Physical Silicon & SoC Integration Boundary**
-  > The RTL implementations and formal models must be evaluated strictly within their documented digital scope. Specifically:
-  > 1. **Clock Domain Crossing (CDC):** In `zc_aon_post_auth_ctrl.sv`, `rst_sys_ni` and `rom_exec_active_i` cross between asynchronous clock domains without dedicated dual-rank synchronizers; formal proofs assume the `async2sync` abstraction.
-  > 2. **SoC Crossbar DMA Firewalls:** Standalone IP blocks do not replace top-level IOMMU or multi-master bus crossbar firewalls.
-  > 3. **Physical Foundry Physics:** High-voltage OTP programming pulses ($V_{\text{PP}}$), analog PVT variations, flash trace capacitive reflections, and silicon side-channel analysis (DPA/EMA) are unverified and formally deferred to Gate D.
-  > 4. **RFC Status:** Proposed V4 architecture enhancements ([`docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md`](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md)) remain in draft status (`DRAFT / NOT RATIFIED`).
+### Verification Evidence & Maturity Status of HYBRID Features
+To maintain technical precision, implemented and verified silicon features are strictly distinguished from pending architectural proposals:
+* **Implemented & Formally Verified in RTL (Gate C Digital Scope):**
+  - **SPI Flash Command Gating & Dual-Bank Access Control ([`zc_spi_flash_firewall.sv`](rtl/zc_spi_flash_firewall.sv)):** Enforces Bank B write containment, rising `/CS` edge gating while `SCK=0`, and `05h RDSR1` WIP status polling reconciliation (`UPD_UNSYNC_RESET` through `UPD_RECOVERY_LOCKOUT`).
+  - **Subordinate Bus Decoupling & Hang Prevention ([`zc_obi_subordinate_bridge.sv`](rtl/zc_obi_subordinate_bridge.sv)):** Enforces synchronous transaction decoupling, a 1024-cycle orphan transaction drain watchdog, and `ST_TRAP` synthetic error injection.
+  - **Atomic OTP Anti-Rollback Authorization ([`zc_aon_post_auth_ctrl.sv`](rtl/zc_aon_post_auth_ctrl.sv)):** Enforces a 4-phase atomic Direct Access Interface (DAI) handshake and sticky session-mismatch fatal lockout.
+  - **Codeword Parity Integrity ([`zc_otp_pkg.sv`](rtl/zc_otp_pkg.sv)):** Hsiao (22,16) SECDED parity generation and codeword verification ($d_{\min}=4$).
+  - **Verification Artifacts:** Formal SVA proof harnesses in [`fv/`](fv/), cycle-accurate simulation testbenches in [`tb/`](tb/), and regression suite [`scripts/verify_gate_b_rev28d.ps1`](scripts/verify_gate_b_rev28d.ps1) (20/20 PASS).
+* **Pending Architectural Goals & Known Silicon Limitations (Gate D Scope):**
+  - **Outbound Telemetry Inspection & Rate-Limiting Silicon:** Current RTL blocks do NOT include a hardware semantic payload inspector or rate-limiting packetizer. Outbound semantic telemetry remains an architectural design target; the OBI bridge provides transaction decoupling only.
+  - **Clock Domain Crossing (CDC) Synchronizers:** Asynchronous control signals (`rst_sys_ni`, `rom_exec_active_i`) entering `clk_aon_i` in `zc_aon_post_auth_ctrl.sv` cross without physical dual-rank synchronizers; formal proofs assume the discrete `async2sync` abstraction. Physical synchronizers are **Gate D (UNVERIFIED)**.
+  - **Top-Level SoC Crossbar DMA Firewalls:** Standalone IP blocks do not replace top-level IOMMU or multi-master bus crossbar firewalls. Full-SoC non-interference is **Gate D (UNVERIFIED)**.
+  - **Physical Foundry Physics:** High-voltage OTP programming pulses ($V_{\text{PP}}$), analog PVT variations, flash trace capacitive reflections, and silicon side-channel analysis (DPA/EMA) are unverified and formally deferred to Gate D.
+  - **RFC Status:** Proposed V4 architecture enhancements ([`docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md`](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md)) remain in draft status (`DRAFT / NOT RATIFIED`).
 
 ---
 
@@ -150,7 +151,7 @@ The **Hybrid Zero-Cloud & Edge Security Architecture** extends the ZC-CORE metho
 - **[Academic Citation Metadata (`CITATION.cff`)](CITATION.cff):** Formal citation specification for academic and scientific publications.
 
 ### 🔐 Cryptographic Integrity & Release Anchors
-- **[ZC-CORE Release Manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`)](ZERO-CLOUD-RELEASE-MANIFEST.md):** Cryptographic SHA-256 seal over all 14 canonical specifications and 4 RTL blocks for candidate `v4.0.0-rc1`.
+- **[ZC-CORE Release Manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`)](ZERO-CLOUD-RELEASE-MANIFEST.md):** Cryptographic SHA-256 seal covering exactly the 18 root artifacts (14 canonical normative & supporting specifications + 4 synthesizable RTL blocks) for candidate `v4.0.0-rc1`. *Scope notice: The 7 specifications in `hybrid-zero-cloud-edge-security-architecture/` constitute an independent candidate architecture suite and are deliberately not tracked in this 18-file root manifest; the 18/18 audit strictly verifies the root release baseline.*
 - **[Historical Release Manifest (`RELEASE-MANIFEST-v3.3.0-rc2.md`)](RELEASE-MANIFEST-v3.3.0-rc2.md):** Cryptographically archived state of previous release candidate.
 
 ### ⚖️ Legal Grounding & Licensing Terms
