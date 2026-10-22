@@ -7,69 +7,156 @@ The Hardware-Enforced, privacy-first hardware reference methodology for Server-I
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
 [![Release Candidate](https://img.shields.io/badge/ZC--CORE-v4.0.0--rc1-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v4.0.0-rc1)
 
-## Overview
-This repository contains the **ZC-CORE v4.0.0-rc1 Release Candidate (Pending Experimental Validation)**. Originally pioneered as a smart-kitchen architecture, it has evolved into a universal, sector-agnostic framework for designing smart devices that operate without centralized server/cloud dependency. As a proud member of the Open Invention Network (OIN), FreeCuli protects the open-source hardware ecosystem.
+## Overview & Shared Foundation
 
-By enforcing Physical Data Diodes, Trust Boundaries, and Hardware-Enforced Raw-Data Destruction / Invalidation (including power-cut, cryptographic zeroization, or independently validated equivalent mechanisms), this methodology is designed to mitigate raw-sensor exposure across the trust boundary (microphone/camera streams) from any AIoT appliance. It is designed to mitigate remote network-based raw-sensor extraction, including attacks originating from compromised network infrastructure, and structurally enforces Privacy-by-Design, providing a hardware-enforced trust boundary for local inference.
+This repository serves as the unified entry point for the **FreeCuli ZC-CORE v4.0.0-rc1 Release Candidate (Pending Experimental Validation)**. Originally pioneered as a smart-kitchen architecture (HFSCA), ZC-CORE has evolved into a universal, sector-agnostic methodology for designing autonomous smart devices that operate without mandatory centralized server or cloud dependency. As a member of the Open Invention Network (OIN), FreeCuli defends and promotes open-source hardware innovation.
 
-### Architectural Security Profiles & Boundary Scope
-In the context of the ZC-CORE v4.0.0-rc1 candidate preparation, two operational profiles are maintained:
-* **STRICT Profile (`ZC-PROFILE-STRICT`):** The normative physical air-gap and unidirectional hardware data diode baseline specified in [`zero-cloud-hardware-reference-architecture.md`](zero-cloud-hardware-reference-architecture.md).
-* **HYBRID Profile (`ZC-PROFILE-HYBRID`):** The candidate bidirectional coordination architecture enabling authenticated inbound OTA firmware updates and allowlisted telemetry via hardware firewalls, specified in the canonical [Hybrid Zero-Cloud & Edge Security Architecture](docs/hybrid-zero-cloud-edge-security-architecture/README.md) suite and draft [V4 architecture RFC](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md). HYBRID specifications do not supersede the root normative standard without formal ratification.
+### The Foundational Security Axiom
+Across all implementations, ZC-CORE enforces one invariant principle: **Sensitive raw sensor data (audio PCM streams, raw camera frames, biometric signals) SHALL NOT leave the local hardware-enforced Trusted Processing Domain.**
 
-> [!WARNING]
-> **Integration and Verification Boundary — Gate D: UNVERIFIED**
-> The RTL blocks, formal verification models, and simulation suites in this repository must be evaluated strictly within their specific test and model scopes. In particular, for `zc_aon_post_auth_ctrl`, clock domain crossing (CDC) transitions, asynchronous reset behaviors, and full-SoC integration are not yet verified at the physical silicon implementation level. This candidate release does not constitute a security guarantee for final silicon or a complete SoC.
+Rather than relying on software promises, operating system sandboxes, or user policy, the trust boundary is enforced through:
+- Hardware-enforced physical or bus-level isolation between the Trusted Processing Domain and external communication interfaces.
+- Rapid, hardware-enforced post-inference raw-data destruction / invalidation (including power-cut, cryptographic zeroization, or independently validated equivalents).
+- Mathematical non-interference and verification of the absence of reverse-read paths from the untrusted network processor.
 
-## The Core Philosophy: Implementation Freedom & Methodological Consistency
+---
 
-**1. Implementation Freedom & Methodological Consistency**
-ZC-CORE does not prescribe or restrict any particular end-user appliance, hardware component, semiconductor vendor, processor, memory technology, or implementation stack. Conformance is determined by the achievement of defined functional security outcomes and their verifiable evidence, rather than by the use of any specific component or implementation technology. 
+## The Two Independent Architecture Families
 
-This principle applies across the AIoT value chain, including semiconductor, module, device, appliance, platform, and system-level implementations. 
+Under the common ZC-CORE methodology umbrella, this repository hosts **two separate and independent architecture families**. They share foundational security invariants and core design principles, but serve distinct operational environments and threat models. **HYBRID is not a sub-version, subordinate profile, or retroactive modification of STRICT; both stand as co-equal architectural paths:**
 
-**2. Conformance ≠ Code Ownership**
-Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli any ownership over a manufacturer's implementation. A manufacturer retains full Intellectual Property (IP) rights over their proprietary codebase, custom ASIC/SoC designs, and firmware. ZC-CORE standardizes the *security properties and verification methodology*, NOT the vendor's implementation.
+```
+                                  +---------------------------------------+
+                                  |   FreeCuli ZC-CORE Common Foundation  |
+                                  |   - Raw-Sensor Trust Boundary Axiom   |
+                                  |   - M1-M10 Methodology Invariants    |
+                                  |   - CERN-OHL-S-2.0 / Dual Licensing  |
+                                  +-------------------+-------------------+
+                                                      |
+                         +----------------------------+----------------------------+
+                         |                                                         |
+                         v                                                         v
+    +-----------------------------------------+               +-----------------------------------------+
+    |           STRICT Architecture           |               |   Hybrid Zero-Cloud & Edge Security     |
+    |          (`ZC-PROFILE-STRICT`)          |               |       Architecture (`ZC-PROFILE-HYBRID`) |
+    +-----------------------------------------+               +-----------------------------------------+
+    | - Complete physical air-gap             |               | - Hardware-gated bidirectional buses     |
+    | - Unidirectional hardware data diode    |               | - Active SPI flash command firewall     |
+    | - Zero outbound telemetry bits          |               | - Inbound authenticated OTA updates     |
+    | - Physical maintenance update paths     |               | - Allowlisted outbound semantic telemetry|
+    | - Ratified normative standard (v3.x)    |               | - Candidate specification (v4.0.0-rc1)  |
+    +-----------------------------------------+               +-----------------------------------------+
+```
 
-## Core Documents (RFC 2119-Style Normative Specification)
+### Architectural Comparison & Key Differences
 
-### 🏗️ Primary Architecture
-1. **[The ZC-CORE Hardware Fortress (Architecture Document)](zero-cloud-hardware-reference-architecture.md)**
-   * Mandatory specifications for Physical Air-Gap, Hardware Data Diode, and Trust Boundary security pillars for Edge AI.
+| Architectural Dimension | STRICT Architecture (`ZC-PROFILE-STRICT`) | Hybrid Zero-Cloud & Edge Security Architecture (`ZC-PROFILE-HYBRID`) |
+| :--- | :--- | :--- |
+| **Primary Objective** | Absolute physical data isolation for mission-critical, zero-trust, or air-gapped environments. | Secure operational coexistence with external networks for connected edge appliances and smart products. |
+| **Interconnect Topology** | Physical unidirectional data diode (optical isolator, TX-only serial line, or physical air-gap). | Hardware-gated bidirectional interconnects (`zc_obi_subordinate_bridge.sv`) and dual-bank SPI flash (`zc_spi_flash_firewall.sv`). |
+| **Outbound Telemetry** | **Zero bits permitted.** No network interface exists on the trusted side of the diode. | **Conditional allowlisted telemetry permitted** (sanitized device health metrics, status, error codes). |
+| **Firmware Update (OTA)** | Physical socket, factory programming header, or physical jumper only. Remote OTA is impossible by design. | Cryptographically validated inbound OTA via hardware SPI firewall, Boot ROM asymmetric verification, and OTP anti-rollback. |
+| **Target Deployments** | Defense, medical implants, critical industrial infrastructure, high-assurance air-gapped sensors. | Commercial smart home appliances, fleet-managed commercial Edge-AI devices, connected industrial sensors. |
+| **Standardization Status** | **Ratified Normative Standard** (v3.x root specifications; fully frozen and active). | **Candidate Architecture Baseline** (`v4.0.0-rc1` release candidate; RFC-0004 unratified proposal). |
+
+### Documented Common Components & Compatibility Relationship
+- **Shared Invariants:** Both architectures adhere to the core methodology invariants (M1, M2, M4, M6, M7, M8, M9, M10). Invariant M3 is strictly one-way for STRICT, while HYBRID specifies `M3-RFC-REVISED` as an unratified candidate adaptation for gated bidirectional coordination.
+- **Detailed Compatibility Specification:** Clause-by-clause mapping and data taxonomy reconciliation (Root 4-Class vs. V4 RFC 5-Class) are documented in [`hybrid-zero-cloud-edge-security-architecture/strict-hybrid-compatibility.md`](hybrid-zero-cloud-edge-security-architecture/strict-hybrid-compatibility.md).
+- **Independent Compliance Boundaries:** Certifications are profile-specific. An implementation achieving STRICT compliance is not automatically HYBRID-compliant, nor does failure to adopt HYBRID firewalls invalidate an existing STRICT certification.
+
+---
+
+## 1. STRICT Architecture (`ZC-PROFILE-STRICT`)
+
+The **STRICT Architecture** defines the immutable normative foundation of the ZC-CORE standard. It relies on unidirectional physical boundaries to guarantee that sensitive sensor telemetry can never egress to an external network.
+
+### Normative Specifications & Core Documents (RFC 2119 Stricture)
+
+#### 🏗️ Architecture & Invariants
+1. **[The ZC-CORE Hardware Fortress (Reference Architecture)](zero-cloud-hardware-reference-architecture.md)**
+   * Mandatory normative specifications for Physical Air-Gap, Hardware Data Diode, and Trust Boundary security pillars.
 2. **[ZC-CORE Methodology Invariants](zero-cloud-core-methodology-invariants.md)**
-   * The absolute DNA of the standard (M1-M10). The normative technological rules that define ZC-CORE.
+   * The foundational rules of the standard (M1–M10) defining hardware-enforced privacy guarantees.
+3. **[ZC-CORE Scope & Boundary Definition](zero-cloud-core-scope-boundary.md)**
+   * The 4-class normative data taxonomy and explicit standard boundaries (device privacy vs. external networks).
 
-### 🛡️ Prior Art & Legal
-3. **[Zero-Cloud Defensive Publication (Prior Art Specification)](zero-cloud-core-defensive-publication.md)**
-   * A timestamped technical disclosure establishing public prior-art baseline to prevent third-party patenting.
-4. **[ZC-CORE Dual-Licensing Framework](zero-cloud-dual-licensing.md)**
-   * Open-source (CERN-OHL-S v2.0) rules vs. Commercial Exemption (B2B) licensing models and patent retaliation clauses.
-5. **[ZC-CORE Scope & Boundary Definition](zero-cloud-core-scope-boundary.md)**
-   * Explicit definitions of what the standard guarantees (on-device privacy) vs. what it does not (cloud security).
+#### 🔬 Testing, Threat Modeling & Evidence
+4. **[FC-ZC Conformance Test Specification (CTS)](zero-cloud-core-conformance-test-specification.md)**
+   * Physical laboratory procedures (oscilloscope, multimeter, X-Ray, VNA) required to prove hardware compliance.
+5. **[ZC-CORE Conformance Evidence Matrix](zero-cloud-core-conformance-evidence-matrix.md)**
+   * Maps each methodology invariant and attack vector to required physical laboratory evidence.
+6. **[ZC-CORE Attack Taxonomy](zero-cloud-core-attack-taxonomy.md)**
+   * Standard classification of physical, side-channel, and electrical threat vectors (AT-001 through AT-010).
+7. **[ZC-CORE Implementation Coverage Matrix](zero-cloud-core-implementation-coverage.md)**
+   * Matches normative requirements to representative technology implementation classes (Optical, FPGA, ASIC).
+8. **[ZC-CORE Conformance Evidence Package](ZC-CORE-CONFORMANCE-EVIDENCE-PACKAGE.md)**
+   * Evidence package index and formal gate closure sign-offs.
+9. **[ZC-CORE Hardware Forensic Audit Protocol](ZC-CORE-HARDWARE-FORENSIC-AUDIT-PROTOCOL.md)**
+   * Destructive and non-destructive physical teardown protocol for physical device audits.
 
-### 🔬 Testing & Evidence
-6. **[FC-ZC-Conformance-Test-Specification (CTS)](zero-cloud-core-conformance-test-specification.md)**
-   * The physical laboratory procedures (oscilloscope, multimeter, X-Ray) required to prove hardware compliance.
-7. **[ZC-CORE Conformance Evidence Matrix](zero-cloud-core-conformance-evidence-matrix.md)**
-   * Maps every invariant and attack vector to the required physical evidence for verification.
+#### 🛡️ Prior Art & Defensive Publication
+10. **[Zero-Cloud Defensive Publication (Prior Art Specification)](zero-cloud-core-defensive-publication.md)**
+    * Timestamped technical disclosure establishing public prior art to protect the open hardware ecosystem from patent trolling.
 
-### ⚔️ Threat Modeling & Coverage
-8. **[ZC-CORE Attack Taxonomy](zero-cloud-core-attack-taxonomy.md)**
-   * The official classification of physical and side-channel threats (AT-001 to AT-010) mitigated by the methodology.
-9. **[ZC-CORE Implementation Coverage Matrix](zero-cloud-core-implementation-coverage.md)**
-   * Matches normative requirements to representative technology classes (Optical, FPGA, ASICs).
+---
 
-### 🏛️ Governance & Certification
-10. **[ZC-CORE Brand, Trademark & Certification Policy](zero-cloud-core-brand-and-trademark-policy.md)**
-    * The 4-tier certification hierarchy (Self-Declared to FreeCuli Certified™) and trademark usage rights.
-11. **[ZC-CORE Versioning and Governance Policy](zero-cloud-core-versioning-and-governance.md)**
-    * The rigid rules governing how the standard evolves, deprecates old methods, and manages change control.
-12. **[ZC-CORE Release Manifest (v4.0.0-rc1)](ZERO-CLOUD-RELEASE-MANIFEST.md)**
-    * The cryptographic SHA-256 seal of this release, binding all documents to a verifiable timeline.
+## 2. Hybrid Zero-Cloud & Edge Security Architecture (`ZC-PROFILE-HYBRID`)
 
-### 🔀 Candidate Architecture Suite (HYBRID Profile)
-13. **[Hybrid Zero-Cloud & Edge Security Architecture Suite](docs/hybrid-zero-cloud-edge-security-architecture/README.md)**
-    * The canonical specification suite for the candidate HYBRID profile, hardware firewalls, compatibility analysis, and implementation evidence.
+The **Hybrid Zero-Cloud & Edge Security Architecture** extends the ZC-CORE methodology to devices requiring bidirectional network communication. It achieves this without compromising raw-sensor privacy through active digital silicon firewalls, atomic OTP write controllers, and bus-level transaction trapping.
 
-## Commercial Certification
-Industrial AIoT manufacturers utilizing this architecture in proprietary hardware must acquire a B2B Certification and Trademark License to obtain the official FreeCuli certification and trademark usage rights for the #FreeCULI badge. See [FreeCuli.com](https://freeculi.com) for details.
+### Canonical Specification Suite (`hybrid-zero-cloud-edge-security-architecture/`)
+1. **[Architecture Suite Overview & Boundaries](hybrid-zero-cloud-edge-security-architecture/README.md)**
+   * Canonical entry point, architectural motivation, profile definition, and boundary notice.
+2. **[Architecture & Security Boundaries Specification](hybrid-zero-cloud-edge-security-architecture/architecture-and-security-boundaries.md)**
+   * Three-domain decomposition (Domain 0/1/AON), bus topology, data/control flow boundaries, and out-of-scope declarations.
+3. **[STRICT vs. HYBRID Compatibility Analysis](hybrid-zero-cloud-edge-security-architecture/strict-hybrid-compatibility.md)**
+   * Detailed clause-by-clause evaluation against M1–M10 and data classification reconciliation.
+4. **[Implementation & Technical Evidence Matrix](hybrid-zero-cloud-edge-security-architecture/implementation-and-evidence-matrix.md)**
+   * Bidirectional traceability linking security claims to synthesizable RTL modules, formal SVA proofs, and testbenches.
+5. **[Threat Model & Operational Control Flows](hybrid-zero-cloud-edge-security-architecture/threat-model-and-control-flows.md)**
+   * Extended attack taxonomy (AT-001..AT-012), end-to-end control sequences for OTA staging, commit, and error recovery.
+6. **[Open Decisions, Silicon Limitations & Gate D Roadmap](hybrid-zero-cloud-edge-security-architecture/open-decisions-and-limitations.md)**
+   * Detailed disclosure of clock domain crossing risks, Gate D physical silicon deferrals, and pending governance decisions.
+7. **[Cross-Reference & Artifact Graph Map](hybrid-zero-cloud-edge-security-architecture/references-and-document-map.md)**
+   * Complete inventory and dependency graph of all linked repository artifacts.
+
+### Synthesizable Silicon IP Implementation (`rtl/`)
+* **[`rtl/zc_spi_flash_firewall.sv`](rtl/zc_spi_flash_firewall.sv):** Active SPI flash firewall enforcing Bank B containment, rising `/CS` edge gating while `SCK=0`, `05h RDSR1` WIP status polling reconciliation, and secondary-side isolation (`spi_update_state_e`).
+* **[`rtl/zc_obi_subordinate_bridge.sv`](rtl/zc_obi_subordinate_bridge.sv):** Decoupled Open Bus Interface (OBI) slave bridge with a 1024-cycle orphan transaction drain watchdog and `ST_TRAP` synthetic error injection.
+* **[`rtl/zc_aon_post_auth_ctrl.sv`](rtl/zc_aon_post_auth_ctrl.sv):** Always-On power domain controller enforcing a 4-phase atomic Direct Access Interface (DAI) handshake and sticky session-mismatch lockout for OTP memory.
+* **[`rtl/zc_otp_pkg.sv`](rtl/zc_otp_pkg.sv):** Hsiao (22,16) SECDED encoding functions, state enums, and codeword generators ($d_{\min}=4$).
+
+### Verification Evidence & Known Technical Limitations
+* **Formally Verified (Gate C HDL Level):**
+  - Formal SVA properties verified under Yosys 0.33 / yosys-smtbmc / Z3 ($t=20$ $k$-induction) in [`fv/`](fv/).
+  - Cycle-accurate testbenches in [`tb/`](tb/) executed under Verilator and Icarus Verilog.
+  - Automated Gate B regression suite: [`scripts/verify_gate_b_rev28d.ps1`](scripts/verify_gate_b_rev28d.ps1) (20/20 PASS).
+* **Known Silicon Limitations — Gate D: UNVERIFIED:**
+  > [!WARNING]
+  > **Physical Silicon & SoC Integration Boundary**
+  > The RTL implementations and formal models must be evaluated strictly within their documented digital scope. Specifically:
+  > 1. **Clock Domain Crossing (CDC):** In `zc_aon_post_auth_ctrl.sv`, `rst_sys_ni` and `rom_exec_active_i` cross between asynchronous clock domains without dedicated dual-rank synchronizers; formal proofs assume the `async2sync` abstraction.
+  > 2. **SoC Crossbar DMA Firewalls:** Standalone IP blocks do not replace top-level IOMMU or multi-master bus crossbar firewalls.
+  > 3. **Physical Foundry Physics:** High-voltage OTP programming pulses ($V_{\text{PP}}$), analog PVT variations, flash trace capacitive reflections, and silicon side-channel analysis (DPA/EMA) are unverified and formally deferred to Gate D.
+  > 4. **RFC Status:** Proposed V4 architecture enhancements ([`docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md`](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md)) remain in draft status (`DRAFT / NOT RATIFIED`).
+
+---
+
+## 3. Governance, Integrity & Licensing
+
+### 🏛️ Governance & Certification Framework
+- **[ZC-CORE Brand, Trademark & Certification Policy](zero-cloud-core-brand-and-trademark-policy.md):** 4-tier certification hierarchy (Self-Declared to FreeCuli Certified™) and trademark usage rights.
+- **[ZC-CORE Versioning and Governance Policy](zero-cloud-core-versioning-and-governance.md):** Strict SemVer governance rules, normative freeze mechanisms, and standards committee amendment procedures.
+- **[Academic Citation Metadata (`CITATION.cff`)](CITATION.cff):** Formal citation specification for academic and scientific publications.
+
+### 🔐 Cryptographic Integrity & Release Anchors
+- **[ZC-CORE Release Manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`)](ZERO-CLOUD-RELEASE-MANIFEST.md):** Cryptographic SHA-256 seal over all 14 canonical specifications and 4 RTL blocks for candidate `v4.0.0-rc1`.
+- **[Historical Release Manifest (`RELEASE-MANIFEST-v3.3.0-rc2.md`)](RELEASE-MANIFEST-v3.3.0-rc2.md):** Cryptographically archived state of previous release candidate.
+
+### ⚖️ Legal Grounding & Licensing Terms
+This repository employs a carefully differentiated legal structure to protect open hardware collaboration while enabling commercial adoption:
+- **Hardware Source Code & Synthesizable RTL (`rtl/`, `fv/`, `tb/`):** Licensed under the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal ([CERN-OHL-S-2.0](LICENSE))**.
+- **Normative Architectural Specifications & Documentation:** Governed by the open standard licensing terms set forth in [`zero-cloud-dual-licensing.md`](zero-cloud-dual-licensing.md).
+- **Commercial Dual-Licensing (Route B):** Commercial manufacturers desiring to implement proprietary closed-source ASICs/SoCs without reciprocal design disclosure may obtain a commercial exemption license.
+- **Patent Non-Aggression & Founder Attestation:** Backed by Open Invention Network (OIN) membership commitments and the founder's sworn non-aggression representation (`ATTEST-01`).
+- **Commercial Certification:** Industrial AIoT manufacturers seeking official certification and trademark usage rights for the #FreeCULI badge should consult [FreeCuli.com](https://freeculi.com).

@@ -11,7 +11,7 @@
 > [!NOTE]
 > **Architectural Profile Scope — STRICT Profile:**
 > This document normatively specifies the ZC-CORE reference architecture based on unidirectional hardware data paths and physical isolation corresponding to the **STRICT Profile (`ZC-PROFILE-STRICT`)**. The V4 hybrid architecture proposal does not automatically alter or supersede the existing normative provisions of this document.
-> For hardware-gated bidirectional interfaces, firmware update paths, and telemetry boundaries, refer to the canonical [Hybrid Zero-Cloud & Edge Security Architecture](docs/hybrid-zero-cloud-edge-security-architecture/README.md) suite and the draft [V4 architecture RFC](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md). The proposals in those documents represent candidate specifications and do not supersede the existing normative standard without formal standards committee ratification.
+> For hardware-gated bidirectional interfaces, firmware update paths, and telemetry boundaries, refer to the canonical [Hybrid Zero-Cloud & Edge Security Architecture](hybrid-zero-cloud-edge-security-architecture/README.md) suite and the draft [V4 architecture RFC](docs/rfc/ZC-CORE-V4-ARCHITECTURE-RFC.md). The proposals in those documents represent candidate specifications and do not supersede the existing normative standard without formal standards committee ratification.
 
 > [!IMPORTANT]
 > **LEGAL NOTICE: Separation of Technical Standard and Legal Licensing**

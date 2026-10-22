@@ -4,7 +4,7 @@
 **Architecture Identifier:** `ZC-ARCH-HYBRID-V4`  
 **Standardization Status:** `PROPOSED / CANDIDATE SPECIFICATION / NOT RATIFIED AS FINAL STANDARD`  
 **Release Context:** Part of the `v4.0.0-rc1` Release Candidate Package (Pending Experimental Validation)  
-**Historical Normative Baseline:** Preserves [`zero-cloud-core-methodology-invariants.md`](../../zero-cloud-core-methodology-invariants.md) and [`zero-cloud-hardware-reference-architecture.md`](../../zero-cloud-hardware-reference-architecture.md) as immutable STRICT reference  
+**Historical Normative Baseline:** Preserves [`zero-cloud-core-methodology-invariants.md`](../zero-cloud-core-methodology-invariants.md) and [`zero-cloud-hardware-reference-architecture.md`](../zero-cloud-hardware-reference-architecture.md) as immutable STRICT reference
 **Classification:** Canonical Architecture Suite  
 
 ---
@@ -88,10 +88,10 @@ This directory forms the authoritative, self-contained specification suite for t
 ## 3. Relationship to Canonical Standard & STRICT Baseline
 
 To prevent ambiguity regarding standard ratification:
-1. **Normative Supremacy of Root Standard:** The 14 canonical specifications in the repository root (anchored by [`zero-cloud-core-methodology-invariants.md`](../../zero-cloud-core-methodology-invariants.md)) define the immutable baseline. Nothing in this directory amends, weakens, or overrides the root standard.
+1. **Normative Supremacy of Root Standard:** The 14 canonical specifications in the repository root (anchored by [`zero-cloud-core-methodology-invariants.md`](../zero-cloud-core-methodology-invariants.md)) define the immutable baseline. Nothing in this directory amends, weakens, or overrides the root standard.
 2. **Profile Stratification:**
-   - **`ZC-PROFILE-STRICT`:** Corresponds to the architecture documented in [`zero-cloud-hardware-reference-architecture.md`](../../zero-cloud-hardware-reference-architecture.md). It remains fully normative, valid, and required for maximum-security or air-gapped deployments.
-   - **`ZC-PROFILE-HYBRID`:** Corresponds to the architecture documented in this directory and [`docs/architecture/`](../architecture/). It represents an opt-in architectural extension for networked devices.
+   - **`ZC-PROFILE-STRICT`:** Corresponds to the architecture documented in [`zero-cloud-hardware-reference-architecture.md`](../zero-cloud-hardware-reference-architecture.md). It remains fully normative, valid, and required for maximum-security or air-gapped deployments.
+   - **`ZC-PROFILE-HYBRID`:** Corresponds to the architecture documented in this directory and [`docs/architecture/`](../docs/architecture/). It represents an opt-in architectural extension for networked devices.
 3. **No Retrospective Compliance Claims:** An implementation certified under v3.x STRICT rules does not automatically achieve HYBRID compliance, nor does non-implementation of HYBRID firewalls invalidate existing STRICT certifications.
 
 ---
@@ -101,9 +101,9 @@ To prevent ambiguity regarding standard ratification:
 The architectural claims in this suite are rigorously grounded in empirical and formal evidence, subject to precise scope boundaries:
 
 * **Gate C Proven (Digital RTL Logic):**
-  - Synthesizable SystemVerilog IP cores located in [`rtl/`](../../rtl/) (`zc_spi_flash_firewall.sv`, `zc_obi_subordinate_bridge.sv`, `zc_aon_post_auth_ctrl.sv`, `zc_otp_pkg.sv`).
+  - Synthesizable SystemVerilog IP cores located in [`rtl/`](../rtl/) (`zc_spi_flash_firewall.sv`, `zc_obi_subordinate_bridge.sv`, `zc_aon_post_auth_ctrl.sv`, `zc_otp_pkg.sv`).
   - Mathematical formal proofs under SymbiYosys / Yosys 0.33 / Z3 over bounded cycles ($t=20$, $k$-induction).
-  - Cycle-accurate digital testbenches in [`tb/`](../../tb/) executed under Verilator and Icarus Verilog.
+  - Cycle-accurate digital testbenches in [`tb/`](../tb/) executed under Verilator and Icarus Verilog.
 * **Gate D Unverified (Physical Silicon & System SoC):**
   - Asynchronous reset filtering and Clock Domain Crossing (CDC) synchronizers between `clk_sys` and `clk_aon_i` in `zc_aon_post_auth_ctrl.sv`.
   - Full-SoC multi-master crossbar arbitrasyon and IOMMU/PMP memory protection.
@@ -117,5 +117,5 @@ The architectural claims in this suite are rigorously grounded in empirical and 
 The hardware source code, architectural specifications, and verification harnesses comprising the Hybrid Zero-Cloud & Edge Security Architecture are licensed under the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S-2.0)**. 
 
 For commercial licensing exemptions, patent non-aggression commitments under Open Invention Network (OIN), and the founder's factual representation (`ATTEST-01`), refer strictly to the root licensing specification:
-- [`zero-cloud-dual-licensing.md`](../../zero-cloud-dual-licensing.md)
-- [`LICENSE`](../../LICENSE)
+- [`zero-cloud-dual-licensing.md`](../zero-cloud-dual-licensing.md)
+- [`LICENSE`](../LICENSE)

@@ -22,7 +22,7 @@ The **Hybrid Zero-Cloud & Edge Security Architecture** operates under an explici
 
 ## 2. Threat Taxonomy Mapping (AT-001 through AT-012)
 
-The architecture maps physical and logical threats to standardized attack classifications defined in [`zero-cloud-core-attack-taxonomy.md`](../../zero-cloud-core-attack-taxonomy.md) and candidate extensions:
+The architecture maps physical and logical threats to standardized attack classifications defined in [`zero-cloud-core-attack-taxonomy.md`](../zero-cloud-core-attack-taxonomy.md) and candidate extensions:
 
 | Attack Class ID | Adversarial Threat Description | Architectural Mitigation Mechanism | Implementation Status |
 | :--- | :--- | :--- | :---: |
@@ -77,7 +77,7 @@ To maintain technical fidelity, every operational flow is categorized into one o
 * **Control Sequence:**
   1. The untrusted Network Co-Processor downloads an encrypted firmware container from an external server over Wi-Fi/Ethernet.
   2. The network processor issues SPI Write commands targeting Flash Bank B through `zc_spi_flash_firewall.sv`.
-  3. The firewall permits write transactions **if and only if** the target address falls strictly within Bank B boundaries. Any attempt to write to Bank A triggers `ST_SPI_ALARM`, permanently isolating the flash until reset.
+  3. The firewall permits write transactions **if and only if** the target address falls strictly within Bank B boundaries. Any attempt to write to Bank A triggers `UPD_RECOVERY_LOCKOUT`, permanently isolating the flash until reset.
   4. The network processor queries write completion via opcode `05h RDSR1`. The firewall's internal status reconciler intercepts the query and asserts `flash_ready_strobe_o` only when bit 0 (WIP) clears.
   5. The network processor notifies Domain 1 that staging is complete via an OBI mailbox interrupt.
 
