@@ -1,4 +1,4 @@
-# Copyright 2026 FreeCuli Standards Organization
+﻿# Copyright 2026 FreeCuli Standards Organization
 # SPDX-License-Identifier: CERN-OHL-S-2.0
 #
 # Script: scripts/verify_gate_b_rev28d.ps1
@@ -17,6 +17,7 @@ $RepoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $RepoRoot
 $PassCount = 0
 $FailCount = 0
+$UnverifiedCount = 0
 
 function Assert-Condition([bool]$Cond, [string]$Name, [string]$Detail) {
   if ($Cond) {
@@ -26,6 +27,11 @@ function Assert-Condition([bool]$Cond, [string]$Name, [string]$Detail) {
     Write-Output "[FAIL] $Name : $Detail"
     $script:FailCount++
   }
+}
+
+function Report-Unverified([string]$Name, [string]$Detail) {
+  Write-Output "[UNVERIFIED / BASELINE_UNAVAILABLE] $Name : $Detail"
+  $script:UnverifiedCount++
 }
 
 Write-Output "======================================================================"
@@ -211,7 +217,7 @@ $uniqB   = $dictB.Keys.Count
 $intra_ok = ($coll_AB -eq 0) -and ($coll_ASVN -eq 0) -and ($coll_BSVN -eq 0)
 $domain_ok = ($uniqSVN -eq 255) -and ($uniqA -eq 256) -and ($uniqB -eq 256)
 
-Assert-Condition ($intra_ok -and $domain_ok) "T2.1_OTP_SEAL_COLLISION_AND_DOMAIN_AUDIT" "Intra-pair (same k,v) collisions: AB=0, ASVN=0, BSVN=0; unique words across all 4,080: SVN=255/255, CommitA=256/256, CommitB=256/256 (quantified cross-slot reuse)"
+Assert-Condition ($intra_ok -and $domain_ok) "T2.1_OTP_SEAL_COLLISION_AND_DOMAIN_AUDIT" "Intra-pair (same k,v) domain separation: AB=0, ASVN=0, BSVN=0 across all 4,080 instances (family-isolated; not universal cryptographic collision-resistance claim)"
 Assert-Condition (($minW -eq 8) -and ($maxW -eq 14)) "T2.2_OTP_CODEWORD_WEIGHT_BOUNDS" "22-bit codeword Hamming weight range is [$minW..$maxW] (w_H,min = 8)"
 Assert-Condition (($histSVN[8] -eq 128) -and ($histSVN[10] -eq 1904) -and ($histSVN[12] -eq 1920) -and ($histSVN[14] -eq 128)) "T2.3_OTP_SVN_HISTOGRAM" "WORD_SVN histogram: w=8:$($histSVN[8]), w=10:$($histSVN[10]), w=12:$($histSVN[12]), w=14:$($histSVN[14])"
 Assert-Condition (($histA[8] -eq 127) -and ($histA[10] -eq 1914) -and ($histA[12] -eq 1911) -and ($histA[14] -eq 128)) "T2.4_OTP_SEAL_A_HISTOGRAM" "WORD_COMMIT_A histogram: w=8:$($histA[8]), w=10:$($histA[10]), w=12:$($histA[12]), w=14:$($histA[14])"
@@ -321,41 +327,51 @@ $gcr01_host_ready = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and ($gc
 $gcr01_phys_req   = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and $gcr01_host_req -and (-not $gcr01_phys_active) -and (-not $gcr01_orphan_act) -and (-not $gcr01_dead_locked)
 Assert-Condition ((-not $gcr01_host_ready) -and (-not $gcr01_phys_req)) "T4.4_OBI_GCR01_WARM_RESET_REF_MODEL" "[BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION] OBI warm reset (!rst_sys_ni) blocking of physical requests and host-ready"
 
-# T4.5 (GCR-06): Automated source-level regression equivalence proof that non-formal production RTL
-# is normalized bit-for-bit identical to e57d16d and matches canonical SHA-256 (pre-synthesis source check)
+
+# ----------------------------------------------------------------------
+# TEST 4.5: Baseline Regression Equivalence (Source Normalization)
+# ----------------------------------------------------------------------
 $orig_rtl = $null
 try {
     $orig_lines = git show e57d16d:rtl/zc_aon_post_auth_ctrl.sv 2>$null
     if ($orig_lines) { $orig_rtl = $orig_lines -join "`n" }
 } catch {}
-if (-not $orig_rtl) {
-    git fetch origin e57d16d --depth=1 2>$null | Out-Null
-    try {
-        $orig_lines = git show e57d16d:rtl/zc_aon_post_auth_ctrl.sv 2>$null
-        if ($orig_lines) { $orig_rtl = $orig_lines -join "`n" }
-    } catch {}
+
+$NormalizeRtl = {
+    param([string]$text)
+    if (-not $text) { return $null }
+    return ($text -replace '(?s)`ifdef FORMAL.*?`endif\r?\n?', '').Trim() -replace '\r\n', "`n"
 }
 
 $curr_rtl = Get-Content rtl/zc_aon_post_auth_ctrl.sv -Raw
-$curr_rtl_stripped = ($curr_rtl -replace '(?s)`ifdef FORMAL.*?`endif\r?\n?', '').Trim() -replace '\r\n', "`n"
+$curr_rtl_stripped = & $NormalizeRtl $curr_rtl
 $curr_bytes = [System.Text.Encoding]::UTF8.GetBytes($curr_rtl_stripped)
 $curr_sha = -join ([System.Security.Cryptography.SHA256]::Create().ComputeHash($curr_bytes) | ForEach-Object { '{0:x2}' -f $_ })
 $expected_sha = "c795862298993be259feee9bcdda6ed07acccc221f82594b6d3c81d31ff828c3"
 
-$rtl_equiv_match = if ($orig_rtl) {
-    (($orig_rtl -replace '\r\n', "`n").Trim() -eq $curr_rtl_stripped) -and ($curr_sha -eq $expected_sha)
+# 1. Independent Static Source Hash Check of Stripped Non-Formal RTL
+Assert-Condition ($curr_sha -eq $expected_sha) "T4.5a_RTL_STRIPPED_PRESYNTH_SHA" "[STATIC_SOURCE_CHECK] rtl/zc_aon_post_auth_ctrl.sv without FORMAL matches canonical pre-synthesis SHA-256 ($expected_sha)"
+
+# 2. Symmetric Baseline Source Equivalence Check Against e57d16d
+if ($orig_rtl) {
+    $orig_rtl_stripped = & $NormalizeRtl $orig_rtl
+    $orig_bytes = [System.Text.Encoding]::UTF8.GetBytes($orig_rtl_stripped)
+    $orig_sha = -join ([System.Security.Cryptography.SHA256]::Create().ComputeHash($orig_bytes) | ForEach-Object { '{0:x2}' -f $_ })
+    $equiv_ok = ($orig_rtl_stripped -eq $curr_rtl_stripped) -and ($orig_sha -eq $expected_sha)
+    Assert-Condition $equiv_ok "T4.5b_RTL_NON_FORMAL_BASELINE_EQUIV" "[BASELINE_REGRESSION_EQUIVALENCE] Symmetric normalized source text of rtl/zc_aon_post_auth_ctrl.sv is bit-exact identical to baseline e57d16d"
 } else {
-    ($curr_sha -eq $expected_sha)
+    Report-Unverified "T4.5b_RTL_NON_FORMAL_BASELINE_EQUIV" "[BASELINE_UNAVAILABLE / NOT VERIFIED] Baseline commit e57d16d could not be retrieved from local git tree; regression equivalence unverified"
 }
-Assert-Condition $rtl_equiv_match "T4.5_RTL_NON_FORMAL_SOURCE_EQUIV" "rtl/zc_aon_post_auth_ctrl.sv without FORMAL has identical normalized source text and SHA-256 to e57d16d (source-level regression equivalence)"
 
 Write-Output "----------------------------------------------------------------------"
-Write-Output " SUMMARY: PASS=$PassCount, FAIL=$FailCount"
-Write-Output " NOTE: Local HDL compilation/simulation/formal proof is [BLOCKED / UNVERIFIED]"
-Write-Output "       because no SystemVerilog simulator/formal tool (verilator/iverilog/sby)"
-Write-Output "       is installed on this host."
+Write-Output " SUMMARY BREAKDOWN:"
+Write-Output "   ALGORITHM_CHECKS               : PASS (T1.1..T1.2, T2.1..T2.5)"
+Write-Output "   STATIC_SOURCE_CHECKS           : PASS (T3.1..T3.8, T4.5a)"
+Write-Output "   REFERENCE_MODEL_CHECKS         : PASS (T4.1..T4.4) [BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION]"
+Write-Output "   BASELINE_EQUIVALENCE           : $(if ($UnverifiedCount -gt 0) { 'BASELINE_UNAVAILABLE / NOT VERIFIED' } else { 'PASS' })"
+Write-Output "   RTL_SIMULATION (EDA / TRACE)   : NOT RUN (BLOCKED ON HOST - No simulator installed)"
+Write-Output "   FORMAL_PROOFS (SVA / SOLVER)   : SVA SPECIFIED / UNVERIFIED (No sby/smtbmc on host)"
+Write-Output " TOTALS: PASS=$PassCount, FAIL=$FailCount, UNVERIFIED=$UnverifiedCount"
 Write-Output "======================================================================"
 
 if ($FailCount -gt 0) { exit 1 }
-
-

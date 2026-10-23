@@ -97,14 +97,20 @@ To maintain technical fidelity, every operational flow is categorized into one o
   6. If readback data or session ID fails at any point, the FSM transitions permanently to `AUTH_LOCKED_FATAL`.
 
 ### 3.3 Flow C: Subordinate Bus Isolation & Error Recovery
-* **Maturity Status:** **RTL'de Mevcut ve Kanıtla Desteklenen** (Watchdog and trap logic).
-* **Control Sequence:**
-  1. Domain 0 initiates an OBI bus read/write cycle (`host_req_i <= 1'b1`).
-  2. The bridge initiates internal subordinate request `periph_phys_req_o <= 1'b1`.
-  3. If the internal peripheral hangs or fails to return `periph_phys_rvalid_i`, internal counter `drain_wdog_cnt_o` decrements each cycle.
-  4. At cycle 1024, the counter underflows, asserting `subsys_dead_locked_q <= 1'b1`.
-  5. The bridge enters `ST_TRAP`, immediately isolating internal buses and asserting `host_err_o <= 1'b1` with zero data (`host_rdata_o <= 32'h0`).
-  6. Subsequent external requests are immediately rejected with error responses until the subsystem completes recovery.
+* **Maturity Status:** **RTL'de Gating & Trap Mantığı Olarak Tanımlı** (RTL gating and trap logic; multi-master crossbar arbitration deferred to Gate D).
+* **Signal Topology & Registers:**
+  - `drain_wdog_cnt_q [9:0]`: 10-bit internal digital register (UP-counter).
+  - `drain_wdog_cnt_o [9:0]`: Module output port directly driven by `drain_wdog_cnt_q`.
+  - `orphan_drain_active_q`: Internal latch asserted on orphan condition; reset by Cold POR (`!rst_por_ni`) or valid physical response (`periph_phys_rvalid_i`).
+  - `orphan_active_w`: Combinational trigger wire (`orphan_drain_active_q || orphan_trigger_w`).
+  - `subsys_dead_locked_q`: Permanent deadlock register; cleared ONLY by Cold Power-On Reset (`rst_por_ni`).
+* **Control Sequence & Cycle-Accurate 4-Stage Semantics:**
+  1. **Subordinate Request Initiation:** Domain 0 initiates an OBI bus read/write cycle (`host_req_i <= 1'b1`). The bridge enters `ST_WAIT_RVALID` and initiates internal subordinate request `periph_phys_req_o <= 1'b1`.
+  2. **Orphan Condition Trigger:** If the internal subordinate hangs, times out (64-cycle timeout in `ST_WAIT_RVALID`), or warm reset (`!rst_sys_ni`) drops while a physical request is active, `orphan_active_w` asserts and latches `orphan_drain_active_q <= 1'b1`.
+  3. **Monotonic Counter Progression (Counting):** While `orphan_active_w` holds and `!subsys_dead_locked_q`, internal register `drain_wdog_cnt_q [9:0]` operates as an **UP-COUNTER**, starting at `10'd0` and incrementing monotonically by +1 on each clock posedge (`0 → 1023`). During this progression, deadlock is NOT yet asserted.
+  4. **Threshold Evaluation & Latching (Locking):** In any clock cycle where the prior registered counter value is `drain_wdog_cnt_q == 10'd1023`, on the subsequent clock posedge under active orphan drain, permanent deadlock register `subsys_dead_locked_q <= 1'b1` is clocked in.
+  5. **Combinational IRQ Generation (IRQ Behavior):** By virtue of the RTL continuous assignment `assign subsys_fatal_fault_irq_o = subsys_dead_locked_q;`, output port `subsys_fatal_fault_irq_o` transitions to high combinationally in the very same clock cycle that `subsys_dead_locked_q` becomes 1.
+  6. **Deadlock Bus Isolation & Error Trap:** Under `subsys_dead_locked_q == 1'b1`, physical subordinate requests are unconditionally suppressed (`periph_phys_req_o = 1'b0`). Subsequent host requests in `ST_IDLE` are accepted (`host_req_ready_o = 1'b1`), transition to `ST_TRAP`, return a deterministic 1-cycle synthetic error (`host_rvalid_o <= 1'b1`, `host_err_o <= 1'b1`, `host_rdata_o <= 32'h0000_0000`), and return to `ST_IDLE` while remaining deadlocked until Cold POR (`rst_por_ni`).
 
 ---
 
