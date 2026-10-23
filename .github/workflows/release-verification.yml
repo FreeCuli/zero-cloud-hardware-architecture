@@ -85,34 +85,28 @@ jobs:
         run: |
           echo "Verifying Git provenance and tag resolution..."
           RELEASE_TAG=$(grep -oE "Git Tag: (v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?)" ZERO-CLOUD-RELEASE-MANIFEST.md | head -n 1 | awk '{print $3}')
-          if [ -z "$RELEASE_TAG" ] && [ -n "${GITHUB_REF_NAME}" ] && [[ "${GITHUB_REF_NAME}" == v* ]]; then
-            RELEASE_TAG="${GITHUB_REF_NAME}"
-          fi
-
-          if [ -n "$RELEASE_TAG" ]; then
-            echo "[PASS] Release Tag ($RELEASE_TAG) resolved."
-          else
-            echo "[FAIL] Release Tag declaration missing in manifest."
+          if [ -z "$RELEASE_TAG" ]; then
+            echo "[FAIL] Release Tag declaration missing in ZERO-CLOUD-RELEASE-MANIFEST.md."
             exit 1
           fi
+          echo "[PASS] Release Tag ($RELEASE_TAG) declared in manifest."
 
-          if grep -q "Git Commit Resolution" ZERO-CLOUD-RELEASE-MANIFEST.md; then
-            echo "[PASS] Git Commit Resolution declared in manifest."
-          else
+          if ! grep -q "Git Commit Resolution" ZERO-CLOUD-RELEASE-MANIFEST.md; then
             echo "[FAIL] Git Commit Resolution declaration missing in manifest."
             exit 1
           fi
+          echo "[PASS] Git Commit Resolution declared in manifest."
 
-          IS_TAG_RELEASE=0
-          if [ "${GITHUB_REF_TYPE}" = "tag" ] || [[ "${GITHUB_REF_NAME}" == v* ]]; then
-            IS_TAG_RELEASE=1
-            # Strict parity check: triggering Git tag must bit-exact match the manifest-declared tag
-            if [ -n "${GITHUB_REF_NAME}" ] && [ "${GITHUB_REF_NAME}" != "$RELEASE_TAG" ]; then
-              echo "[FAIL] Tag parity mismatch: Triggering Git ref (${GITHUB_REF_NAME}) != Manifest declared tag (${RELEASE_TAG})"
+          # Determine whether this is a formal Git tag release run
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "Formal release tag trigger detected: ${GITHUB_REF_NAME}"
+            if [ -z "${GITHUB_REF_NAME}" ] || [ "${GITHUB_REF_NAME}" != "$RELEASE_TAG" ]; then
+              echo "[FAIL] Git tag and manifest RELEASE_TAG mismatch."
               exit 1
-            else
-              echo "[PASS] Triggering Git tag strictly matches manifest declaration (${RELEASE_TAG})."
             fi
+            echo "[PASS] Git tag matches release manifest ($RELEASE_TAG)."
+          else
+            echo "[INFO] Running on non-tag event (${GITHUB_REF_TYPE:-commit}: ${GITHUB_REF_NAME:-detached}); validating against manifest tag target ($RELEASE_TAG)."
           fi
 
           # Deep git tag provenance check: ensure the tag points to the current checkout commit
@@ -128,7 +122,7 @@ jobs:
               echo "[FAIL] Provenance mismatch: refs/tags/$RELEASE_TAG resolves to ($TAG_COMMIT) but HEAD is ($HEAD_COMMIT)."
               exit 1
             fi
-          elif [ "$IS_TAG_RELEASE" -eq 1 ]; then
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             echo "[FAIL] Required release tag $RELEASE_TAG could not be resolved on release tag event."
             exit 1
           else
@@ -138,24 +132,9 @@ jobs:
       - name: Verify Git tag signature
         run: |
           RELEASE_TAG=$(grep -oE "Git Tag: (v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?)" ZERO-CLOUD-RELEASE-MANIFEST.md | head -n 1 | awk '{print $3}')
-          if [ -z "$RELEASE_TAG" ] && [ -n "${GITHUB_REF_NAME}" ] && [[ "${GITHUB_REF_NAME}" == v* ]]; then
-            RELEASE_TAG="${GITHUB_REF_NAME}"
-          fi
           echo "Verifying signature for release tag $RELEASE_TAG..."
           git config gpg.format ssh
           git config gpg.ssh.allowedSignersFile .github/allowed_signers
-
-          IS_TAG_RELEASE=0
-          if [ "${GITHUB_REF_TYPE}" = "tag" ] || [[ "${GITHUB_REF_NAME}" == v* ]]; then
-            IS_TAG_RELEASE=1
-            # Strict parity check: triggering Git tag must bit-exact match the manifest-declared tag
-            if [ -n "${GITHUB_REF_NAME}" ] && [ "${GITHUB_REF_NAME}" != "$RELEASE_TAG" ]; then
-              echo "[FAIL] Tag parity mismatch: Triggering Git ref (${GITHUB_REF_NAME}) != Manifest declared tag (${RELEASE_TAG})"
-              exit 1
-            else
-              echo "[PASS] Triggering Git tag strictly matches manifest declaration (${RELEASE_TAG})."
-            fi
-          fi
 
           if git rev-parse "$RELEASE_TAG" >/dev/null 2>&1; then
             if git tag -v "$RELEASE_TAG"; then
@@ -164,11 +143,11 @@ jobs:
               echo "[FAIL] Git Tag $RELEASE_TAG signature verification failed!"
               exit 1
             fi
-          elif [ "$IS_TAG_RELEASE" -eq 1 ]; then
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             echo "[FAIL] Git Tag $RELEASE_TAG missing on tag push event!"
             exit 1
           else
-            echo "[INFO] Git Tag $RELEASE_TAG not present in local tree; skipping signature check during pre-tag run."
+            echo "[INFO] Git Tag $RELEASE_TAG not present in local tree; signature check is deferred to formal release tagging."
           fi
 
       - name: Verify no legacy normative content
