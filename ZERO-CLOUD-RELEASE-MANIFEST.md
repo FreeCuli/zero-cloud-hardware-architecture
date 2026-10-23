@@ -11,7 +11,9 @@ This manifest records the cryptographic identity, publication metadata, and file
 * **Repository:** FreeCuli/zero-cloud-hardware-architecture
 * **Git Tag: v4.0.0-rc2**
 * **Git Commit Resolution:** Resolves dynamically to the canonical tagged tree commit of `refs/tags/v4.0.0-rc2`
-* **Distribution Archive SHA-256 (Candidate Evaluation ZIP):** `DC2665032F64656A08E020E894660D53915DF466A985250BFD4F84696F91A8D2` (`zero-cloud-hardware-architecture-v4.0.0-rc2-final.zip`)
+* **Git Tag Lineage & Provenance:** Initial candidate evaluation baseline tagged at `bd5ccb1` (evaluated under archive `DC266503...`); remediated candidate release candidate tagged at child commit incorporating auditor findings.
+* **Audit Baseline Evaluation Archive SHA-256 (commit bd5ccb1):** `DC2665032F64656A08E020E894660D53915DF466A985250BFD4F84696F91A8D2` (`zero-cloud-hardware-architecture-v4.0.0-rc2-candidate-eval-DC266503.zip`)
+* **Post-Remediation Release Distribution Archive:** Published externally in GitHub release checksum assets (sha256sum) to avoid circular self-reference.
 * **Zenodo Release Artifact SHA-256:** *(to be computed and recorded upon post-audit publication of the immutable Zenodo archival archive)*
 
 ## Cryptographic Evidence (SHA-256 Hashes)

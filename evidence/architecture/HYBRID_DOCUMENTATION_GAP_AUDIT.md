@@ -149,11 +149,14 @@ Bu yaklaşım, hem Zero-Cloud'un katı kurallarını koruyacak hem de Gate C'de 
 
 ---
 
-## 8. Tarihsel Boşlukların Güncel v4.0.0-rc2 Kapanış Durumu Tablosu
+## 8. Tarihsel Boşlukların Özet Durum Tablosu (Summary Status of Historical Gaps)
 
-| Eski Rapor Bulgusu | Güncel Durum ve İlgili Dosyalar |
-| :--- | :--- |
-| **Hibrit mimari kök belgelerde yok** | **KAPATILDI (ADAY KÜME):** Hibrit mimari ayrı bir aday belge kümesinde (`hybrid-zero-cloud-edge-security-architecture/`) müstakil olarak tanımlanmış; kök normatif metinle ilişkisi `strict-hybrid-compatibility.md` ile haritalandırılmıştır. |
-| **Gate C RTL'si ve formal kanıtları eksik** | **KAPATILDI (ARŞİVDE MEVCUT):** RTL (`rtl/`), SVA (`fv/`) ve testbench (`tb/`) dosyaları depoda mevcuttur; formal ispatlar tarihsel Gate C Run #45 (`eb3ed5a`) kaydıyla ilişkilendirilmiştir (`HISTORICAL_RUN45_CITED`). |
-| **CTS'de profil uyumluluğu testi yok** | **KAPATILDI / GATE D ERTELENDİ:** CTS (`zero-cloud-core-conformance-test-specification.md`) Annex A ve B içinde STRICT ve HYBRID profil test sınırları belgelenmiştir; fiziksel netlist doğrulaması Gate D kapsamına ertelenmiştir. |
-| **Manifest Gate C/hibrit dosyalarını içermiyor** | **KAPSAM AYRIMI NETLEŞTİRİLDİ:** 18 dosyalık kök manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`) kök normatif standardı mühürler; 7 belgeli hibrit mimari müstakil aday küme olarak `README.md` satır 154'te açıkça kapsam dışı bırakılmıştır. |
+| İnceleme Konusu | Değerlendirme & Statü | İlgili Dosyalar & Sınırlar |
+| :--- | :--- | :--- |
+| **Hibrit mimari dokümantasyonu** | **KAPATILDI (MÜSTAKİL ADAY KÜME)** | Hibrit mimari ayrı bir aday belge kümesinde (`hybrid-zero-cloud-edge-security-architecture/`) müstakil olarak tanımlanmış; kök normatif metinle ilişkisi `strict-hybrid-compatibility.md` ile haritalandırılmıştır. |
+| **Kaynak RTL / SVA / Testbench mevcudiyeti** | **KAPATILDI (ARŞİVDE MEVCUT)** | `rtl/` (4 dosya), `fv/` (9 dosya) ve `tb/` (5 dosya) eksiksiz olarak depoda ve dağıtım arşivinde mevcuttur. |
+| **Tarihsel Gate C kanıtının referanslanması** | **KAYIT ALTINDA** | Gate C Run #45 (`eb3ed5a`, 2026-10-20) formal kanıt kayıtlarına atıf yapılmıştır. |
+| **Güncel RC2 üzerinde RTL simülasyonu ve formal ispat** | **DOĞRULANMADI (ÇALIŞTIRILMADI)** | Mevcut derleme/çalışma ortamında EDA simülatörü (Verilator/ModelSim/VCS) ve formal çözücü (sby/smtbmc) bulunmadığından simülasyon ve formal ispat bu oturumda yeniden koşturulmamıştır. |
+| **Fiziksel donanım / silikon (Gate D)** | **ERTELENDİ / DOĞRULANMADI** | Analog PVT, saat kayması, PCB iz yansımaları ve optokuplör fiziksel sınırları Gate D kapsamına ertelenmiştir. |
+| **CTS profil uyumluluğu ve telemetri sınırları** | **KAPATILDI / GATE D ERTELENDİ** | CTS (`zero-cloud-core-conformance-test-specification.md`) Annex A ve B içinde STRICT ve HYBRID profil test sınırları belgelenmiştir; fiziksel netlist doğrulaması Gate D kapsamına ertelenmiştir. |
+| **Kök manifest ayrımı** | **KAPSAM AYRIMI NETLEŞTİRİLDİ** | 18 dosyalık kök manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`) kök normatif standardı mühürler; 7 belgeli hibrit mimari müstakil aday küme olarak açıkça kapsam dışı bırakılmıştır. |
