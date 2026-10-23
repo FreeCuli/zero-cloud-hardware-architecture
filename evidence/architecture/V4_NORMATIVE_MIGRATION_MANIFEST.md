@@ -1,20 +1,24 @@
 # FREECULI ZC-CORE — Normative Migration Manifest for v4.0.0 Architecture
 ## Comprehensive File-by-File Inventory, Disposition Decisions, Proposed Normative Diff Specifications & Phased Migration Sequencing
 
-**Manifest Document ID:** ZC-CORE-MANIFEST-V4-MIGRATION-01  
-**Date:** 20 October 2026  
-**Status:** `DRAFT / PROPOSED MIGRATION MANIFEST / NOT AUTHORIZED FOR MERGE`  
-**Target Milestone:** Preparation for ZC-CORE v4.0.0 Migration (Post-RFC Consensus)  
-**Reference Technical Baseline:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
-**Governance Level:** Normative Transition Planning  
+**Manifest Document ID:** ZC-CORE-MANIFEST-V4-MIGRATION-01
+**Date:** 20 October 2026
+**Status:** `DRAFT / PROPOSED MIGRATION MANIFEST / NOT AUTHORIZED FOR MERGE`
+**Target Milestone:** Preparation for ZC-CORE v4.0.0 Migration (Post-RFC Consensus)
+**Reference Technical Baseline:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)
+**Governance Level:** Normative Transition Planning
 
 ---
 
+> [!NOTE]
+> **Tarihsel Geçiş Planı Açıklaması:**
+> Bu belge, v4.0.0 geçişinden önce hazırlanmış planlama kaydıdır. İçindeki eski "DO NOT MERGE / RELEASE BLOCKED" ifadeleri, kendi tarihsel karar bağlamını açıklar; güncel Git etiketi, yayın yetkilendirmesi veya Gate D tamamlanma durumu hakkında tek başına hüküm oluşturmaz. v4.0.0-rc2 aday sürümü, normatif standardın nihai ratifikasyonu anlamına gelmez.
+
 > [!CAUTION]
-> **GOVERNANCE DIRECTIVE — ZERO UNAUTHORIZED EDITS TO NORMATIVE DOCUMENTS:**  
-> This manifest is a **planning specification and audit inventory ONLY**.  
-> **NO ROOT NORMATIVE DOCUMENTS (`zero-cloud-*.md`, `README.md`, `ZERO-CLOUD-RELEASE-MANIFEST.md`) MAY BE MODIFIED AT THIS STAGE.**  
-> Any modification to existing normative documents requires prior independent auditor sign-off and formal standards committee ratification of `RFC-ZC-CORE-0004-DRAFT`.  
+> **GOVERNANCE DIRECTIVE — ZERO UNAUTHORIZED EDITS TO NORMATIVE DOCUMENTS:**
+> This manifest is a **planning specification and audit inventory ONLY**.
+> **NO ROOT NORMATIVE DOCUMENTS (`zero-cloud-*.md`, `README.md`, `ZERO-CLOUD-RELEASE-MANIFEST.md`) MAY BE MODIFIED AT THIS STAGE.**
+> Any modification to existing normative documents requires prior independent auditor sign-off and formal standards committee ratification of `RFC-ZC-CORE-0004-DRAFT`.
 > Current status remains: **`DO NOT MERGE / RELEASE BLOCKED`**.
 
 ---

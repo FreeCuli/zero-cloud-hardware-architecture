@@ -1,14 +1,17 @@
 # FREECULI ZC-CORE — Gate C Consolidated Normative Evidence Matrix
 ## Rev. 2.0.0 — Strict 1-to-1 Traceable Security Claim Inventory & Formal Audit
 
-**Document ID:** ZC-CORE-GATE-C-CONSOLIDATED-EVIDENCE-MATRIX  
-**Revision:** 2.0.0 (Post-GCR-09 / GCR-10 / GCR-11 Alignment)  
-**Milestone:** Gate C (Open-Source RTL & Formal Verification Scope Sign-Off)  
-**Repository:** `https://github.com/FreeCuli/zero-cloud-hardware-architecture`  
-**Working Branch:** `gate-c/formal-scope-audit`  
-**Verified Git Commit:** `eb3ed5ad9fddb551506d43d2692bd040843af06f`  
-**Verified CI Run:** [Run #45 (ID: 39321501893)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/actions/runs/39321501893) — **SUCCESS** (13/13 Steps Pass)  
-**Gate Status:** **Gate C PARTIAL / QUALIFIED** | **Gate D UNVERIFIED** | **RELEASE BLOCKED / DO NOT MERGE**  
+**Document ID:** ZC-CORE-GATE-C-CONSOLIDATED-EVIDENCE-MATRIX
+**Revision:** 2.0.0 (Post-GCR-09 / GCR-10 / GCR-11 Alignment)
+**Milestone:** Gate C (Open-Source RTL & Formal Verification Scope Sign-Off)
+**Repository:** `https://github.com/FreeCuli/zero-cloud-hardware-architecture`
+**Working Branch:** `gate-c/formal-scope-audit`
+**Verified Git Commit:** `eb3ed5ad9fddb551506d43d2692bd040843af06f`
+**Verified CI Run:** [Run #45 (ID: 39321501893)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/actions/runs/39321501893) — **SUCCESS** (13/13 Steps Pass)
+**Gate Status (Gate C Kapanışında):** **Gate C PARTIAL / QUALIFIED** | **Gate D UNVERIFIED** | **RELEASE BLOCKED / DO NOT MERGE (Tarihsel Kapanış Kaydı)**
+
+> [!NOTE]
+> **Tarihsel Kanıt Matrisi Kaydı:** Bu matris, Gate C kapanışındaki (`eb3ed5a`, Run #45) doğrulanmış iddiaların tarihsel durumunu kaydeder.
 
 ---
 

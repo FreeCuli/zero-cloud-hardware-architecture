@@ -1,15 +1,18 @@
 # FREECULI ZC-CORE — v4.0.0 Legacy Licensing Baseline Audit
 
-**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology  
-**Target:** v4.0.0 Normative Migration & RFC Transition  
-**Document Classification:** Legal & Governance Audit Baseline  
-**File Location:** `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md`  
-**Baseline Commit:** `96425c69376f27373c7b3819d28fc222f42f00cc`  
-**Branch:** `gate-c/formal-scope-audit`  
+**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology
+**Target:** v4.0.0 Normative Migration & RFC Transition
+**Document Classification:** Legal & Governance Audit Baseline
+**File Location:** `evidence/legal/V4_LEGACY_LICENSING_BASELINE_AUDIT.md`
+**Baseline Commit:** `96425c69376f27373c7b3819d28fc222f42f00cc`
+**Branch:** `gate-c/formal-scope-audit`
 
-**Governance Status:** `DRAFT / INFORMATIONAL AUDIT / NOT NORMATIVE / NOT RATIFIED`  
-**Gate Status:** `Gate C: PARTIAL / QUALIFIED` | `Gate D: UNVERIFIED`  
-**Release Constraint:** `DO NOT MERGE / RELEASE BLOCKED`  
+**Governance Status:** `DRAFT / INFORMATIONAL AUDIT / NOT NORMATIVE / NOT RATIFIED`
+**Gate Status:** `Gate C: PARTIAL / QUALIFIED` | `Gate D: UNVERIFIED`
+**Release Constraint (Historical):** `DO NOT MERGE / RELEASE BLOCKED (Gate C Review Stricture)`
+
+> [!NOTE]
+> **Historical Audit Snapshot:** This document records the licensing baseline audit performed during the Gate C review on branch `gate-c/formal-scope-audit` (commit `96425c6`). Preserved as non-normative historical evidence.
 **Legal Disclaimer:** This audit is an engineering and architectural analysis prepared to support formal legal review. It does NOT constitute formal legal advice. A qualified intellectual property attorney must review and approve all legal RFCs and license instruments prior to v4.0.0 ratification.
 
 ---
@@ -85,9 +88,9 @@ The table below audits all root governance, legal, architectural, and specificat
 ### 4.1. Finding L-01: Scope Overreach on the Abstract Methodology
 
 #### Legacy Text Analysis
-- **`LICENSE` (Lines 39–41):**  
+- **`LICENSE` (Lines 39–41):**
   > *"Manufacturers seeking to build compliant Zero-Cloud appliances without releasing proprietary trade secrets, firmware, or silicon designs MUST execute a Commercial Exemption Agreement with FreeCuli prior to commercial distribution."*
-- **`zero-cloud-dual-licensing.md` (Lines 36–38):**  
+- **`zero-cloud-dual-licensing.md` (Lines 36–38):**
   > *"A device found implementing the ZC-CORE physical isolation hardware locks (Data Diode/Cryptographic Zeroization) without a commercial license AND without open-sourcing its schematics may be subject to strict enforcement under applicable license obligations for violating the CERN-OHL-S v2.0 license obligations."*
 
 #### Legal & Architectural Conflict
@@ -98,9 +101,9 @@ Under universal copyright and intellectual property jurisprudence (e.g., 17 U.S.
 
 #### Internal Contradiction in Legacy Repository
 The legacy repository contains a direct contradiction between documents:
-- `zero-cloud-core-methodology-invariants.md` §4 correctly states:  
+- `zero-cloud-core-methodology-invariants.md` §4 correctly states:
   > *"Independent manufacturers may adopt the ZC-CORE methodology using their own proprietary hardware designs. However, utilizing FreeCuli's specific Reference Hardware schematics immediately binds the manufacturer to the Strongly Reciprocal open-source obligations..."*
-- `README.md` §Philosophy correctly states:  
+- `README.md` §Philosophy correctly states:
   > *"Conformance != Code Ownership: Passing the ZC-CORE Conformance Test Specification (CTS) does not grant FreeCuli any ownership over a manufacturer's implementation. A manufacturer retains full Intellectual Property (IP) rights over their proprietary codebase, custom ASIC/SoC designs, and firmware."*
 
 The overreaching clauses in `LICENSE` and `zero-cloud-dual-licensing.md` directly contradict these sound statements.
@@ -115,7 +118,7 @@ In `ZC-CORE-V4-DUAL-LICENSING-POLICY-RFC.md`, establish unambiguous boundaries:
 ### 4.2. Finding L-02: Open Source Discrimination (OSD #5 & #6 Violation)
 
 #### Legacy Text Analysis
-- **`zero-cloud-dual-licensing.md` (Lines 14–23):**  
+- **`zero-cloud-dual-licensing.md` (Lines 14–23):**
   > *"1. The Open Source Path (Free): If you are an academic institution, an independent developer, or an open-source hardware startup: You may implement the FreeCuli ZC-CORE hardware flow completely free of charge... 2. The Commercial Exemption Path (B2B License): If you are a commercial AIoT manufacturer (e.g., Bosch, Samsung, Aselsan, Siemens)... You MUST obtain a Commercial Exemption License..."*
 
 #### Legal & Community Conflict
@@ -159,7 +162,7 @@ Automated open-source compliance tooling (e.g., FOSSology, Black Duck, Snyk) sca
 ### 4.4. Finding L-04: Trademark and Copyright Commingling
 
 #### Legacy Text Analysis
-- **`zero-cloud-core-brand-and-trademark-policy.md` §Commercial Exemption (Line 44):**  
+- **`zero-cloud-core-brand-and-trademark-policy.md` §Commercial Exemption (Line 44):**
   > *"To bypass these obligations and keep hardware designs proprietary while obtaining the official certification badge, manufacturers must acquire a Commercial Exemption and B2B Trademark License."*
 
 #### Legal Clarification
@@ -185,7 +188,7 @@ In `ZC-CORE-V4-TRADEMARK-AND-CONFORMANCE-RFC.md`:
 ### 4.5. Finding L-05: Defensive Publication and Patent Retaliation Realism
 
 #### Legacy Text Analysis
-- **`zero-cloud-dual-licensing.md` §3 (Lines 29–35):**  
+- **`zero-cloud-dual-licensing.md` §3 (Lines 29–35):**
   > *"Patent Retaliation Clause: ...right to use the CERN-OHL-S v2.0 / ZC-CORE license is subject to worldwide revocation under applicable license terms... Furthermore, as an official Open Invention Network (OIN) member, FreeCuli leverages cross-licensing..."*
 
 #### Legal Boundary Analysis

@@ -1,14 +1,17 @@
 # FREECULI ZC-CORE — v4.0.0 Strategic IP & Licensing Independent Audit
 
-**Audit Document ID:** ZC-CORE-AUDIT-IP-01  
-**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology  
-**Target Commit:** `798277149ab59cfb8824f7128a85cc9eb1515b61`  
-**Parent Commit:** `96425c69376f27373c7b3819d28fc222f42f00cc`  
-**Branch:** `gate-c/formal-scope-audit`  
-**Audit Mode:** `READ-ONLY AUDIT — NO AUTOMATIC MERGE, PUSH, OR POLICY ACTIVATION`  
-**Governance Status:** `DRAFT AUDIT REPORT / INFORMATIONAL / NOT RATIFIED`  
-**Gate Status:** `Gate C: PARTIAL / QUALIFIED` | `Gate D: UNVERIFIED`  
-**Release Constraint:** `DO NOT MERGE / RELEASE BLOCKED`  
+**Audit Document ID:** ZC-CORE-AUDIT-IP-01
+**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology
+**Original Review Target Commit:** `798277149ab59cfb8824f7128a85cc9eb1515b61` (Historical Context)
+**Original Parent Commit:** `96425c69376f27373c7b3819d28fc222f42f00cc`
+**Original Review Branch:** `gate-c/formal-scope-audit`
+**Audit Mode:** `READ-ONLY AUDIT — NO AUTOMATIC MERGE, PUSH, OR POLICY ACTIVATION`
+**Governance Status:** `DRAFT AUDIT REPORT / INFORMATIONAL / NOT RATIFIED`
+**Gate Status:** `Gate C: PARTIAL / QUALIFIED` | `Gate D: UNVERIFIED`
+**Release Constraint (Historical):** `DO NOT MERGE / RELEASE BLOCKED (Gate C Review Stricture)`
+
+> [!NOTE]
+> **Historical Audit Snapshot:** This report records the strategic IP audit conducted on branch `gate-c/formal-scope-audit` prior to candidate release engineering. Preserved as non-normative historical evidence.
 
 ---
 

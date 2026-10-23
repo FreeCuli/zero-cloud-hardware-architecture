@@ -1,12 +1,12 @@
 # FREECULI ZC-CORE — Hibrit Mimari Dokümantasyon Boşluk Analizi Raporu
 ## (Hybrid Architecture Documentation Gap Audit)
 
-**Belge Kimliği:** ZC-CORE-EVIDENCE-ARCH-GAP-AUDIT-01  
-**Tarih:** 20 Ekim 2026  
-**Revizyon:** 1.0.0 (Zenodo Defensive Publication Preflight Öncesi Yönetişim İncelemesi)  
-**Hedef Depo:** `FreeCuli/zero-cloud-hardware-architecture`  
-**Çalışma Dalı:** `gate-c/formal-scope-audit`  
-**Yönetişim Statüsü:** **Gate C: PARTIAL / QUALIFIED** | **Gate D: UNVERIFIED** | **DO NOT MERGE** | **RELEASE BLOCKED**  
+**Belge Kimliği:** ZC-CORE-EVIDENCE-ARCH-GAP-AUDIT-01
+**Tarih:** 20 Ekim 2026
+**Revizyon:** 1.0.0 (Zenodo Defensive Publication Preflight Öncesi Yönetişim İncelemesi)
+**Hedef Depo:** `FreeCuli/zero-cloud-hardware-architecture`
+**Çalışma Dalı:** `gate-c/formal-scope-audit`
+**Yönetişim Statüsü (Tarihsel İnceleme):** **Gate C: PARTIAL / QUALIFIED** | **Gate D: UNVERIFIED** | **DO NOT MERGE** | **RELEASE BLOCKED (Tarihsel Analiz)**
 
 ---
 
@@ -15,9 +15,9 @@
 Bu rapor, FreeCuli ZC-CORE projesinin GitHub deposundaki mevcut mimari, metodolojik, normatif ve savunma amaçlı yayın dokümantasyonunu, projenin geldiği **STRICT ve HYBRID çalışma profilleri** ve **Gate C'de doğrulanan donanım blokları (SPI Flash Firewall, OBI Subordinate Bridge, AON OTP Controller)** açısından ayrıntılı bir boşluk analizine (gap analysis) tabi tutmaktadır.
 
 ### Temel Sorun ve Ayrım:
-1. **ZC-CORE Mimarisi Neyi Tanımlıyor?**  
+1. **ZC-CORE Mimarisi Neyi Tanımlıyor?**
    STRICT ve HYBRID profilleri, bilgi akışı politikaları, güven sınırları (Trust Boundaries), ağ yardımcı işlemcisi (Network Co-Processor) ile Ana MCU/NPU arasındaki ayrım, inbound OTA güncelleme doğrulama mekanizmaları ve izin verilen semantik telemetri davranışları.
-2. **Gate C Gerçekte Neyi Doğruladı?**  
+2. **Gate C Gerçekte Neyi Doğruladı?**
    Yalnızca belirli açık kaynak dijital RTL IP blokları (`zc_spi_flash_firewall.sv`, `zc_obi_subordinate_bridge.sv`, `zc_aon_post_auth_ctrl.sv`) üzerindeki yerel mantıksal, endüktif ($t=20$) ve döngü-doğrusal simülasyon özellikleri (33 iddia: 19 PROVEN, 4 SIMULATED, 4 BOUNDED, 2 BLOCKED, 4 UNVERIFIED).
 
 Bu iki alan birbirinden net çizgilerle ayrılmadığı takdirde, Zenodo üzerinde yapılacak bir savunma amaçlı yayın (Defensive Publication); okuyucu veya patent incelemecisi nezdinde **hibrit mimarinin tüm fiziksel, analog ve tam-SoC seviyesinde tamamlandığı veya sertifikalandığı yönünde yanıltıcı bir algı** oluşturabilir.
@@ -68,7 +68,7 @@ Bu çalışma, mevcut Gate C kapanış kararını (`PARTIAL / QUALIFIED`) geriye
 ### 4.1 STRICT ve HYBRID Bilgi Akışı Ayrımı
 - **Mevcut Durum:** Belgeler tüm ZC-CORE cihazlarının tek bir katı kurala tabi olduğunu ima ediyor ("Sensör verisi asla dışarı çıkamaz").
 - **Boşluk:** Bu ilke doğrudur, ancak bir cihazın *hiçbir telemetri göndermemesi* (**STRICT**) ile *güven sınırında donanım tarafından denetlenen istatistik/durum telemetrisi göndermesi* (**HYBRID**) arasındaki bilgi akışı kuralları yazılmamıştır.
-- **Mimari Çözüm:** 
+- **Mimari Çözüm:**
   - **STRICT Profil:** Ağ modülü olsa bile dışa doğru sıfır telemetri (Zero-Outbound). Yalnızca yerel fiziksel eyleyici ve tek yönlü donanım diyotu.
   - **HYBRID Profil:** Giden telemetri kesinlikle donanım kontrollü izin listesine (Allowlist) ve hız sınırlamasına (Rate Limiting) tabidir; ham sensör veya türetilmiş temsil (embeddings) çıkışı donanımsal olarak engellenmiştir.
 
@@ -145,3 +145,15 @@ Bu boşluk analizi raporunun hazırlanması sürecinde bağımsız denetçinin k
    - **Adım 4:** Bu güncellemelerin ardından **Zenodo Defensive Publication Preflight** paketini bağımsız denetim onayına sunmak.
 
 Bu yaklaşım, hem Zero-Cloud'un katı kurallarını koruyacak hem de Gate C'de elde edilen üstün formal başarıyı dünya çapında sağlam bir fikri mülkiyet kalkanına dönüştürecektir.
+
+
+---
+
+## 8. Tarihsel Boşlukların Güncel v4.0.0-rc2 Kapanış Durumu Tablosu
+
+| Eski Rapor Bulgusu | Güncel Durum ve İlgili Dosyalar |
+| :--- | :--- |
+| **Hibrit mimari kök belgelerde yok** | **KAPATILDI (ADAY KÜME):** Hibrit mimari ayrı bir aday belge kümesinde (`hybrid-zero-cloud-edge-security-architecture/`) müstakil olarak tanımlanmış; kök normatif metinle ilişkisi `strict-hybrid-compatibility.md` ile haritalandırılmıştır. |
+| **Gate C RTL'si ve formal kanıtları eksik** | **KAPATILDI (ARŞİVDE MEVCUT):** RTL (`rtl/`), SVA (`fv/`) ve testbench (`tb/`) dosyaları depoda mevcuttur; formal ispatlar tarihsel Gate C Run #45 (`eb3ed5a`) kaydıyla ilişkilendirilmiştir (`HISTORICAL_RUN45_CITED`). |
+| **CTS'de profil uyumluluğu testi yok** | **KAPATILDI / GATE D ERTELENDİ:** CTS (`zero-cloud-core-conformance-test-specification.md`) Annex A ve B içinde STRICT ve HYBRID profil test sınırları belgelenmiştir; fiziksel netlist doğrulaması Gate D kapsamına ertelenmiştir. |
+| **Manifest Gate C/hibrit dosyalarını içermiyor** | **KAPSAM AYRIMI NETLEŞTİRİLDİ:** 18 dosyalık kök manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`) kök normatif standardı mühürler; 7 belgeli hibrit mimari müstakil aday küme olarak `README.md` satır 154'te açıkça kapsam dışı bırakılmıştır. |

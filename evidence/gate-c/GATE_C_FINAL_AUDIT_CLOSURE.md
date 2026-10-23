@@ -1,15 +1,19 @@
 # FREECULI ZC-CORE — Gate C Nihai Kapanış ve Mutabakat Kaydı
 
-**Tarih:** 20 Ekim 2026  
-**Proje:** FreeCuli ZC-CORE (Zero-Cloud Hardware Core)  
-**Belge Türü:** Teknik denetim kapanış ve yönetişim kaydı  
-**Belge Kimliği:** ZC-CORE-GATE-C-FINAL-AUDIT-CLOSURE  
-**Gate C Kararı:** **PARTIAL / QUALIFIED — SIGN-OFF ACCEPTED**  
-**GCR-01 – GCR-11:** **CLOSED — Tanımlı denetim kapsamları dahilinde**  
-**Teknik Doğrulama Temeli:** Commit [`eb3ed5ad9fddb551506d43d2692bd040843af06f`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) — [CI Run #45 (ID: 39321501893)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/actions/runs/39321501893)  
-**Dokümantasyon Referansı:** Commit [`324e3c988c80ad312984920b79cf4a54c600f913`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/324e3c988c80ad312984920b79cf4a54c600f913)  
-**Gate D:** **UNVERIFIED**  
-**Yönetişim:** **DO NOT MERGE / RELEASE BLOCKED**
+**Tarih:** 20 Ekim 2026
+**Proje:** FreeCuli ZC-CORE (Zero-Cloud Hardware Core)
+**Belge Türü:** Teknik denetim kapanış ve yönetişim kaydı
+**Belge Kimliği:** ZC-CORE-GATE-C-FINAL-AUDIT-CLOSURE
+**Gate C Kararı:** **PARTIAL / QUALIFIED — SIGN-OFF ACCEPTED**
+**GCR-01 – GCR-11:** **CLOSED — Tanımlı denetim kapsamları dahilinde**
+**Teknik Doğrulama Temeli:** Commit [`eb3ed5ad9fddb551506d43d2692bd040843af06f`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) — [CI Run #45 (ID: 39321501893)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/actions/runs/39321501893)
+**Dokümantasyon Referansı:** Commit [`324e3c988c80ad312984920b79cf4a54c600f913`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/324e3c988c80ad312984920b79cf4a54c600f913)
+**Gate D:** **UNVERIFIED**
+**Yönetişim (Tarihsel Gate C Kapanışında):** **DO NOT MERGE / RELEASE BLOCKED (Tarihsel Şart)**
+
+> [!NOTE]
+> **Tarihsel Yönetişim Kaydı (Gate C Kapanış Bağlamı):**
+> Bu belgedeki "DO NOT MERGE / RELEASE BLOCKED" kısıtlaması, 20 Ekim 2026 tarihinde `gate-c/formal-scope-audit` dalının kapatılması sırasındaki tarihsel denetim koşulunu kayıt altına almaktadır. Bu kısıtlama o tarihteki kapı durumunu belgeler; sonraki sürüm adayı (`v4.0.0-rc2`) geliştirme ve yayın hazırlık süreçlerini geçmişe dönük olarak kısıtlamaz.
 
 ---
 
@@ -20,8 +24,8 @@ FreeCuli ZC-CORE donanım mimarisi için yürütülen Gate C bağımsız teknik 
 Gate C'nin mevcut ve gerçekleştirilebilir açık kaynak RTL, formal doğrulama ($k$-induction, BMC, SMT2) ve döngü-doğrusal dijital simülasyon alt kapsamı, belgelenmiş sınırlar dahilinde tamamlanmıştır.
 
 > [!IMPORTANT]
-> **Kapsam ve Statü Açıklığı:**  
-> Bu karar, **bağımsız teknik inceleme kapsamında kabul edilmiş** bir mimari ve mantıksal doğrulama mutabakatıdır; resmî bir akreditasyon kuruluşunun veya üçüncü taraf sertifikasyon otoritesinin verdiği bir haricî güvenlik sertifikasyonu değildir.  
+> **Kapsam ve Statü Açıklığı:**
+> Bu karar, **bağımsız teknik inceleme kapsamında kabul edilmiş** bir mimari ve mantıksal doğrulama mutabakatıdır; resmî bir akreditasyon kuruluşunun veya üçüncü taraf sertifikasyon otoritesinin verdiği bir haricî güvenlik sertifikasyonu değildir.
 > Bu karar, Gate C genel güvenlik hedeflerinin bütünüyle tamamlandığı, bütün olası RTL davranışlarının fiziksel/analog düzeyde ispatlandığı veya silikon güvenlik sertifikasyonu verildiği anlamına **gelmez**.
 
 Konsolide 33 iddianın normatif sınıflandırması:
@@ -40,15 +44,15 @@ Bu sınıflandırmaların teknik geçerliliği, [`CONSOLIDATED_NORMATIVE_EVIDENC
 
 Aşağıdaki doğrulama yükümlülükleri açık kaynak dijital Gate C kapanış kararının kapsamı dışında kalmakta olup, kesin sınırlarla **Gate D (UNVERIFIED)** kapsamına ertelenmiştir:
 
-1. **Tam SoC İki-İzli Non-Interference Doğrulaması (`BLOCKED`):**  
+1. **Tam SoC İki-İzli Non-Interference Doğrulaması (`BLOCKED`):**
    Çift çekirdekli Ibex CPU, NPU koproserü ve güvenli SRAM crossbar'ını içeren tam SoC seviyesindeki `SVA-M7-01` ve `SVA-M8-01` miter modelleri.
-2. **Gerçek OTP/Antifuse Makrosunun Analog ve Fiziksel Karakterizasyonu (`UNVERIFIED`):**  
+2. **Gerçek OTP/Antifuse Makrosunun Analog ve Fiziksel Karakterizasyonu (`UNVERIFIED`):**
    $V_{\text{PP}} > 1.8\,\text{V}$ yüksek gerilim şarj pompası regülasyonu, programlama darbe süresi ($t_{\text{PROG}} \approx 10\,\mu\text{s}$), termal soak ve algılama marjinleri.
-3. **Gate-Level Mantıksal Eşdeğerlik Doğrulaması (LEC) (`UNVERIFIED`):**  
+3. **Gate-Level Mantıksal Eşdeğerlik Doğrulaması (LEC) (`UNVERIFIED`):**
    Dökümhane PDK standard hücre kütüphanesine karşı post-synthesis netlist eşdeğerliği (Synopsys Formality / Cadence Conformal).
-4. **Statik Zamanlama Analizi (STA) ve PVT Analizi (`UNVERIFIED`):**  
+4. **Statik Zamanlama Analizi (STA) ve PVT Analizi (`UNVERIFIED`):**
    Asenkron reset removal/recovery ($t_{\text{rem}}, t_{\text{rec}}$) zamanlama kapanışı ve saat alanları arası (CDC) metastabilite doğrulaması.
-5. **FPGA, Laboratuvar ve Gerçek Donanım Üzerinde Doğrulama:**  
+5. **FPGA, Laboratuvar ve Gerçek Donanım Üzerinde Doğrulama:**
    Fiziksel kart üzerinde SPI Flash, voltaj glitching ve lojik analizör ile donanım düzeyinde doğrulama.
 
 Bu yükümlülükler Gate C kapsamında tamamlanmış olarak gösterilemez; bunların tamamlanması için gerekli teknik ön koşullar Gate D giriş planında ayrıca tanımlanacaktır.
@@ -77,8 +81,8 @@ Bu paket, kamuya açıklanmadan önce aşağıdaki sıkı kontrollerden geçiril
 - DOI, sürüm, yazar listesi, yayın tarihi ve kriptografik arşiv bütünlüğü (SHA-256).
 
 > [!WARNING]
-> **Yayın Öncesi Hukuki ve Teknik Sınır:**  
-> Yayın ön hazırlığı, Zenodo üzerinde otomatik veya koşulsuz bir yayımlama yetkisi teşkil etmez.  
+> **Yayın Öncesi Hukuki ve Teknik Sınır:**
+> Yayın ön hazırlığı, Zenodo üzerinde otomatik veya koşulsuz bir yayımlama yetkisi teşkil etmez.
 > Defensive publication (savunma amaçlı yayın), kamuya açıklama yoluyla dünya çapında bir *olası prior-art (tekniğin bilinen durumu)* kaydı oluşturmayı hedefler; ancak tek başına otomatik ve mutlak bir patent koruması veya her ülkede koşulsuz bir patent geçersiz kılma garantisi olarak sunulamaz.
 
 ---

@@ -1,21 +1,24 @@
 # FREECULI ZC-CORE — v4.0.0 Audit Evidence Clarification Addendum
 
-**Document ID:** ZC-CORE-ADDENDUM-AUDIT-01  
-**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology  
-**Target Commit:** `798277149ab59cfb8824f7128a85cc9eb1515b61`  
-**Parent Commit:** `96425c69376f27373c7b3819d28fc222f42f00cc`  
-**Branch:** `gate-c/formal-scope-audit`  
-**Document Classification:** Audit Evidence Clarification & Factual Verification Addendum  
-**Location:** `evidence/audit/V4_AUDIT_EVIDENCE_CLARIFICATION_ADDENDUM.md`  
-**Governance Mode:** `LOCAL-ONLY / DRAFT / READ-ONLY / STAND DOWN / NOT RATIFIED`  
-**Gate Status:** `Gate C: PARTIAL / QUALIFIED` | `Gate D: UNVERIFIED`  
-**Release Constraint:** `DO NOT MERGE / RELEASE BLOCKED / STAND DOWN`  
+**Document ID:** ZC-CORE-ADDENDUM-AUDIT-01
+**Project:** FreeCuli ZC-CORE Hardware Architecture & Methodology
+**Original Target Commit (Historical Context):** `798277149ab59cfb8824f7128a85cc9eb1515b61`
+**Original Parent Commit:** `96425c69376f27373c7b3819d28fc222f42f00cc`
+**Original Review Branch:** `gate-c/formal-scope-audit`
+**Document Classification:** Audit Evidence Clarification & Factual Verification Addendum
+**Location:** `evidence/audit/V4_AUDIT_EVIDENCE_CLARIFICATION_ADDENDUM.md`
+**Governance Mode:** `HISTORICAL AUDIT SNAPSHOT / NON-NORMATIVE EVIDENCE`
+**Gate Status (Gate C Baseline):** `Gate C: PARTIAL / QUALIFIED` | `Gate D: UNVERIFIED`
+**Release Constraint (Historical):** `DO NOT MERGE / RELEASE BLOCKED / STAND DOWN (Historical Gate C State)`
+
+> [!NOTE]
+> **Historical Audit Snapshot:** This addendum was originally prepared during the Gate C review on branch `gate-c/formal-scope-audit`. It is included in candidate v4.0.0-rc2 as non-normative supporting evidence; its former local-only / stand-down status describes its original authoring state and does not restrict the current repository archive.
 
 ---
 
 ## 1. Purpose & Mandate
 
-This document serves as the formal **Evidence Clarification Addendum** to the Phase A–G Independent Audit reports (`evidence/audit/V4_*.md`). 
+This document serves as the formal **Evidence Clarification Addendum** to the Phase A–G Independent Audit reports (`evidence/audit/V4_*.md`).
 
 In direct compliance with the Independent Auditor's review directives:
 1. **Prior-Art Categorical Statements Qualified:** Categorical assertions that a prior publication definitively prevents patent grants are replaced with jurisdiction-qualified language ("Potential prior art; technical scope, public availability, and legal effect subject to determination under applicable national patent laws").
@@ -55,9 +58,9 @@ Under 35 U.S.C. § 102 (United States) and Article 54 of the European Patent Con
 ## 3. Item 2: Zenodo Provenance & DOI Distinction
 
 ### 3.1 Concept DOI vs Version DOI Architecture
-- **Concept DOI (`10.5281/zenodo.22838473`):**  
+- **Concept DOI (`10.5281/zenodo.22838473`):**
   In Zenodo, a Concept DOI is a persistent meta-identifier that **dynamically resolves to the latest published version**. It does not lock a static historical file set or timestamp. Citing a Concept DOI alone does not prove to a patent examiner what exact files existed on a specific historical date.
-- **Version DOIs (Immutable Snapshots):**  
+- **Version DOIs (Immutable Snapshots):**
   Each individual Zenodo release is assigned a permanent, immutable **Version DOI** bound to a specific archived `.zip`/`.tar.gz` archive and cryptographic SHA-256 manifest.
 
 ### 3.2 Zenodo Archival Status Audit
@@ -160,14 +163,14 @@ A technical disclosure's sufficiency (enablement under 35 U.S.C. § 112 / EPC Ar
 
 ### 7.2 Exact Clauses Identified for Review Prior to v4.0.0 Ratification
 
-1. **`LICENSE` Lines 39–41:**  
-   *Clause:* *"Manufacturers seeking to build compliant Zero-Cloud appliances without releasing proprietary trade secrets... MUST execute a Commercial Exemption Agreement with FreeCuli prior to commercial distribution."*  
+1. **`LICENSE` Lines 39–41:**
+   *Clause:* *"Manufacturers seeking to build compliant Zero-Cloud appliances without releasing proprietary trade secrets... MUST execute a Commercial Exemption Agreement with FreeCuli prior to commercial distribution."*
    *Target Remediation:* Replace in v4 successor with Clean-Room Freedom Guarantee.
-2. **`zero-cloud-dual-licensing.md` Lines 14–23:**  
-   *Clause:* Restricting Open Source Path to academics/startups and demanding commercial entities obtain Route B licenses.  
+2. **`zero-cloud-dual-licensing.md` Lines 14–23:**
+   *Clause:* Restricting Open Source Path to academics/startups and demanding commercial entities obtain Route B licenses.
    *Target Remediation:* Replace in v4 successor with non-discriminatory Route A (open to commercial entities complying with reciprocity) and voluntary Route B.
-3. **`zero-cloud-core-brand-and-trademark-policy.md` Line 44:**  
-   *Clause:* Bundling CERN-OHL-S copyright exemption with "FreeCuli Certified" trademark license.  
+3. **`zero-cloud-core-brand-and-trademark-policy.md` Line 44:**
+   *Clause:* Bundling CERN-OHL-S copyright exemption with "FreeCuli Certified" trademark license.
    *Target Remediation:* Decouple copyright from trademark in v4 successor.
 
 ---
