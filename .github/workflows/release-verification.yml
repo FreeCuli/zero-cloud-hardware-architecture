@@ -106,6 +106,13 @@ jobs:
           IS_TAG_RELEASE=0
           if [ "${GITHUB_REF_TYPE}" = "tag" ] || [[ "${GITHUB_REF_NAME}" == v* ]]; then
             IS_TAG_RELEASE=1
+            # Strict parity check: triggering Git tag must bit-exact match the manifest-declared tag
+            if [ -n "${GITHUB_REF_NAME}" ] && [ "${GITHUB_REF_NAME}" != "$RELEASE_TAG" ]; then
+              echo "[FAIL] Tag parity mismatch: Triggering Git ref (${GITHUB_REF_NAME}) != Manifest declared tag (${RELEASE_TAG})"
+              exit 1
+            else
+              echo "[PASS] Triggering Git tag strictly matches manifest declaration (${RELEASE_TAG})."
+            fi
           fi
 
           # Deep git tag provenance check: ensure the tag points to the current checkout commit
@@ -141,6 +148,13 @@ jobs:
           IS_TAG_RELEASE=0
           if [ "${GITHUB_REF_TYPE}" = "tag" ] || [[ "${GITHUB_REF_NAME}" == v* ]]; then
             IS_TAG_RELEASE=1
+            # Strict parity check: triggering Git tag must bit-exact match the manifest-declared tag
+            if [ -n "${GITHUB_REF_NAME}" ] && [ "${GITHUB_REF_NAME}" != "$RELEASE_TAG" ]; then
+              echo "[FAIL] Tag parity mismatch: Triggering Git ref (${GITHUB_REF_NAME}) != Manifest declared tag (${RELEASE_TAG})"
+              exit 1
+            else
+              echo "[PASS] Triggering Git tag strictly matches manifest declaration (${RELEASE_TAG})."
+            fi
           fi
 
           if git rev-parse "$RELEASE_TAG" >/dev/null 2>&1; then
