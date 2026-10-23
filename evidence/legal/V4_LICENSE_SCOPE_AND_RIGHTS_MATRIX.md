@@ -87,8 +87,8 @@ flowchart TD
 
 - [x] **ATTESTATION-01 (RTL Provenance & Sole Development):** Founder representation recorded in `evidence/audit/V4_LICENSE_AND_RIGHTS_RISK_REGISTER.md` (ATTEST-01: 100% of commits in `rtl/` authored by `yemekyarismasi <ajibaoytun@gmail.com>`). Documents founder's representation; not characterized as an independent legal title deed.
 - [x] **ATTESTATION-02 (Brand & Trademark Representation):** Founder representation recorded (ATTEST-02: Common-law "™" source identification for `FreeCuli` and `ZC-CORE`).
-- [x] **ATTESTATION-03a (No Conflicting Grant/Patent Obligations — Founder Representation):** Founder representation recorded in risk register (ATTEST-03: Founder represents that no prior employment, university, or third-party grant IP encumbrance applies to the codebase).
-- [ ] **ATTESTATION-03b (Independent Legal / Contractual Verification):** Independent third-party legal audit or contractual verification of prior agreements has not been conducted.
+- [x] **ATTESTATION-03a (No Conflicting Institutional/Patent Obligations — Founder Representation):** Founder representation recorded (ATTEST-03: Founder represents that no TÜBİTAK, public institution, university, or employment-derived IP ownership or patent application obligations encumber the repository).
+- [ ] **ATTESTATION-03b / CONTRACT-CHECK-01 (Conditional Contractual Audit):** Serves as a conditional control triggerable only if a specific relevant agreement or third-party obligation is identified; as no specific conflicting agreement has been identified, no independent contractual review has been conducted.
 - [ ] **ATTESTATION-04 (Registered Trademarks):** Common-law mark claimed; formal trademark registration certificates unverified in archive.
 
 ---
