@@ -4,7 +4,7 @@
 **RFC Document ID:** RFC-ZC-CORE-0004-DRAFT  
 **Date:** 20 October 2026  
 **Status:** `DRAFT / PROPOSED ARCHITECTURAL RFC / NOT RATIFIED / NOT RELEASED / NOT SOC-VERIFIED`  
-**Target Milestone:** Post-Gate C Governance / Gate D Preparation (`ZC-CORE v4.0.0-rc1` Candidate)  
+**Target Milestone:** Post-Gate C Governance / Gate D Preparation (`ZC-CORE v4.0.0-rc2` Candidate)
 **Historical Normative Baseline:** Preserves [`ZC-CORE v3.3.0-rc2`](../../zero-cloud-core-methodology-invariants.md) as immutable STRICT reference  
 **Technical Hardware Baseline:** Commit [`eb3ed5a`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) (Run #45)  
 **Governance Level:** Standards Committee Consensus Proposal  
@@ -18,7 +18,7 @@
 > 1. Approval of this RFC draft authorizes architectural analysis only; it does **NOT** authorize modifying the 14 immutable v3.x normative documents in the repository root.
 > 2. The technical proofs achieved in Gate C (`PARTIAL / QUALIFIED`) verify local digital RTL IP blocks (`zc_spi_flash_firewall`, `zc_obi_subordinate_bridge`, `zc_aon_post_auth_ctrl`) under open-source tools ($t=20$). They do **NOT** prove full-SoC information-flow noninterference, general-purpose DMA firewalling, or physical silicon side-channel immunity.
 > 3. All physical silicon, SoC crossbar DMA isolation, and analog covert-channel bounds remain strictly **`Gate D (UNVERIFIED)`**.
-> 4. Current normative standard status: **`DO NOT MERGE / RELEASE BLOCKED`** as a final ratified standard. (This restriction applies strictly to ratifying a final production standard; it does not restrict the publication or distribution of this document as an unratified architectural draft within the `v4.0.0-rc1` candidate release).
+> 4. Current normative standard status: **`DO NOT MERGE / RELEASE BLOCKED`** as a final ratified standard. (This restriction applies strictly to ratifying a final production standard; it does not restrict the publication or distribution of this document as an unratified architectural draft within the `v4.0.0-rc2` candidate release).
 
 ---
 

@@ -140,9 +140,9 @@ To eliminate any chilling effect on industry adoption and uphold intellectual pr
 
 ### 5.1. Defensive Prior Art Foundation
 FreeCuli does not seek a patent monopoly over the ZC-CORE architecture. Instead, FreeCuli protects the technology against predatory patent trolls and third-party patent assertions through **Defensive Technical Publication**:
-1. Every release candidate, architecture RFC, and defensive publication document is timestamped and archived on Zenodo (Concept DOI: `10.5281/zenodo.22838473`) and GitHub.
+1. Defensive publication documents and approved production releases are timestamped and published publicly on GitHub, with production releases archived under the repository's registered Zenodo Concept DOI (`10.5281/zenodo.22838473`) upon formal release gate completion.
 2. Under 35 U.S.C. § 102(a)(1) and European Patent Convention (EPC) Art. 54(2), these publicly accessible technical disclosures constitute statutory prior art against any subsequent third-party patent application claiming the disclosed combinations.
-3. FreeCuli confirms that it has no outstanding patent commitments or grant obligations (e.g., under TÜBİTAK TEYDEB 1501/1507 or ARDEB) mandating patent applications.
+3. Under the conditional contractual review process (`CONTRACT-CHECK-01`), the founder represents that no institutional grant obligations or public funding agreements (e.g., academic or national research grants such as TÜBİTAK TEYDEB/ARDEB) exist that mandate patent applications or restrict defensive open-source publication.
 
 ### 5.2. Realistic Patent Retaliation Clause
 To defend the open ecosystem, FreeCuli incorporates the standard patent retaliation mechanisms of `CERN-OHL-S v2.0 §4.4`:

@@ -29,7 +29,7 @@ The architecture maps physical and logical threats to standardized attack classi
 | **AT-001** | Direct Memory Read into isolated sensor domain | Hardware bus separation; OBI address decoding isolating sensor memory. | **PARTIAL (RTL) / Gate D (UNVERIFIED SoC)** |
 | **AT-002** | Direct Memory Access (DMA) Read of raw sensor buffers | Physical domain separation; Network processor has no DMA master path to sensor SRAM. | **Architectural Invariant / Gate D (UNVERIFIED SoC)** |
 | **AT-003** | Cache Residual Read (Cold-Boot / Warm-Boot) | Hardware memory zeroization (M8) upon reset or inference completion; Boot ROM verification. | **Architectural Goal / Gate D (UNVERIFIED)** |
-| **AT-004** | Shared Memory / IPC Leakage & Physical Trace Coupling | Physical SRAM domain separation; mailbox register isolation without shared sensor memory; radiated leakage benchmark target (<-80 dBm candidate threshold under CTS Annex B). | **Architectural Invariant / Gate D (UNVERIFIED)** |
+| **AT-004** | Shared Memory / IPC Leakage | Physical SRAM domain separation; mailbox register isolation without shared sensor memory buffers. | **Architectural Invariant / Gate D (UNVERIFIED SoC)** |
 | **AT-005** | Debug / Trace Extraction via JTAG/SWD | Permanent debug port disabling via OTP eFuse lock bits; hardware debug isolation. | **Gate D (UNVERIFIED Physical Security)** |
 | **AT-006** | Peripheral Bridge Bypass into Trusted Domain | Dedicated point-to-point interconnect; peripheral firewall isolation. | **Architectural Invariant / Gate D (UNVERIFIED)** |
 | **AT-007** | Management Controller / Control-Plane Leakage | Warm reset (`rst_sys_ni`) request gating in OBI bridge (`F-OBI-07`); AON permanent fatal lock. | **IMPLEMENTED (RTL `F-OBI-07`)** |
@@ -38,6 +38,7 @@ The architecture maps physical and logical threats to standardized attack classi
 | **AT-010** | AI Output / Metadata Leakage | Semantic payload quantization, bounding, and strict allowlisting of outbound telemetry (RFC-0004). | **Architectural Goal (RFC Proposal)** |
 | **AT-011 (RFC)**| Bus Exhaustion & Subordinate Starvation | 1024-cycle orphan watchdog; `ST_TRAP` synthetic error delivery (`F-OBI-05`, `F-OBI-06`). | **IMPLEMENTED (RTL `F-OBI-05`, `F-OBI-06`)** |
 | **AT-012 (RFC)**| Flash Write Exhaustion & Execution Hijack | Dual /CS hardware routing; Bank-B boundary containment; commit strobe gated until Boot ROM validation (`F-SPI-02`). | **IMPLEMENTED (RTL `F-SPI-01`..`F-SPI-04`)** |
+| **AT-013 (RFC)**| Physical Trace Crosstalk & Electromagnetic Coupling | Physical PCB trace isolation and RF shielding; candidate radiated leakage benchmark (<-80 dBm threshold under CTS Annex B). | **Gate D (UNVERIFIED) / RFC Candidate Target** |
 
 ---
 

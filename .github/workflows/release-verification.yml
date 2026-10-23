@@ -103,6 +103,11 @@ jobs:
             exit 1
           fi
 
+          IS_TAG_RELEASE=0
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] || [[ "${GITHUB_REF_NAME}" == v* ]]; then
+            IS_TAG_RELEASE=1
+          fi
+
           # Deep git tag provenance check: ensure the tag points to the current checkout commit
           git fetch --tags --force
           TAG_COMMIT=$(git rev-list -n 1 "$RELEASE_TAG" 2>/dev/null || true)
@@ -116,8 +121,11 @@ jobs:
               echo "[FAIL] Provenance mismatch: refs/tags/$RELEASE_TAG resolves to ($TAG_COMMIT) but HEAD is ($HEAD_COMMIT)."
               exit 1
             fi
+          elif [ "$IS_TAG_RELEASE" -eq 1 ]; then
+            echo "[FAIL] Required release tag $RELEASE_TAG could not be resolved on release tag event."
+            exit 1
           else
-            echo "[WARN] Release tag $RELEASE_TAG not yet tagged on remote (pre-tag commit verification)."
+            echo "[INFO] Release tag $RELEASE_TAG not yet tagged on remote (pre-tag commit verification)."
           fi
 
       - name: Verify Git tag signature
@@ -127,7 +135,14 @@ jobs:
             RELEASE_TAG="${GITHUB_REF_NAME}"
           fi
           echo "Verifying signature for release tag $RELEASE_TAG..."
+          git config gpg.format ssh
           git config gpg.ssh.allowedSignersFile .github/allowed_signers
+
+          IS_TAG_RELEASE=0
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] || [[ "${GITHUB_REF_NAME}" == v* ]]; then
+            IS_TAG_RELEASE=1
+          fi
+
           if git rev-parse "$RELEASE_TAG" >/dev/null 2>&1; then
             if git tag -v "$RELEASE_TAG"; then
               echo "[PASS] Git Tag $RELEASE_TAG signature is VALID and belongs to a trusted signer."
@@ -135,8 +150,11 @@ jobs:
               echo "[FAIL] Git Tag $RELEASE_TAG signature verification failed!"
               exit 1
             fi
+          elif [ "$IS_TAG_RELEASE" -eq 1 ]; then
+            echo "[FAIL] Git Tag $RELEASE_TAG missing on tag push event!"
+            exit 1
           else
-            echo "[WARN] Git Tag $RELEASE_TAG not present in local tree; skipping signature check during pre-tag run."
+            echo "[INFO] Git Tag $RELEASE_TAG not present in local tree; skipping signature check during pre-tag run."
           fi
 
       - name: Verify no legacy normative content

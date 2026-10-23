@@ -3,9 +3,9 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22838473-blue)](https://doi.org/10.5281/zenodo.22838473)
 [![License: CERN-OHL-S v2.0](https://img.shields.io/badge/License-CERN--OHL--S-blue.svg)](https://ohwr.org/cernohl)
 [![OIN Member](https://img.shields.io/badge/OIN%202.0-Member-brightgreen.svg)](https://openinventionnetwork.com)
-[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v4.0.0--rc1-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v4.0.0-rc1)
+[![Release Candidate](https://img.shields.io/badge/ZC--CORE-v4.0.0--rc2-yellow.svg)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/releases/tag/v4.0.0-rc2)
 
-The FreeCuli ZC-CORE Architecture and the underlying AIoT/Edge AI methodology are guarded by strict Open Source licenses (CERN-OHL-S v2.0 for hardware, AGPL-3.0 for software) designed to protect the integrity of on-device inference and absolute privacy. 
+The FreeCuli ZC-CORE Architecture and hardware designs in this repository are governed by the CERN Open Hardware Licence Version 2 - Strongly Reciprocal (CERN-OHL-S-2.0). If companion software packages, firmware, or drivers are released in separate repositories in the future, they will be distributed under designated software licenses (such as GNU AGPL-3.0-or-later) or commercial agreements.
 
 However, we recognize that established AIoT Hardware Manufacturers (B2B)-whether in Smart Home, Defense, Medical IoT, or Industrial Automation—invest heavily in their R&D and may not be legally or commercially capable of open-sourcing their proprietary PCB schematics or internal controller software.
 

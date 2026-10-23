@@ -19,9 +19,9 @@
 
 ## 1. Architectural Motivation & Executive Summary
 
-The foundational axiom of the FreeCuli Zero-Cloud Hardware Core (ZC-CORE) methodology is an absolute privacy guarantee: **sensitive raw sensory information (microphone audio waveforms, camera video frames, biometric scans) SHALL NEVER leave the local hardware-enforced Trusted Processing Domain.**
+The foundational architectural requirement and normative boundary of the FreeCuli Zero-Cloud Hardware Core (ZC-CORE) methodology is the privacy boundary invariant: **sensitive raw sensory information (microphone audio waveforms, camera video frames, biometric scans) SHALL NOT leave the local hardware-enforced Trusted Processing Domain.**
 
-In the baseline **STRICT Profile (`ZC-PROFILE-STRICT`)**, this guarantee is enforced via a complete physical air-gap or hardware-unidirectional data diode (optocoupler / TX-only UART). While impenetrable against remote exfiltration, pure unidirectional air-gapping creates operational barriers for connected edge IoT devices:
+In the baseline **STRICT Profile (`ZC-PROFILE-STRICT`)**, this boundary is enforced via a complete physical air-gap or hardware-unidirectional data diode (optocoupler / TX-only UART). While structurally precluding remote electronic exfiltration, pure unidirectional air-gapping creates operational barriers for connected edge IoT devices:
 - Devices cannot receive verified Over-The-Air (OTA) firmware or security updates without physical socket access.
 - Fleet management, uptime telemetry, and remote crash diagnostics are impossible.
 - Inter-processor coordination between an untrusted Network Co-Processor (Wi-Fi / BLE / Ethernet) and the local Edge AI core cannot execute.
