@@ -97,16 +97,21 @@ jobs:
           fi
           echo "[PASS] Git Commit Resolution declared in manifest."
 
-          # Determine whether this is a formal Git tag release run
-          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            echo "Formal release tag trigger detected: ${GITHUB_REF_NAME}"
+          # Determine whether this is a formal Git tag release push event
+          IS_FORMAL_TAG_PUSH=0
+          if [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            IS_FORMAL_TAG_PUSH=1
+          fi
+
+          if [ "$IS_FORMAL_TAG_PUSH" -eq 1 ]; then
+            echo "Formal release tag push detected: ${GITHUB_REF_NAME}"
             if [ -z "${GITHUB_REF_NAME}" ] || [ "${GITHUB_REF_NAME}" != "$RELEASE_TAG" ]; then
               echo "[FAIL] Git tag and manifest RELEASE_TAG mismatch."
               exit 1
             fi
             echo "[PASS] Git tag matches release manifest ($RELEASE_TAG)."
           else
-            echo "[INFO] Running on non-tag event (${GITHUB_REF_TYPE:-commit}: ${GITHUB_REF_NAME:-detached}); validating against manifest tag target ($RELEASE_TAG)."
+            echo "[INFO] Running on non-tag-push event (${GITHUB_EVENT_NAME:-manual}/${GITHUB_REF_TYPE:-commit}: ${GITHUB_REF_NAME:-detached}); validating against manifest tag target ($RELEASE_TAG)."
           fi
 
           # Deep git tag provenance check: ensure the tag points to the current checkout commit
@@ -115,7 +120,7 @@ jobs:
           HEAD_COMMIT=$(git rev-parse HEAD)
           echo "Tag resolved commit:  $TAG_COMMIT"
           echo "Current HEAD commit: $HEAD_COMMIT"
-          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+          if [ "$IS_FORMAL_TAG_PUSH" -eq 1 ]; then
             if [ -z "$TAG_COMMIT" ]; then
               echo "[FAIL] Required release tag $RELEASE_TAG could not be resolved on release tag event."
               exit 1
@@ -129,9 +134,9 @@ jobs:
           else
             if [ -n "$TAG_COMMIT" ]; then
               if [ "$TAG_COMMIT" = "$HEAD_COMMIT" ]; then
-                echo "[INFO] Non-tag event checkout matches target release tag commit ($HEAD_COMMIT)."
+                echo "[INFO] Non-formal run checkout matches target release tag commit ($HEAD_COMMIT)."
               else
-                echo "[INFO] Non-tag event running on commit ($HEAD_COMMIT) differs from existing tag $RELEASE_TAG ($TAG_COMMIT); equality check not enforced for non-tag runs."
+                echo "[INFO] Non-formal run on commit ($HEAD_COMMIT) differs from existing tag $RELEASE_TAG ($TAG_COMMIT); equality check not enforced for manual/non-tag-push runs."
               fi
             else
               echo "[INFO] Release tag $RELEASE_TAG not yet tagged on remote (pre-tag commit verification)."
@@ -145,19 +150,24 @@ jobs:
           git config gpg.format ssh
           git config gpg.ssh.allowedSignersFile .github/allowed_signers
 
+          IS_FORMAL_TAG_PUSH=0
+          if [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            IS_FORMAL_TAG_PUSH=1
+          fi
+
           if git rev-parse "$RELEASE_TAG" >/dev/null 2>&1; then
             if git tag -v "$RELEASE_TAG"; then
-              if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-                echo "[PASS] Git Tag $RELEASE_TAG signature is VALID and belongs to a trusted signer on release event."
+              if [ "$IS_FORMAL_TAG_PUSH" -eq 1 ]; then
+                echo "[PASS] Git Tag $RELEASE_TAG signature is VALID and belongs to a trusted signer on formal release event."
               else
-                echo "[PASS] Git Tag $RELEASE_TAG signature is VALID for tag target; note that this non-tag run does not certify current branch HEAD as the release commit."
+                echo "[PASS] Git Tag $RELEASE_TAG signature is VALID for tag target; note that this non-formal/manual run does not certify current branch HEAD as the release commit."
               fi
             else
               echo "[FAIL] Git Tag $RELEASE_TAG signature verification failed!"
               exit 1
             fi
-          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            echo "[FAIL] Git Tag $RELEASE_TAG missing on tag push event!"
+          elif [ "$IS_FORMAL_TAG_PUSH" -eq 1 ]; then
+            echo "[FAIL] Git Tag $RELEASE_TAG missing on formal tag push event!"
             exit 1
           else
             echo "[INFO] Git Tag $RELEASE_TAG not present in local tree; signature check is deferred to formal release tagging."
