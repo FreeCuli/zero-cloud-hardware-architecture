@@ -240,7 +240,7 @@ The interconnect architecture enforces hardware trust boundaries across three di
 ### 6.2 OBI Subordinate Bridge (`zc_obi_subordinate_bridge.sv`)
 * **Verification Status:** `FORMALLY PROVEN` (`F-OBI-01`..`F-OBI-07`) / `SIMULATED` (1,024-cycle watchdog timeout).
 * **Core Function:** Synchronously decouples host bus transactions from subordinate peripherals, drains orphan responses, and traps bus deadlocks.
-* **Watchdog Evidence Classification (HAR-06):** Continuous progression across 1,024 cycles is verified via digital RTL simulation (`tb_zc_obi.sv` Test 2 / `SIMULATED`). Properties `F-OBI-04` and `F-OBI-05` formally prove local inductive step logic and lock assertion (`PROVEN` at RTL step level).
+* **Watchdog Evidence Classification (HAR-06):** Continuous progression across 1,024 cycles is verified via digital RTL simulation (`tb_zc_obi.sv` Test 3 / `SIMULATED`). Properties `F-OBI-04` and `F-OBI-05` formally prove local inductive step logic and lock assertion (`PROVEN` at RTL step level).
 * **Subsystem Boundary Disclosure (HAR-02 & HAR-07):** The OBI Bridge provides point-to-point transaction decoupling. It does **NOT** constitute a multi-master crossbar IOMMU, does **NOT** act as a system-wide DMA firewall, and does **NOT** filter or inspect telemetry payloads (`PROPOSED / NOT IMPLEMENTED IN CURRENT RTL`).
 
 ### 6.3 AON Post-Authorization Controller (`zc_aon_post_auth_ctrl.sv`)

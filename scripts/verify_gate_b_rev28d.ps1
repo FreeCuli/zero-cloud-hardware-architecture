@@ -1,4 +1,4 @@
-﻿# Copyright 2026 FreeCuli Standards Organization
+# Copyright 2026 FreeCuli Standards Organization
 # SPDX-License-Identifier: CERN-OHL-S-2.0
 #
 # Script: scripts/verify_gate_b_rev28d.ps1
@@ -320,7 +320,7 @@ $trap_cycle_rdata  = if ($trap_cycle_rvalid) { 0 } else { 0xDEAD }
 $obi_state_next = "ST_IDLE"
 Assert-Condition ($dead_locked -and ($wdog_cnt -eq 1023) -and $host_req_ready -and (-not $periph_phys_req) -and $trap_cycle_rvalid -and $trap_cycle_err -and ($trap_cycle_rdata -eq 0) -and ($obi_state_next -eq "ST_IDLE")) "T4.3_OBI_WDOG_1024_BEHAVIORAL_REF_MODEL" "[BEHAVIORAL_REFERENCE_MODEL - NOT RTL SIMULATION] OBI orphan watchdog 1024-cycle count and ST_TRAP synthetic error response model"
 
-# T4.4 (GCR-01): OBI Warm Reset (!rst_sys_ni == 0) blocks periph_phys_req_o and host_req_ready_o even when host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0
+# T4.4 (GCR-01): OBI Warm Reset (rst_sys_ni == 1'b0 / !rst_sys_ni) blocks periph_phys_req_o and host_req_ready_o even when host_req_i=1, periph_phys_gnt_i=1, phys_req_active_q=0
 $gcr01_rst_sys_n = $false; $gcr01_state = "ST_IDLE"; $gcr01_host_req = $true; $gcr01_phys_gnt = $true
 $gcr01_phys_active = $false; $gcr01_orphan_act = $false; $gcr01_dead_locked = $false
 $gcr01_host_ready = $gcr01_rst_sys_n -and ($gcr01_state -eq "ST_IDLE") -and ($gcr01_dead_locked -or ((-not $gcr01_phys_active) -and (-not $gcr01_orphan_act) -and $gcr01_phys_gnt))

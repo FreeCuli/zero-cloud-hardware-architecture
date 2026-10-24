@@ -12,12 +12,12 @@
 //   - F-OBI-03 (SVA-L0-12a): Strictly normative - Normal active CPU wait without orphan_drain_active_o
 //     never triggers or increments watchdog (drain_wdog_cnt_o == 0 && !subsys_fatal_fault_irq_o)
 //   - F-OBI-04 (R28B-03 / SVA-L0-13a): Unconditional monotonic +1 progression of drain_wdog_cnt_q
-//     whenever orphan_active_w holds (even while !rst_sys_ni == 0 or ST_TIMEOUT_ERR persists)
+//     whenever orphan_active_w holds (even while rst_sys_ni == 1'b0 or ST_TIMEOUT_ERR persists)
 //   - F-OBI-05 (SVA-L0-13b): Reaching drain_wdog_cnt_q == 1023 without rvalid locks subsys_dead_locked_q = 1
 //   - F-OBI-06 (Rev. 28D P1 / SVA-L0-13c): Under subsys_dead_locked_q == 1, ST_IDLE accepts CPU requests
 //     with periph_phys_req_o == 0, transitions to ST_TRAP, returns synthetic bus error (rvalid=1, err=1, rdata=0),
 //     and returns to ST_IDLE on the following cycle
-//   - F-OBI-07 (GCR-01 / SVA-L0-14): Warm Reset (!rst_sys_ni == 0) strictly forces host_req_ready_o == 0,
+//   - F-OBI-07 (GCR-01 / SVA-L0-14): Warm Reset (rst_sys_ni == 1'b0 / !rst_sys_ni) strictly forces host_req_ready_o == 0,
 //     periph_phys_req_o == 0, and host_rvalid_o == 0
 
 module zc_obi_formal_proof (
@@ -91,7 +91,7 @@ module zc_obi_formal_proof (
       assert (!host_rvalid_o);
     end
 
-    // F-OBI-07 (GCR-01 / SVA-L0-14): Warm Reset (!rst_sys_ni == 0) blocks request, ready, and rvalid
+    // F-OBI-07 (GCR-01 / SVA-L0-14): Warm Reset (rst_sys_ni == 1'b0 / !rst_sys_ni) blocks request, ready, and rvalid
     if (rst_por_ni && !rst_sys_ni) begin
       assert (!host_req_ready_o);
       assert (!periph_phys_req_o);
