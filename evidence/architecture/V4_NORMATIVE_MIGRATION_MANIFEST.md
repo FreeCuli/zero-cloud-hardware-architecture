@@ -11,8 +11,8 @@
 ---
 
 > [!NOTE]
-> **Tarihsel Geçiş Planı Açıklaması:**
-> Bu belge, v4.0.0 geçişinden önce hazırlanmış planlama kaydıdır. İçindeki eski "DO NOT MERGE / RELEASE BLOCKED" ifadeleri, kendi tarihsel karar bağlamını açıklar; güncel Git etiketi, yayın yetkilendirmesi veya Gate D tamamlanma durumu hakkında tek başına hüküm oluşturmaz. v4.0.0-rc2 aday sürümü, normatif standardın nihai ratifikasyonu anlamına gelmez.
+> **Historical Migration Plan Disclosure:**
+> This document is a historical normative transition plan prepared prior to the `v4.0.0-rc2` release candidate engineering phase. The "DO NOT MERGE / RELEASE BLOCKED" statements herein explain the decision context at the time of authoring; they do not by themselves govern the current Git tag, release candidate packaging, or Gate D completion status. The `v4.0.0-rc2` release candidate does not constitute final ratification of the normative standard.
 
 > [!CAUTION]
 > **GOVERNANCE DIRECTIVE — ZERO UNAUTHORIZED EDITS TO NORMATIVE DOCUMENTS:**

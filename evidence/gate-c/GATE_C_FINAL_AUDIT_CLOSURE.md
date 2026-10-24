@@ -1,122 +1,122 @@
-# FREECULI ZC-CORE — Gate C Nihai Kapanış ve Mutabakat Kaydı
+# FREECULI ZC-CORE — Gate C Final Audit Closure & Governance Record
 
-**Tarih:** 20 Ekim 2026
-**Proje:** FreeCuli ZC-CORE (Zero-Cloud Hardware Core)
-**Belge Türü:** Teknik denetim kapanış ve yönetişim kaydı
-**Belge Kimliği:** ZC-CORE-GATE-C-FINAL-AUDIT-CLOSURE
-**Gate C Kararı:** **PARTIAL / QUALIFIED — SIGN-OFF ACCEPTED**
-**GCR-01 – GCR-11:** **CLOSED — Tanımlı denetim kapsamları dahilinde**
-**Teknik Doğrulama Temeli:** Commit [`eb3ed5ad9fddb551506d43d2692bd040843af06f`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) — [CI Run #45 (ID: 39321501893)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/actions/runs/39321501893)
-**Dokümantasyon Referansı:** Commit [`324e3c988c80ad312984920b79cf4a54c600f913`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/324e3c988c80ad312984920b79cf4a54c600f913)
+**Date:** 20 October 2026
+**Project:** FreeCuli ZC-CORE (Zero-Cloud Hardware Core)
+**Document Type:** Technical Audit Closure & Governance Record
+**Document ID:** ZC-CORE-GATE-C-FINAL-AUDIT-CLOSURE
+**Gate C Verdict:** **PARTIAL / QUALIFIED — SIGN-OFF ACCEPTED**
+**GCR-01 – GCR-11:** **CLOSED — Within Defined Audit Scopes**
+**Technical Verification Baseline:** Commit [`eb3ed5ad9fddb551506d43d2692bd040843af06f`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/eb3ed5ad9fddb551506d43d2692bd040843af06f) — [CI Run #45 (ID: 39321501893)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/actions/runs/39321501893)
+**Documentation Reference:** Commit [`324e3c988c80ad312984920b79cf4a54c600f913`](https://github.com/FreeCuli/zero-cloud-hardware-architecture/commit/324e3c988c80ad312984920b79cf4a54c600f913)
 **Gate D:** **UNVERIFIED**
-**Yönetişim (Tarihsel Gate C Kapanışında):** **DO NOT MERGE / RELEASE BLOCKED (Tarihsel Şart)**
+**Governance (At Historical Gate C Closure):** **DO NOT MERGE / RELEASE BLOCKED (Historical Condition)**
 
 > [!NOTE]
-> **Tarihsel Yönetişim Kaydı (Gate C Kapanış Bağlamı):**
-> Bu belgedeki "DO NOT MERGE / RELEASE BLOCKED" kısıtlaması, 20 Ekim 2026 tarihinde `gate-c/formal-scope-audit` dalının kapatılması sırasındaki tarihsel denetim koşulunu kayıt altına almaktadır. Bu kısıtlama o tarihteki kapı durumunu belgeler; sonraki sürüm adayı (`v4.0.0-rc2`) geliştirme ve yayın hazırlık süreçlerini geçmişe dönük olarak kısıtlamaz.
+> **Historical Governance Record (Gate C Closure Context):**
+> The "DO NOT MERGE / RELEASE BLOCKED" restriction in this document records the historical audit condition at the time of closing the `gate-c/formal-scope-audit` branch on 20 October 2026. It documents the gate state at that point in time and does not retroactively restrict subsequent release candidate (`v4.0.0-rc2`) engineering and release preparation workflows.
 
 ---
 
-## 1. Nihai Denetim Kararının Kaydı
+## 1. Record of Final Audit Decision
 
-FreeCuli ZC-CORE donanım mimarisi için yürütülen Gate C bağımsız teknik inceleme sürecinde, **GCR-01'den GCR-11'e kadar tüm bulgular**, her bir bulgu için belirlenen kapsam, modelleme sınırları ve doğrulama ortamı dahilinde **CLOSED** olarak değerlendirilmiş ve kabul edilmiştir.
+During the Gate C independent technical review conducted for the FreeCuli ZC-CORE hardware architecture, **all findings from GCR-01 through GCR-11** were evaluated and accepted as **CLOSED** within the scope, modeling boundaries, and verification environment defined for each finding.
 
-Gate C'nin mevcut ve gerçekleştirilebilir açık kaynak RTL, formal doğrulama ($k$-induction, BMC, SMT2) ve döngü-doğrusal dijital simülasyon alt kapsamı, belgelenmiş sınırlar dahilinde tamamlanmıştır.
+The open-source RTL, formal verification ($k$-induction, BMC, SMT2), and cycle-accurate digital simulation sub-scope of Gate C has been completed within its documented boundaries.
 
 > [!IMPORTANT]
-> **Kapsam ve Statü Açıklığı:**
-> Bu karar, **bağımsız teknik inceleme kapsamında kabul edilmiş** bir mimari ve mantıksal doğrulama mutabakatıdır; resmî bir akreditasyon kuruluşunun veya üçüncü taraf sertifikasyon otoritesinin verdiği bir haricî güvenlik sertifikasyonu değildir.
-> Bu karar, Gate C genel güvenlik hedeflerinin bütünüyle tamamlandığı, bütün olası RTL davranışlarının fiziksel/analog düzeyde ispatlandığı veya silikon güvenlik sertifikasyonu verildiği anlamına **gelmez**.
+> **Scope and Status Clarity:**
+> This decision is an architectural and logical verification sign-off **accepted within an independent technical review**; it is not an external security certification issued by an official accreditation body or third-party certification authority.
+> This decision **does not** imply that overall Gate C security objectives are exhaustively proven at the physical/analog level, that all possible RTL behaviors are proven across silicon corners, or that commercial silicon security certification has been granted.
 
-Konsolide 33 iddianın normatif sınıflandırması:
-- **`PROVEN`:** 19 (Formal endüktif değişmezler ve sembolik ispatlar)
-- **`SIMULATED`:** 4 (Döngü-doğrusal dinamik HDL simülasyonları)
-- **`BOUNDED`:** 4 (Sınırlı formal cover şahitleri ve modellenmiş ufuk sınırları)
-- **`BLOCKED`:** 2 (Tam SoC 2-trace miter entegrasyon özellikleri)
-- **`UNVERIFIED`:** 4 (Fiziksel silikon, dökümhane analog makro, STA ve LEC parametreleri)
-- **TOPLAM:** 33 benzersiz normatif güvenlik iddiası
+Normative classification of the consolidated 33 claims:
+- **`PROVEN`:** 19 (Formal inductive invariants and symbolic proofs)
+- **`SIMULATED`:** 4 (Cycle-accurate dynamic HDL simulations)
+- **`BOUNDED`:** 4 (Bounded formal cover witnesses and modeled horizon limits)
+- **`BLOCKED`:** 2 (Full-SoC 2-trace miter integration properties)
+- **`UNVERIFIED`:** 4 (Physical silicon, foundry analog macro, STA, and LEC parameters)
+- **TOTAL:** 33 unique normative security claims
 
-Bu sınıflandırmaların teknik geçerliliği, [`CONSOLIDATED_NORMATIVE_EVIDENCE_MATRIX.md`](CONSOLIDATED_NORMATIVE_EVIDENCE_MATRIX.md) ve [`MODELING_LIMITS.md`](MODELING_LIMITS.md) belgelerinde açıklanan kaynak, varsayım, çözücü soyutlamaları (`async2sync`) ve kanıt sınırlarıyla birlikte bir bütün olarak bağlayıcıdır.
-
----
-
-## 2. Açık Kalan Doğrulama Yükümlülükleri (Gate D Deferral)
-
-Aşağıdaki doğrulama yükümlülükleri açık kaynak dijital Gate C kapanış kararının kapsamı dışında kalmakta olup, kesin sınırlarla **Gate D (UNVERIFIED)** kapsamına ertelenmiştir:
-
-1. **Tam SoC İki-İzli Non-Interference Doğrulaması (`BLOCKED`):**
-   Çift çekirdekli Ibex CPU, NPU koproserü ve güvenli SRAM crossbar'ını içeren tam SoC seviyesindeki `SVA-M7-01` ve `SVA-M8-01` miter modelleri.
-2. **Gerçek OTP/Antifuse Makrosunun Analog ve Fiziksel Karakterizasyonu (`UNVERIFIED`):**
-   $V_{\text{PP}} > 1.8\,\text{V}$ yüksek gerilim şarj pompası regülasyonu, programlama darbe süresi ($t_{\text{PROG}} \approx 10\,\mu\text{s}$), termal soak ve algılama marjinleri.
-3. **Gate-Level Mantıksal Eşdeğerlik Doğrulaması (LEC) (`UNVERIFIED`):**
-   Dökümhane PDK standard hücre kütüphanesine karşı post-synthesis netlist eşdeğerliği (Synopsys Formality / Cadence Conformal).
-4. **Statik Zamanlama Analizi (STA) ve PVT Analizi (`UNVERIFIED`):**
-   Asenkron reset removal/recovery ($t_{\text{rem}}, t_{\text{rec}}$) zamanlama kapanışı ve saat alanları arası (CDC) metastabilite doğrulaması.
-5. **FPGA, Laboratuvar ve Gerçek Donanım Üzerinde Doğrulama:**
-   Fiziksel kart üzerinde SPI Flash, voltaj glitching ve lojik analizör ile donanım düzeyinde doğrulama.
-
-Bu yükümlülükler Gate C kapsamında tamamlanmış olarak gösterilemez; bunların tamamlanması için gerekli teknik ön koşullar Gate D giriş planında ayrıca tanımlanacaktır.
+The technical validity of these classifications is binding only as an integrated whole together with the source code, environmental assumptions, solver abstractions (`async2sync`), and proof boundaries disclosed in [`CONSOLIDATED_NORMATIVE_EVIDENCE_MATRIX.md`](CONSOLIDATED_NORMATIVE_EVIDENCE_MATRIX.md) and [`MODELING_LIMITS.md`](MODELING_LIMITS.md).
 
 ---
 
-## 3. Referansların ve Yönetişimin Korunması
+## 2. Open Verification Obligations (Gate D Deferral)
 
-1. **Teknik Baseline:** Run #45 (`eb3ed5ad9fddb551506d43d2692bd040843af06f`), Gate C'nin dondurulmuş teknik doğrulama temeli olarak muhafaza edilecektir.
-2. **RTL ve Formal Dondurma:** Gate C referans RTL'si ([`rtl/`](../../rtl/)) ve formal harness'leri ([`fv/`](../../fv/)), yeni bir resmî değişiklik kontrol kararı (RFC/ECN) olmaksızın değiştirilmeyecektir.
-3. **Dal ve Sürüm Kilidi:** `gate-c/formal-scope-audit` çalışma dalı `main` dalına birleştirilmeyecektir (**DO NOT MERGE**). `v3.4.0` veya `v4.0.0` genel sürümleri için sürüm yayınlama yetkisi verilmemiştir (**RELEASE BLOCKED**).
-4. **Çalışma Serbestisi:** Bu kısıtlamalar, doğrulama planlarının, savunma amaçlı teknik yayın paketlerinin ve Gate D hazırlık belgelerinin bağımsız olarak hazırlanmasına engel teşkil etmez.
+The following verification obligations fall outside the open-source digital Gate C closure decision and are strictly deferred to **Gate D (UNVERIFIED)**:
+
+1. **Full-SoC Two-Trace Non-Interference Verification (`BLOCKED`):**
+   Top-level SoC `SVA-M7-01` and `SVA-M8-01` miter models encompassing dual-core Ibex CPUs, the NPU coprocessor, and the secure SRAM crossbar.
+2. **Analog and Physical Characterization of the Real OTP/Antifuse Macro (`UNVERIFIED`):**
+   $V_{\text{PP}} > 1.8\,\text{V}$ high-voltage charge pump regulation, programming pulse duration ($t_{\text{PROG}} \approx 10\,\mu\text{s}$), thermal soak, and sense-amplifier read margins.
+3. **Gate-Level Logic Equivalence Checking (LEC) (`UNVERIFIED`):**
+   Post-synthesis netlist equivalence against a foundry PDK standard cell library (Synopsys Formality / Cadence Conformal).
+4. **Static Timing Analysis (STA) and PVT Corner Analysis (`UNVERIFIED`):**
+   Asynchronous reset removal/recovery ($t_{\text{rem}}, t_{\text{rec}}$) timing closure and clock-domain crossing (CDC) metastability validation.
+5. **FPGA, Laboratory, and Physical Hardware Validation:**
+   Board-level hardware verification with physical SPI Flash, voltage glitching, and logic analyzer capture.
+
+These obligations cannot be represented as completed under Gate C; their technical prerequisites will be defined separately in the Gate D entry plan.
 
 ---
 
-## 4. Zenodo Savunma Amaçlı Yayın Ön Hazırlığı (Defensive Publication Preflight)
+## 3. Preservation of References and Governance
 
-Bir sonraki aşamada **FreeCuli ZC-CORE: Gate C Formal Verification Report & Technical Specification (Defensive Publication)** başlıklı teknik yayın paketi hazırlanacaktır.
+1. **Technical Baseline:** Run #45 (`eb3ed5ad9fddb551506d43d2692bd040843af06f`) shall be preserved as the frozen technical verification baseline of Gate C.
+2. **RTL and Formal Freeze:** Gate C reference RTL ([`rtl/`](../../rtl/)) and formal harnesses ([`fv/`](../../fv/)) shall not be modified without a formal engineering change decision (RFC/ECN).
+3. **Historical Branch and Release Lock (at Gate C Closure):** At the time of Gate C closure, the `gate-c/formal-scope-audit` working branch was held isolated (**DO NOT MERGE**) and general release authorization for `v3.4.0` or `v4.0.0` was withheld (**RELEASE BLOCKED**) pending architectural RFC alignment.
+4. **Operational Continuity:** These historical Gate C restrictions do not preclude the independent preparation of verification plans, defensive publication packages, candidate architecture RFCs, and Gate D readiness documentation.
 
-Bu paket, kamuya açıklanmadan önce aşağıdaki sıkı kontrollerden geçirilecektir:
-- Kamuya açıklanabilecek teknik bilgilerin kapsamı ve sınırları.
-- Normatif iddialarla (`ZC-CLAIM-01..33`) depodaki gerçek teknik kanıtların birebir uyumu.
-- Kaynak commit'lerinin, git tag'lerinin ve kanıt dosyalarının tam izlenebilirliği.
-- Açık donanım lisansı (CERN-OHL-S v2.0), üçüncü taraf fikri mülkiyet hakları ve ticari çift-lisanslama stratejisi.
-- Savunma amaçlı yayının patent stratejisine, üçüncü taraflarca olası türev patent başvurularına ve savunma bariyerine etkileri.
-- DOI, sürüm, yazar listesi, yayın tarihi ve kriptografik arşiv bütünlüğü (SHA-256).
+---
+
+## 4. Zenodo Defensive Publication Preflight
+
+In the subsequent phase, the technical publication package titled **FreeCuli ZC-CORE: Gate C Formal Verification Report & Technical Specification (Defensive Publication)** will be prepared.
+
+Prior to public disclosure, this package shall undergo strict preflight checks covering:
+- Scope and boundaries of publicly disclosable technical information.
+- Strict 1-to-1 alignment between normative claims (`ZC-CLAIM-01..33`) and actual technical evidence in the repository.
+- Full traceability of source commits, git tags, and evidence artifacts.
+- Open hardware license (CERN-OHL-S v2.0), third-party intellectual property rights, and commercial dual-licensing strategy.
+- Impact of defensive publication on patent strategy, potential third-party derivative patent filings, and defensive prior-art barriers.
+- DOI, version, author list, publication date, and cryptographic archive integrity (SHA-256).
 
 > [!WARNING]
-> **Yayın Öncesi Hukuki ve Teknik Sınır:**
-> Yayın ön hazırlığı, Zenodo üzerinde otomatik veya koşulsuz bir yayımlama yetkisi teşkil etmez.
-> Defensive publication (savunma amaçlı yayın), kamuya açıklama yoluyla dünya çapında bir *olası prior-art (tekniğin bilinen durumu)* kaydı oluşturmayı hedefler; ancak tek başına otomatik ve mutlak bir patent koruması veya her ülkede koşulsuz bir patent geçersiz kılma garantisi olarak sunulamaz.
+> **Pre-Publication Legal and Technical Boundary:**
+> Publication preflight preparation does not constitute automatic or unconditional authorization to publish on Zenodo.
+> A defensive publication aims to establish a worldwide *documentary prior-art* record through public disclosure; however, it cannot be presented as automatic patent protection or an unconditional guarantee of patent invalidation across all jurisdictions.
 
 ---
 
-## 5. Gate D Giriş Planı (Roadmap)
+## 5. Gate D Entry Plan (Roadmap)
 
-`GATE_D_ENTRY_CRITERIA.md` ve fiziksel doğrulama planı müstakil bir teknik çalışma paketi olarak hazırlanacaktır.
+`GATE_D_ENTRY_CRITERIA.md` and the physical verification plan will be prepared as a dedicated technical work package.
 
-Bu plan asgari olarak şu başlıkları kapsayacaktır:
-- FPGA prototipleme mimarisi ve donanım test ortamı (Xilinx/Alveo veya açık kaynak donanım çekirdeği).
-- SPI ve OBI fiziksel gözlem ve lojik analizör sinyal yakalama senaryoları.
-- Sıcak/soğuk reset transients, brown-out ve glitch fault injection test prosedürleri.
-- Analog OTP makro fiziksel sınırları ve dökümhane PDK bağımlılıkları.
-- Tam SoC entegrasyonu için Ibex CPU, NPU koproserü ve crossbar arayüz şartnameleri.
-- Ölçüm kabul toleransları ve bağımsız laboratuvar kanıtlarının izlenebilirlik kuralları.
+At a minimum, this plan will cover:
+- FPGA prototyping architecture and hardware testbed setup (Xilinx/Alveo or open-source hardware core).
+- Physical SPI and OBI observation and logic analyzer signal capture scenarios.
+- Warm/cold reset transients, brown-out, and glitch fault injection test procedures.
+- Analog OTP macro physical boundaries and foundry PDK dependencies.
+- Ibex CPU, NPU coprocessor, and crossbar interface specifications for full-SoC integration.
+- Measurement acceptance tolerances and traceability rules for independent laboratory evidence.
 
 ---
 
-## 6. Nihai Yönetişim ve Mutabakat Özeti
+## 6. Final Governance and Sign-Off Summary
 
-```
+```text
 ========================================================================================
  FREECULI ZC-CORE — GATE C FINAL AUDIT CLOSURE & GOVERNANCE RECORD
 ========================================================================================
- Denetim Durumu : GCR-01 through GCR-11 CLOSED (Within Scoped Modeling Limits)
- Gate C Statüsü : PARTIAL / QUALIFIED — SIGN-OFF ACCEPTED
- Gate D Statüsü : UNVERIFIED (Deferred to Physical Silicon / Full-SoC Validation)
- Branch Status  : DO NOT MERGE (gate-c/formal-scope-audit remains isolated)
- Release Status : RELEASE BLOCKED (v3.4.0 / v4.0.0 Release Authorization NOT Granted)
+ Audit Status   : GCR-01 through GCR-11 CLOSED (Within Scoped Modeling Limits)
+ Gate C Status  : PARTIAL / QUALIFIED — SIGN-OFF ACCEPTED
+ Gate D Status  : UNVERIFIED (Deferred to Physical Silicon / Full-SoC Validation)
+ Branch Status  : DO NOT MERGE (Historical gate-c/formal-scope-audit isolation record)
+ Release Status : RELEASE BLOCKED (Historical Gate C condition; does not block RC2)
  Technical Base : eb3ed5ad9fddb551506d43d2692bd040843af06f (Run #45 Verified)
  Doc Baseline   : 324e3c988c80ad312984920b79cf4a54c600f913
 ========================================================================================
- Bu kayıt, gelecekteki fiziksel doğrulama (Gate D) ve savunma amaçlı teknik yayın
- (Zenodo Defensive Publication) çalışmalarının resmî başlangıç referansıdır;
- yeni bir güvenlik sertifikası veya ticari silikon sürüm onayı değildir.
+ This record serves as the official baseline reference for subsequent physical
+ validation (Gate D) and defensive publication preflight work; it does not
+ constitute a commercial silicon release approval or external security certification.
 ========================================================================================
 ```

@@ -8,10 +8,10 @@
 **Working Branch:** `gate-c/formal-scope-audit`
 **Verified Git Commit:** `eb3ed5ad9fddb551506d43d2692bd040843af06f`
 **Verified CI Run:** [Run #45 (ID: 39321501893)](https://github.com/FreeCuli/zero-cloud-hardware-architecture/actions/runs/39321501893) — **SUCCESS** (13/13 Steps Pass)
-**Gate Status (Gate C Kapanışında):** **Gate C PARTIAL / QUALIFIED** | **Gate D UNVERIFIED** | **RELEASE BLOCKED / DO NOT MERGE (Tarihsel Kapanış Kaydı)**
+**Gate Status (At Gate C Closure):** **Gate C PARTIAL / QUALIFIED** | **Gate D UNVERIFIED** | **RELEASE BLOCKED / DO NOT MERGE (Historical Closure Record)**
 
 > [!NOTE]
-> **Tarihsel Kanıt Matrisi Kaydı:** Bu matris, Gate C kapanışındaki (`eb3ed5a`, Run #45) doğrulanmış iddiaların tarihsel durumunu kaydeder.
+> **Historical Evidence Matrix Record:** This matrix records the historical verification status of the 33 claims at Gate C closure (`eb3ed5a`, Run #45). The "RELEASE BLOCKED / DO NOT MERGE" notation reflects the historical gate condition of the `gate-c/formal-scope-audit` branch at that time and does not restrict the `v4.0.0-rc2` release candidate package.
 
 ---
 

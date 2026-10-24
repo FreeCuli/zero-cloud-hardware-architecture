@@ -45,9 +45,9 @@ The architecture maps physical and logical threats to standardized attack classi
 ## 3. End-to-End Control & Data Flows
 
 To maintain technical fidelity, every operational flow is categorized into one of three explicit maturity states:
-1. **RTL'de Mevcut ve Kanıtla Desteklenen** (Implemented in synthesizable RTL and proven via SVA/testbench)
-2. **Mimari Öneri veya RFC Tasarımı** (Architectural target or unratified RFC proposal)
-3. **Henüz Tanımlanmamış veya Teknik Kanıt Bekleyen** (TBD — Requires technical evidence or founder decision)
+1. **Implemented in RTL & Backed by Verification Evidence** (Implemented in synthesizable RTL and verified via SVA/testbench)
+2. **Architectural Proposal or RFC Design** (Architectural target or unratified RFC proposal)
+3. **Undefined or Pending Technical Evidence** (TBD — Requires technical evidence or founder decision)
 
 ```
 +---------------------------------------------------------------------------------------------------------+
@@ -74,7 +74,7 @@ To maintain technical fidelity, every operational flow is categorized into one o
 ```
 
 ### 3.1 Flow A: Secure Inbound Over-The-Air (OTA) Firmware Staging
-* **Maturity Status:** **RTL'de Mevcut ve Kanıtla Desteklenen** (Gating logic) / **Mimari Öneri** (External transport).
+* **Maturity Status:** **Implemented in RTL & Backed by Evidence** (Gating logic) / **Architectural Proposal** (External transport).
 * **Control Sequence:**
   1. The untrusted Network Co-Processor downloads an encrypted firmware container from an external server over Wi-Fi/Ethernet.
   2. The network processor issues SPI Write commands targeting Flash Bank B through `zc_spi_flash_firewall.sv`.
@@ -83,7 +83,7 @@ To maintain technical fidelity, every operational flow is categorized into one o
   5. The network processor notifies Domain 1 that staging is complete via an OBI mailbox interrupt.
 
 ### 3.2 Flow B: Cryptographic Verification & Anti-Rollback Commit
-* **Maturity Status:** **RTL'de Mevcut ve Kanıtla Desteklenen** (OTP authorization FSM) / **Gate D (UNVERIFIED)** (Foundry antifuse macro).
+* **Maturity Status:** **Implemented in RTL & Backed by Evidence** (OTP authorization FSM) / **Gate D (UNVERIFIED)** (Foundry antifuse macro).
 * **Control Sequence:**
   1. Domain 1 Boot ROM executes an asymmetric signature check (Ed25519 / ECDSA) over the staged Bank B image.
   2. If signature verification passes, Boot ROM extracts the container's Security Version Number (SVN).
@@ -97,7 +97,7 @@ To maintain technical fidelity, every operational flow is categorized into one o
   6. If readback data or session ID fails at any point, the FSM transitions permanently to `AUTH_LOCKED_FATAL`.
 
 ### 3.3 Flow C: Subordinate Bus Isolation & Error Recovery
-* **Maturity Status:** **RTL'de Gating & Trap Mantığı Olarak Tanımlı** (RTL gating and trap logic; multi-master crossbar arbitration deferred to Gate D).
+* **Maturity Status:** **Defined as RTL Gating & Trap Logic** (RTL gating and trap logic; multi-master crossbar arbitration deferred to Gate D).
 * **Signal Topology & Registers:**
   - `drain_wdog_cnt_q [9:0]`: 10-bit internal digital register (UP-counter).
   - `drain_wdog_cnt_o [9:0]`: Module output port directly driven by `drain_wdog_cnt_q`.

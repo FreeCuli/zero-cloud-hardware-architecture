@@ -68,7 +68,7 @@ The **Hybrid Zero-Cloud & Edge Security Architecture** links all repository comp
 
 ### 2.3 Legal, Licensing & Cryptographic Manifests
 * **[`LICENSE`](../LICENSE):** Official CERN-OHL-S-2.0 legal text.
-* **[`zero-cloud-dual-licensing.md`](../zero-cloud-dual-licensing.md):** CERN-OHL-S-2.0 §7.2 patent termination, Route B commercial exemption, and kurucu beyanı (`ATTEST-01`).
+* **[`zero-cloud-dual-licensing.md`](../zero-cloud-dual-licensing.md):** CERN-OHL-S-2.0 §7.2 patent termination, Route B commercial exemption, and founder representation (`ATTEST-01`).
 * **[`ZERO-CLOUD-RELEASE-MANIFEST.md`](../ZERO-CLOUD-RELEASE-MANIFEST.md):** SHA-256 cryptographic seal over 14 canonical specs and 4 RTL blocks.
 * **[`RELEASE-MANIFEST-v3.3.0-rc2.md`](../RELEASE-MANIFEST-v3.3.0-rc2.md):** Frozen cryptographic state of previous RC2 milestone.
 

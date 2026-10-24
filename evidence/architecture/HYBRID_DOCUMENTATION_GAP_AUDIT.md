@@ -1,162 +1,156 @@
-# FREECULI ZC-CORE — Hibrit Mimari Dokümantasyon Boşluk Analizi Raporu
-## (Hybrid Architecture Documentation Gap Audit)
+# FREECULI ZC-CORE — Hybrid Architecture Documentation Gap Audit Report
 
-**Belge Kimliği:** ZC-CORE-EVIDENCE-ARCH-GAP-AUDIT-01
-**Tarih:** 20 Ekim 2026
-**Revizyon:** 1.0.0 (Zenodo Defensive Publication Preflight Öncesi Yönetişim İncelemesi)
-**Hedef Depo:** `FreeCuli/zero-cloud-hardware-architecture`
-**Çalışma Dalı:** `gate-c/formal-scope-audit`
-**Yönetişim Statüsü (Tarihsel İnceleme):** **Gate C: PARTIAL / QUALIFIED** | **Gate D: UNVERIFIED** | **DO NOT MERGE** | **RELEASE BLOCKED (Tarihsel Analiz)**
-
----
-
-## 1. Yönetici Özeti ve Amaç
-
-Bu rapor, FreeCuli ZC-CORE projesinin GitHub deposundaki mevcut mimari, metodolojik, normatif ve savunma amaçlı yayın dokümantasyonunu, projenin geldiği **STRICT ve HYBRID çalışma profilleri** ve **Gate C'de doğrulanan donanım blokları (SPI Flash Firewall, OBI Subordinate Bridge, AON OTP Controller)** açısından ayrıntılı bir boşluk analizine (gap analysis) tabi tutmaktadır.
-
-### Temel Sorun ve Ayrım:
-1. **ZC-CORE Mimarisi Neyi Tanımlıyor?**
-   STRICT ve HYBRID profilleri, bilgi akışı politikaları, güven sınırları (Trust Boundaries), ağ yardımcı işlemcisi (Network Co-Processor) ile Ana MCU/NPU arasındaki ayrım, inbound OTA güncelleme doğrulama mekanizmaları ve izin verilen semantik telemetri davranışları.
-2. **Gate C Gerçekte Neyi Doğruladı?**
-   Yalnızca belirli açık kaynak dijital RTL IP blokları (`zc_spi_flash_firewall.sv`, `zc_obi_subordinate_bridge.sv`, `zc_aon_post_auth_ctrl.sv`) üzerindeki yerel mantıksal, endüktif ($t=20$) ve döngü-doğrusal simülasyon özellikleri (33 iddia: 19 PROVEN, 4 SIMULATED, 4 BOUNDED, 2 BLOCKED, 4 UNVERIFIED).
-
-Bu iki alan birbirinden net çizgilerle ayrılmadığı takdirde, Zenodo üzerinde yapılacak bir savunma amaçlı yayın (Defensive Publication); okuyucu veya patent incelemecisi nezdinde **hibrit mimarinin tüm fiziksel, analog ve tam-SoC seviyesinde tamamlandığı veya sertifikalandığı yönünde yanıltıcı bir algı** oluşturabilir.
-
-Bu çalışma, mevcut Gate C kapanış kararını (`PARTIAL / QUALIFIED`) geriye dönük değiştirmeden, Zenodo yayını öncesinde giderilmesi gereken normatif ve mimari boşlukları ortaya koymaktadır.
+**Document ID:** ZC-CORE-EVIDENCE-ARCH-GAP-AUDIT-01
+**Date:** 20 October 2026
+**Revision:** 1.0.0 (Governance Review Prior to Zenodo Defensive Publication Preflight)
+**Target Repository:** `FreeCuli/zero-cloud-hardware-architecture`
+**Working Branch:** `gate-c/formal-scope-audit`
+**Governance Status (Historical Review):** **Gate C: PARTIAL / QUALIFIED** | **Gate D: UNVERIFIED** | **DO NOT MERGE** | **RELEASE BLOCKED (Historical Analysis)**
 
 ---
 
-## 2. Salt Okunur Dokümantasyon Envanteri (14 Temel Belge)
+## 1. Executive Summary and Purpose
 
-| Belge | Mevcut Sürüm & Durum | STRICT/HYBRID Profil Tanımı | Inbound OTA & Telemetri Kapsamı | Raw Sensor İzolasyon Sınırı | M1–M10 Uyumluluğu | Gate C Kanıt Bağlantısı | Durum Değerlendirmesi |
+This report conducts a systematic gap analysis of the existing architectural, methodological, normative, and defensive publication documentation in the FreeCuli ZC-CORE GitHub repository against the project's **STRICT and HYBRID operational profiles** and the **hardware blocks verified in Gate C (SPI Flash Firewall, OBI Subordinate Bridge, AON OTP Controller)**.
+
+### Core Problem and Demarcation:
+1. **What Does the ZC-CORE Architecture Define?**
+   STRICT and HYBRID profiles, information flow policies, Trust Boundaries, separation between the Network Co-Processor and the Host MCU/NPU, inbound OTA update verification mechanisms, and permitted semantic telemetry behaviors.
+2. **What Did Gate C Actually Verify?**
+   Strictly the local logical, inductive ($t=20$), and cycle-accurate simulation properties of specific open-source digital RTL IP blocks (`zc_spi_flash_firewall.sv`, `zc_obi_subordinate_bridge.sv`, `zc_aon_post_auth_ctrl.sv`) across 33 claims (19 PROVEN, 4 SIMULATED, 4 BOUNDED, 2 BLOCKED, 4 UNVERIFIED).
+
+Unless these two domains are clearly demarcated, a defensive publication on Zenodo could create a **misleading impression before readers or patent examiners that the hybrid architecture is fully implemented and certified at the physical, analog, and full-SoC levels**.
+
+This analysis identifies the normative and architectural gaps that must be resolved prior to Zenodo publication without retroactively altering the historical Gate C closure decision (`PARTIAL / QUALIFIED`).
+
+---
+
+## 2. Read-Only Documentation Inventory (14 Baseline Documents)
+
+| Document | Baseline Version & Status | STRICT/HYBRID Profile Definition | Inbound OTA & Telemetry Scope | Raw Sensor Isolation Boundary | M1–M10 Compatibility | Gate C Evidence Link | Assessment |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **`README.md`** | v3.3.0-rc2 (Sept 2026) | **YOK** (Yalnızca tek yönlü hava boşluğu/optokuplör vurgusu) | **YOK** | Fiziksel air-gap ve güç kesintisi tanımlı | M1-M10 özetlenmiş, ayrım yok | RTL bloklarına referans yok | **Eksik & Eski:** STRICT/HYBRID ayrımı eklenmeli. |
-| **`Zero-Cloud-Smart-Home-Edge-AI-Architecture.md`** | v3.1.0 Obsolete Stub | **YOK** | **YOK** | Yok (4 satırlık yönlendirme) | Belirsiz | Yok | **Eski Yönlendirme:** Arşiv statüsünde korunmalı. |
-| **`zero-cloud-hardware-reference-architecture.md`** | v3.3.0-rc2 (v3.2.1 kilitleri) | **YOK** (Klasik tek yönlü NPU->Opto->MCU modeli) | §2.7'de kavramsal OTA var; veri yolu veya bus tanımı yok | M1/M8 mutlak güç kesintisi/zeroization | M1–M10 ile uyumlu fakat STRICT odaklı | Gate C SPI/OBI/OTP blokları hiç geçmiyor | **Kritik Boşluk:** Hibrit ara bağlantı ve RTL blokları eklenmeli. |
-| **`zero-cloud-core-methodology-invariants.md`** | v3.3.0-rc2 | **YOK** (M3 içinde inbound OTA istisnası tek cümle) | M3'te tek cümle istisna var; telemetri kuralları yok | M1, M7, M8 mutlak | Çekirdek DNA; STRICT varsayıyor | Gate C miter özelliklerine referans yok | **Normatif Eksiklik:** M3 telemetri ve profil ayrımı netleştirilmeli. |
-| **`zero-cloud-core-scope-boundary.md`** | v3.3.0-rc2 | **YOK** (Yalnızca "Zero-Cloud Telemetry / OTA" terimi var) | §1.20'de genel telemetri izni var; sınır/hız/izin listesi yok | 4 sınıflı veri taksonomisi tanımlı | Uyumlu | RTL sınırları tanımlanmamış | **Eksik Tanım:** İzin verilen ve yasaklanan telemetri tanımlanmalı. |
-| **`zero-cloud-core-conformance-test-specification.md`** | v3.3.0-rc2 (28 KB) | **YOK** (C1/C2/C3 laboratuvar güvence seviyeleri var, profil yok) | FC-ZC-007'de kavramsal güncelleme testi var | Annex B TVLA ve MI < 10^-4 sınırı | Uyumlu | Gate C RTL testbench'leri ile bağlantısız | **Uyuşmazlık:** CTS donanım PCB/lab odaklı, RTL seviyesini içermiyor. |
-| **`zero-cloud-core-defensive-publication.md`** | v3.3.0-rc2 | **YOK** (ZC-CORE-001..007 iddiaları tek yönlü opto odaklı) | ZC-CORE-003 tek yönlü transferi koruyor | ZC-CORE-005 mutlak sıfırlama | Uyumlu | Gate C donanım buluşları (SPI/OBI/OTP) talep edilmemiş | **Stratejik Boşluk:** RTL seviyesindeki yeni buluşlar claim edilmemiş. |
-| **`ZERO-CLOUD-RELEASE-MANIFEST.md`** | v3.3.0-rc2 (2026-09-24) | **YOK** | **YOK** | 14 belgenin SHA-256 hash'i kilitli | Uyumlu | Gate C dosyaları manifestte yok | **Kilitli:** Gate C veya Hibrit belgeleri içermiyor. |
-| **`zero-cloud-core-attack-taxonomy.md`** | v3.3.0-rc2 | **YOK** | T8 (Malicious OTA) ve AT-008/AT-010 tanımlı | AT-001..AT-010 kapsamlı | Uyumlu | Hibrit covert channel ve side-channel riskleri eksik | **Geliştirilmeli:** Hibrit telemetri kaçakları eklenmeli. |
-| **`zero-cloud-core-implementation-coverage.md`** | v3.3.0-rc2 | **YOK** | Tabloda genel optik/FPGA/ASIC sınıfları var | M1–M10 eşlemesi var | Uyumlu | RTL IP blok seviyesi yer almıyor | **Eksik:** Hibrit interconnect sınıfları eklenmeli. |
-| **`zero-cloud-core-conformance-evidence-matrix.md`** | v3.3.0-rc2 | **YOK** | FC-ZC test kanıtları listeli | Fiziksel laboratuvar kanıtları | Uyumlu | Gate C simülasyon ve formal kanıtları eksik | **Eksik:** Fiziksel kanıtlar ile formal kanıtlar ayrılmalı. |
-| **`docs/gate-b/ZC-CORE-GATE-B-REV28D-ARCHITECTURE-CONTRACT.md`** | Rev. 28D (Draft) | Kısmi (RTL blok kontratı tanımlı, profil adı yok) | SPI, OBI, OTP kontratı tanımlı | M7/M8 miter hedefi var | Uyumlu | Gate C RTL dosyalarının tasarım temeli | **Teknik Köprü:** RTL bloklarının mimari sözleşmesini içeriyor. |
-| **`evidence/gate-c/CONSOLIDATED_NORMATIVE_EVIDENCE_MATRIX.md`** | Rev. 2.0.0 (Run #45) | Kısmi (33 iddia tanımlı, profil bazlı ayrım yok) | SPI, OBI, OTP formal/sim ispatları tam | M7/M8 BLOCKED, fiziksel UNVERIFIED | Tam uyumlu | Gate C'nin doğrudan teknik kanıtı (eb3ed5a) | **Tamamlandı:** Yalnızca tanımlı RTL kapsamını belgeler. |
-| **`evidence/gate-c/GATE_C_FINAL_AUDIT_CLOSURE.md`** | Rev. 1.0.0 (afde531) | Kısmi (Gate C sınırları açıkça deklare edildi) | Kapsam sınırları ve Gate D devri açık | Tam ayrıştırılmış | Tam uyumlu | Gate C'nin nihai bağımsız kabul belgesi | **Tamamlandı:** Kapsam ve yönetişim kilitli. |
+| **`README.md`** | v3.3.0-rc2 (Sept 2026) | **NONE** (Focuses solely on unidirectional air-gap/optocoupler) | **NONE** | Physical air-gap and power cutoff defined | M1–M10 summarized without profile split | No reference to RTL blocks | **Incomplete & Legacy:** STRICT/HYBRID distinction needed. |
+| **`Zero-Cloud-Smart-Home-Edge-AI-Architecture.md`** | v3.1.0 Obsolete Stub | **NONE** | **NONE** | None (4-line redirect stub) | N/A | None | **Legacy Pointer:** Preserve as archival stub. |
+| **`zero-cloud-hardware-reference-architecture.md`** | v3.3.0-rc2 (v3.2.1 locks) | **NONE** (Classic unidirectional NPU->Opto->MCU model) | Conceptual OTA in §2.7; no bus definition | M1/M8 absolute power cutoff/zeroization | Compatible with M1–M10 but STRICT-focused | Gate C SPI/OBI/OTP blocks absent | **Critical Gap:** Hybrid interconnect and RTL blocks needed. |
+| **`zero-cloud-core-methodology-invariants.md`** | v3.3.0-rc2 | **NONE** (Single-sentence inbound OTA exception in M3) | Single-sentence exception in M3; no telemetry rules | M1, M7, M8 absolute | Core DNA; assumes STRICT | No reference to Gate C miter properties | **Normative Gap:** Clarify M3 telemetry and profile split. |
+| **`zero-cloud-core-scope-boundary.md`** | v3.3.0-rc2 | **NONE** (Only mentions "Zero-Cloud Telemetry / OTA" term) | General telemetry permission in §1.20; no rate/allowlist bounds | 4-class data taxonomy defined | Compatible | RTL boundaries undefined | **Incomplete Definition:** Define permitted and prohibited telemetry. |
+| **`zero-cloud-core-conformance-test-specification.md`** | v3.3.0-rc2 (28 KB) | **NONE** (Has C1/C2/C3 lab assurance levels, no profile split) | Conceptual update test in FC-ZC-007 | Annex B TVLA and MI < 10^-4 bound | Compatible | Unlinked to Gate C RTL testbenches | **Mismatch:** CTS focuses on PCB/lab, omits RTL tier. |
+| **`zero-cloud-core-defensive-publication.md`** | v3.3.0-rc2 | **NONE** (Claims ZC-CORE-001..007 focus on unidirectional opto) | ZC-CORE-003 covers unidirectional transfer | ZC-CORE-005 absolute zeroization | Compatible | Gate C hardware mechanisms (SPI/OBI/OTP) unclaimed | **Strategic Gap:** New RTL-level mechanisms not claimed. |
+| **`ZERO-CLOUD-RELEASE-MANIFEST.md`** | v3.3.0-rc2 (2026-09-24) | **NONE** | **NONE** | SHA-256 hashes of 14 docs locked | Compatible | Gate C files absent from manifest | **Locked:** Does not include Gate C or Hybrid files. |
+| **`zero-cloud-core-attack-taxonomy.md`** | v3.3.0-rc2 | **NONE** | T8 (Malicious OTA) and AT-008/AT-010 defined | AT-001..AT-010 comprehensive | Compatible | Hybrid covert-channel and side-channel risks missing | **Needs Expansion:** Add hybrid telemetry leakage vectors. |
+| **`zero-cloud-core-implementation-coverage.md`** | v3.3.0-rc2 | **NONE** | Table lists general optical/FPGA/ASIC classes | M1–M10 mapping present | Compatible | RTL IP block tier absent | **Incomplete:** Add hybrid interconnect classes. |
+| **`zero-cloud-core-conformance-evidence-matrix.md`** | v3.3.0-rc2 | **NONE** | FC-ZC test evidence listed | Physical laboratory evidence | Compatible | Gate C simulation and formal evidence missing | **Incomplete:** Separate physical evidence from formal proofs. |
+| **`docs/gate-b/ZC-CORE-GATE-B-REV28D-ARCHITECTURE-CONTRACT.md`** | Rev. 28D (Draft) | Partial (RTL block contract defined, no profile name) | SPI, OBI, OTP contracts defined | M7/M8 miter target present | Compatible | Design baseline of Gate C RTL files | **Technical Bridge:** Contains architectural contract for RTL blocks. |
+| **`evidence/gate-c/CONSOLIDATED_NORMATIVE_EVIDENCE_MATRIX.md`** | Rev. 2.0.0 (Run #45) | Partial (33 claims defined, no profile split) | SPI, OBI, OTP formal/sim proofs complete | M7/M8 BLOCKED, physical UNVERIFIED | Fully compatible | Direct technical evidence of Gate C (`eb3ed5a`) | **Completed:** Documents defined RTL scope only. |
+| **`evidence/gate-c/GATE_C_FINAL_AUDIT_CLOSURE.md`** | Rev. 1.0.0 (`afde531`) | Partial (Gate C boundaries explicitly declared) | Scope limits and Gate D deferral explicit | Fully demarcated | Fully compatible | Final independent acceptance record of Gate C | **Completed:** Scope and governance locked. |
 
 ---
 
-## 3. Sistematik Boşluk Analizi Tablosu (Findings Matrix)
+## 3. Systematic Gap Analysis Matrix (Findings Matrix)
 
-| Dosya | Mevcut İfade | Eksiklik veya Çelişki | Önerilen Değişiklik | Normatif Etki | Kanıt Durumu | Öncelik |
+| File | Baseline Statement | Identified Gap or Conflict | Recommended Remediation | Normative Impact | Evidence Status | Priority |
 | :--- | :--- | :--- | :--- | :--- | :---: | :---: |
-| **`README.md`** | *"By enforcing Physical Data Diodes, Trust Boundaries... optocouplers, FPGA, ASICs"* | Yalnızca katı tek yönlü hava boşluğu modelini anlatıyor; STRICT ve HYBRID profillerinden hiç bahsetmiyor. | STRICT (tam hava boşluğu/telemetrisiz) ve HYBRID (denetimli telemetri/donanım sınırları) profilleri tanıtılmalı. | Informative | Gate C RTL Kanıtları Mevcut | **P1 (Yüksek)** |
-| **`zero-cloud-hardware-reference-architecture.md`** | Bölüm 2.2: *"The transmission cable MUST be isolated using a physical data diode (e.g., an Optocoupler)"* | SPI Flash Firewall, OBI Subordinate Bridge ve AON OTP Controller gibi Gate C'de geliştirilen ve doğrulanan çift yönlü/kontrollü ara bağlantı blokları mimaride hiç yer almıyor. | Mimariye "Bölüm 2.10: ZC-CORE Güvenli Ara Bağlantı ve Donanım Duvarı Mimarisi (SPI, OBI, OTP)" eklenmeli; STRICT ve HYBRID topolojileri ayrılmalı. | Normative (Mimari Şartname) | RTL Seviyesinde Kanıtlı (Gate C) / Fiziksel Olarak UNVERIFIED | **P0 (Kritik)** |
-| **`zero-cloud-hardware-reference-architecture.md`** | Bölüm 3: *Data Flow Schematic (Mermaid)* | Şemada yalnızca `NPU -> Opto -> Main MCU` akışı var. Ana MCU'dan Flash'a veya NPU'ya gelen güvenli güncelleme (OTA) ve denetimli durum akışı şemada gösterilmiyor. | Şema güncellenerek (a) STRICT tek yönlü akış ve (b) HYBRID denetimli OBI/SPI akışı iki ayrı alt-grafik olarak modellenmeli. | Architectural | Gate C Modelleri ile Uyumlu | **P1 (Yüksek)** |
-| **`zero-cloud-core-methodology-invariants.md`** | M3: *"Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain..."* | M3 telemetriye açıkça değinmiyor; giden verinin "yalnızca tek yönlü işlenmiş komut" olduğunu varsayıyor. Hibrit telemetrinin izin verilen sınırları tanımsız. | M3 invariant'ı korunarak, bu kuralın uygulanmasını yöneten STRICT ve HYBRID profillerinin normatif şartları tanımlanmalı. M1-M10'a dokunulmadan profiller eklenmeli. | Normative Stricture | Analitik / Metodolojik | **P0 (Kritik)** |
-| **`zero-cloud-core-scope-boundary.md`** | Bölüm 1.20: *"Zero-Cloud Telemetry / OTA... provided such channels are cryptographically bound and strictly comply with M3"* | "Telemetri" kavramı çok geniş; izin listesi (allowlist), hız sınırlama (rate-limiting), minimum entropi ve covert channel (gizli kanal) kısıtlamaları bulunmuyor. | "İzin Verilen Hibrit Telemetri Şartnamesi" eklenmeli: Telemetri yükü kesinlikle ham sensör içermemeli, sadece doğrulanmış sistem sağlığı/istatistik yükü olmalı. | Normative Policy | Gate C Kapsamı Dışında (Gate D) | **P1 (Yüksek)** |
-| **`zero-cloud-core-conformance-test-specification.md`** | Bölüm 2: *"For ZC-CORE-C1/C2 profiles... MI_upper_bound is fixed at 10^-4 bits"* | C1/C2/C3 profilleri yalnızca TVLA/MI örneklem sayısı güvence seviyeleridir; cihazın STRICT mi HYBRID mi olduğunu test eden hiçbir test prosedürü (FC-ZC-XXX) yoktur. | CTS'e iki yeni test prosedürü eklenmeli: (1) `FC-ZC-017: STRICT Profile Conformance (Zero Outbound Telemetry)`, (2) `FC-ZC-018: HYBRID Profile Telemetry Conformance & Covert Channel Bounding`. | Normative Test Specification | UNVERIFIED (Laboratuvar Testi) | **P1 (Yüksek)** |
-| **`zero-cloud-core-defensive-publication.md`** | Claim Family ZC-CORE-001..007 | Mevcut patent savunma iddiaları yalnızca optokuplör, güç kesintisi ve air-gap kombinasyonlarını koruyor. Gate C'de geliştirdiğimiz 3-katmanlı SPI Flash Firewall ve OBI subordinate orphan drain mimarisi savunma kapsamında YOK! | Yeni Claim Ailesi eklenmeli: `ZC-CORE-008: Hardware-Enforced Bus Isolation & Secure Inbound Update Firewall` (SPI Firewall, OBI Orphan Drain, 4-Phase DAI OTP Handshake). | Defensive Prior-Art | Gate C Formal Olarak PROVEN / SIMULATED | **P0 (Kritik - Zenodo Öncesi Şart)** |
-| **`ZERO-CLOUD-RELEASE-MANIFEST.md`** | Tüm Belge (v3.3.0-rc2 Hashes) | 24 Eylül 2026 tarihli v3.3.0-rc2 hash setinde Gate C kanıtları, formal modeller ve hibrit mimari belgeleri yer almıyor. | Manifest bu haliyle dondurulmalı; yeni yayın için `ZC-CORE Gate C Defensive Publication Manifest` müstakil olarak üretilmeli. | Governance Integrity | Kriptografik Hash | **P2 (Orta)** |
-| **`zero-cloud-core-attack-taxonomy.md`** | AT-008 & AT-010 | Hibrit telemetri üzerinden yapılabilecek gizli kanal (covert channel), yan kanal zamanlama modülasyonu veya OTA üzerinden flash aşındırma (flash wear-out) saldırıları taksonomide eksik. | `AT-011: Telemetry Covert Channel Exfiltration` ve `AT-012: Inbound Update Desynchronization / Flash Denial of Service` tehdit sınıfları eklenmeli. | Informative Taxonomy | Analitik | **P2 (Orta)** |
+| **`README.md`** | *"By enforcing Physical Data Diodes, Trust Boundaries... optocouplers, FPGA, ASICs"* | Describes only the strict unidirectional air-gap model; makes no mention of STRICT and HYBRID profiles. | Introduce STRICT (full air-gap/zero-telemetry) and HYBRID (bounded telemetry/hardware firewall) profiles. | Informative | Gate C RTL Evidence Available | **P1 (High)** |
+| **`zero-cloud-hardware-reference-architecture.md`** | Section 2.2: *"The transmission cable MUST be isolated using a physical data diode (e.g., an Optocoupler)"* | Controlled interconnect blocks developed and verified in Gate C (SPI Flash Firewall, OBI Subordinate Bridge, AON OTP Controller) are absent from the architecture. | Add Section 2.10 covering ZC-CORE Secure Interconnect and Hardware Firewall Architecture (SPI, OBI, OTP) and separate STRICT and HYBRID topologies. | Normative (Architecture Spec) | Proven at RTL Level (Gate C) / Physically UNVERIFIED | **P0 (Critical)** |
+| **`zero-cloud-hardware-reference-architecture.md`** | Section 3: *Data Flow Schematic (Mermaid)* | Schematic shows only `NPU -> Opto -> Main MCU` flow. Secure inbound update (OTA) and bounded status flows are omitted. | Update schematic to model (a) STRICT unidirectional flow and (b) HYBRID bounded OBI/SPI flow as distinct sub-graphs. | Architectural | Compatible with Gate C Models | **P1 (High)** |
+| **`zero-cloud-core-methodology-invariants.md`** | M3: *"Authenticated control-plane and firmware-update traffic MAY enter the Trusted Domain..."* | M3 does not explicitly address outbound telemetry; assumes outbound flow is strictly actuator commands. Permitted hybrid telemetry bounds are undefined. | Preserve M3 while defining normative requirements for STRICT and HYBRID profiles governing M3 enforcement. | Normative Stricture | Analytical / Methodological | **P0 (Critical)** |
+| **`zero-cloud-core-scope-boundary.md`** | Section 1.20: *"Zero-Cloud Telemetry / OTA... provided such channels are cryptographically bound and strictly comply with M3"* | "Telemetry" is overly broad; lacks allowlist, rate-limiting, minimum entropy, and covert-channel constraints. | Add Permitted Hybrid Telemetry Specification: telemetry payload must never contain raw sensor data, only verified system health/statistical payloads. | Normative Policy | Outside Gate C Scope (Gate D) | **P1 (High)** |
+| **`zero-cloud-core-conformance-test-specification.md`** | Section 2: *"For ZC-CORE-C1/C2 profiles... MI_upper_bound is fixed at 10^-4 bits"* | C1/C2/C3 profiles are TVLA/MI sample-count assurance levels; no test procedure (FC-ZC-XXX) tests whether a device is STRICT or HYBRID. | Add two test procedures to CTS: (1) `FC-ZC-017: STRICT Profile Conformance (Zero Outbound Telemetry)`, (2) `FC-ZC-018: HYBRID Profile Telemetry Conformance & Covert Channel Bounding`. | Normative Test Specification | UNVERIFIED (Laboratory Test) | **P1 (High)** |
+| **`zero-cloud-core-defensive-publication.md`** | Claim Family ZC-CORE-001..007 | Existing defensive claims cover only optocoupler, power cutoff, and air-gap combinations. The 3-layer SPI Flash Firewall and OBI subordinate orphan drain architecture from Gate C are absent. | Add Claim Family `ZC-CORE-008: Hardware-Enforced Bus Isolation & Secure Inbound Update Firewall` (SPI Firewall, OBI Orphan Drain, 4-Phase DAI OTP Handshake). | Defensive Prior-Art | Formally PROVEN / SIMULATED in Gate C | **P0 (Critical)** |
+| **`ZERO-CLOUD-RELEASE-MANIFEST.md`** | Full Document (v3.3.0-rc2 Hashes) | The 24 September 2026 v3.3.0-rc2 hash set does not include Gate C evidence, formal models, or hybrid architecture documents. | Preserve v3.3.0-rc2 manifest as historical record and generate updated v4.0.0-rc2 release manifest covering canonical documents and RTL files. | Governance Integrity | Cryptographic Hash | **P2 (Medium)** |
+| **`zero-cloud-core-attack-taxonomy.md`** | AT-008 & AT-010 | Covert-channel exfiltration over hybrid telemetry, timing side-channel modulation, and flash wear-out / desynchronization attacks over OTA are missing. | Add threat classes `AT-011: Telemetry Covert Channel Exfiltration` and `AT-012: Inbound Update Desynchronization / Flash Denial of Service`. | Informative Taxonomy | Analytical | **P2 (Medium)** |
 
 ---
 
-## 4. Mimari Boşlukların 8 Boyutta Derinlemesine Analizi
+## 4. Deep-Dive Analysis of Architectural Gaps Across 8 Dimensions
 
-### 4.1 STRICT ve HYBRID Bilgi Akışı Ayrımı
-- **Mevcut Durum:** Belgeler tüm ZC-CORE cihazlarının tek bir katı kurala tabi olduğunu ima ediyor ("Sensör verisi asla dışarı çıkamaz").
-- **Boşluk:** Bu ilke doğrudur, ancak bir cihazın *hiçbir telemetri göndermemesi* (**STRICT**) ile *güven sınırında donanım tarafından denetlenen istatistik/durum telemetrisi göndermesi* (**HYBRID**) arasındaki bilgi akışı kuralları yazılmamıştır.
-- **Mimari Çözüm:**
-  - **STRICT Profil:** Ağ modülü olsa bile dışa doğru sıfır telemetri (Zero-Outbound). Yalnızca yerel fiziksel eyleyici ve tek yönlü donanım diyotu.
-  - **HYBRID Profil:** Giden telemetri kesinlikle donanım kontrollü izin listesine (Allowlist) ve hız sınırlamasına (Rate Limiting) tabidir; ham sensör veya türetilmiş temsil (embeddings) çıkışı donanımsal olarak engellenmiştir.
+### 4.1 STRICT vs. HYBRID Information Flow Separation
+- **Baseline State:** Legacy documents imply all ZC-CORE devices follow a single monolithic rule ("Sensor data never leaves").
+- **Gap:** While raw sensor non-egress holds universally, the information flow distinction between *sending zero outbound telemetry* (**STRICT**) and *sending hardware-policed statistical/health telemetry across the trust boundary* (**HYBRID**) was not codified.
+- **Architectural Resolution:**
+  - **STRICT Profile:** Zero outbound telemetry even if a network module exists. Strictly local physical actuation and unidirectional hardware diode.
+  - **HYBRID Profile:** Outbound telemetry is subject to hardware-enforced allowlisting and rate-limiting; raw sensor data or high-dimensional embeddings are blocked at the boundary.
 
-### 4.2 Ağ Yardımcı İşlemcisi (Network Co-Processor) vs. Host Güven Sınırı
-- **Mevcut Durum:** `zero-cloud-hardware-reference-architecture.md` şemada "Wi-Fi Module" ile "Main MCU"yu tek bir açık kutuda gösteriyor.
-- **Boşluk:** Ağ işlemcisinin (ör. ESP32, nRF5340 ağ çekirdeği) ele geçirilmesi durumunda, Host MCU ile arasındaki SPI/OBI veri yolundan NPU'ya nasıl sızılamayacağı ve Gate C RTL bloklarının (SPI Firewall, OBI Bridge) buradaki rolü açıkça tarif edilmemiştir.
-- **Mimari Çözüm:** Ağ işlemcisi "Untrusted External Interface" olarak sınıflandırılmalı; Host MCU/NPU ile arasındaki veri yolu `zc_obi_subordinate_bridge` ve `zc_spi_flash_firewall` donanım bariyerleriyle sınırlandırılmalıdır.
+### 4.2 Network Co-Processor vs. Host Trust Boundary
+- **Baseline State:** `zero-cloud-hardware-reference-architecture.md` depicts the "Wi-Fi Module" and "Main MCU" inside a single shared box.
+- **Gap:** If the network processor (e.g., ESP32, nRF5340 network core) is compromised, how the SPI/OBI bus between the Host MCU and NPU prevents lateral movement — and the exact role of the Gate C RTL blocks (SPI Firewall, OBI Bridge) — was not explicitly mapped.
+- **Architectural Resolution:** Classify the Network Co-Processor as an Untrusted External Interface and bound the interconnect to the Host MCU/NPU via `zc_obi_subordinate_bridge` and `zc_spi_flash_firewall` hardware barriers.
 
-### 4.3 Gate C Donanım Bloklarının Gerçek Kapsamı vs. İddialar
-- **Mevcut Durum:** Gate C kapanış raporları 33 iddiayı listeliyor.
-- **Boşluk:** Bir dış gözlemci, bu 33 iddianın tüm hibrit çipi ve fiziksel katmanı kapsadığını sanabilir.
-- **Gerçek:** Gate C yalnızca 3 dijital IP bloğunun yerel davranışlarını ispatladı. Tam SoC (M7/M8), analog OTP ve fiziksel zamanlama **Gate D** kapsamındadır.
-- **Mimari Çözüm:** Dokümantasyonda "Gate C Verified Subsystem" başlığı altında yalnızca bu 3 IP bloğu sınırlandırılmalı; sistem seviyesi iddialar Gate D'ye açıkça referanslanmalıdır.
+### 4.3 Actual Scope of Gate C Hardware Blocks vs. System Claims
+- **Baseline State:** Gate C closure reports list 33 verified claims.
+- **Gap:** An external reader might assume those 33 claims cover the entire hybrid SoC and physical layer.
+- **Reality:** Gate C proved local protocol behaviors of 3 standalone digital IP blocks. Full-SoC non-interference (M7/M8), analog OTP physics, and physical timing belong to **Gate D**.
+- **Architectural Resolution:** Explicitly scope the 3 IP blocks under "Gate C Verified Subsystem" and reference system-level/physical claims as deferred to Gate D.
 
-### 4.4 Telemetri İzin Listesi, Hız Sınırlama ve Covert Channel Riskleri
-- **Mevcut Durum:** `zero-cloud-core-scope-boundary.md` telemetriye izin veriyor ama nasıl denetleneceğini söylemiyor.
-- **Boşluk:** Bir saldırgan, inference sonuçlarının zamanlamasını (timing side-channel) veya telemetri paket boyutlarını modüle ederek dışarıya ses/görüntü sızdırabilir (Covert Channel).
-- **Mimari Çözüm:** Telemetri veri akışı için deterministik paket boyutu, sabit zamanlı gönderim aralıkları (constant-rate dummy padding) ve donanım register'larında tanımlı alan kısıtlamaları normatif olarak şart koşulmalıdır.
+### 4.4 Telemetry Allowlisting, Rate-Limiting, and Covert-Channel Risks
+- **Baseline State:** `zero-cloud-core-scope-boundary.md` permits telemetry conceptually without specifying hardware policing rules.
+- **Gap:** A compromised enclave could modulate inference timing or packet lengths to exfiltrate audio/video features (covert channel).
+- **Architectural Resolution:** Mandate deterministic packet sizes, fixed-interval transmission schedules, and strict schema field constraints as normative requirements for hybrid telemetry.
 
-### 4.5 Inbound OTA Doğrulama, Anti-Rollback ve Anahtar Yaşam Döngüsü
-- **Mevcut Durum:** M6 Secure Boot'u emreder; `zc_aon_post_auth_ctrl.sv` SVN (Security Version Number) yazma mantığını içerir.
-- **Boşluk:** Harici Flash bellekten gelen firmware paketinin imza kontrolünün nerede yapılacağı (ROM Bootloader), başarısız güncelleme anında eski sürüme güvenli dönüş (A/B bank rollback recovery) ve anahtar iptal mekanizması mimari dokümanlarda bir bütün olarak açıklanmamıştır.
-- **Mimari Çözüm:** `zc_spi_flash_firewall`'un `bank_b_commit_ready_o` sinyali ile `rom_img_verif_valid_i` ilişkisi mimari dokümanda bir durum diyagramı ile açıklanmalıdır.
+### 4.5 Inbound OTA Verification, Anti-Rollback, and Key Lifecycle
+- **Baseline State:** M6 mandates Secure Boot; `zc_aon_post_auth_ctrl.sv` implements SVN (Security Version Number) commit logic.
+- **Gap:** Where signature verification of the external Flash image occurs (Boot ROM), safe fallback upon interrupted updates (A/B bank recovery), and key revocation were not unified in the architectural prose.
+- **Architectural Resolution:** Document the relationship between `bank_b_commit_ready_o` in `zc_spi_flash_firewall` and `rom_img_verif_valid_i` with an explicit state flow.
 
-### 4.6 Kontrol Düzlemi Bypass Yolları (DMA, Debug, Reset, Clock)
-- **Mevcut Durum:** M5 ve AT-007 kontrol düzlemi izolasyonunu genel olarak belirtir.
-- **Boşluk:** OBI Subordinate köprüsünde çözdüğümüz `rst_sys_ni` warm reset gating (`F-OBI-07`) ve ST_TRAP sentetik hata üretimi gibi donanımsal korumalar ana mimari belgede yoktur.
-- **Mimari Çözüm:** Kontrol düzlemi kuralları arasına OBI bridge sıcak reset kilidi ve öksüz (orphan) işlem zaman aşımı donanım kuralı olarak eklenmelidir.
+### 4.6 Control-Plane Bypass Paths (DMA, Debug, Reset, Clock)
+- **Baseline State:** M5 and AT-007 state control-plane isolation in general terms.
+- **Gap:** Hardware protections implemented in the OBI Subordinate Bridge — such as `rst_sys_ni` warm reset gating (`F-OBI-07`) and `ST_TRAP` synthetic error generation — were absent from the reference architecture document.
+- **Architectural Resolution:** Incorporate OBI bridge warm reset gating and orphan transaction drain timeout into the control-plane specification.
 
-### 4.7 PCB, FPGA ve Analog Donanım Kanıtlarının Eksikliği
-- **Mevcut Durum:** Dokümantasyon sürekli "fiziksel laboratuvar kanıtı (CTS)" talep ediyor.
-- **Boşluk:** Projede şu anda fiziksel bir PCB veya FPGA testi yapılmamıştır; elimizdeki kanıtlar %100 dijital RTL simülasyonu ve formal SMT kanıtlarıdır.
-- **Mimari Çözüm:** Dokümantasyonda "Aşama 1: Formal RTL Doğrulaması (Tamamlandı - Gate C)" ile "Aşama 2: Fiziksel Donanım / FPGA Doğrulaması (Planlandı - Gate D)" net olarak ayrılmalıdır.
+### 4.7 Absence of PCB, FPGA, and Analog Hardware Evidence
+- **Baseline State:** Conformance documentation emphasizes physical laboratory evidence (CTS).
+- **Gap:** Physical PCB or silicon laboratory testing has not yet been performed; current repository evidence consists of digital RTL simulations and formal SMT proofs.
+- **Architectural Resolution:** Clearly separate "Stage 1: Formal RTL Verification (Completed — Gate C)" from "Stage 2: Physical Hardware / Silicon Validation (Deferred — Gate D)".
 
-### 4.8 Sürümleme, Lisanslama ve Fikri Mülkiyet (IP) Etkileri
-- **Mevcut Durum:** Tüm dokümanlar `v3.3.0-rc2` etiketlidir.
-- **Boşluk:** Gate C'de geliştirilen formal modeller ve RTL kodları `v3.3.0-rc2` sürümünde yoktur; ancak ana dala merge edilmediği için `v3.4.0` veya `v4.0.0` da çıkarılamaz (`RELEASE BLOCKED`).
-- **Mimari Çözüm:** Zenodo'da yayınlanacak paket, "ZC-CORE v3.3.x Gate C Technical Report & Defensive Publication" olarak adlandırılmalı; ticari çip sürümü olmadığı vurgulanmalıdır.
+### 4.8 Versioning, Licensing, and Intellectual Property (IP) Implications
+- **Baseline State:** Legacy documents were tagged `v3.3.0-rc2`.
+- **Gap:** Formal models and RTL blocks developed in Gate C were not part of `v3.3.0-rc2`.
+- **Architectural Resolution:** Transition the hybrid architecture and RTL reference blocks into the `v4.0.0-rc2` release candidate architecture with explicit Gate C / Gate D boundary disclosures.
 
 ---
 
-## 5. Yeni Belge İhtiyacı Değerlendirmesi
+## 5. Evaluation of Candidate New Documents
 
-Gereksiz belge enflasyonunu önlemek adına denetçinin önerdiği 4 potansiyel yeni belge incelenmiştir:
+To prevent unnecessary documentation sprawl, four candidate documents were evaluated:
 
-| Aday Belge | Gerekli mi? | Tavsiye Edilen Yaklaşım | Gerekçe |
+| Candidate Document | Required? | Recommended Approach | Rationale |
 | :--- | :---: | :--- | :--- |
-| **`zc-core-security-profiles.md`** | **EVET (Zorunlu)** | Yeni müstakil normatif belge olarak oluşturulmalı. | STRICT ve HYBRID profillerinin güvenlik hedeflerini, veri akış kurallarını ve izin verilen sınırlarını M1-M10'u bozmadan tanımlayacak tek temiz yer burasıdır. |
-| **`zc-core-information-flow-policy.md`** | **HAYIR (Birleştirilebilir)** | `zero-cloud-core-scope-boundary.md` içine yeni bir bölüm olarak eklenmelidir. | Ayrı bir belge açmak yerine mevcut kapsam ve sınır belgesinin telemetri ve OTA politikalarıyla zenginleştirilmesi yönetişimi sadeleştirir. |
-| **`zc-core-hybrid-interconnect.md`** | **EVET (Zorunlu)** | Yeni teknik referans mimari belgesi olarak oluşturulmalı. | Gate C'de doğrulanan SPI Firewall, OBI Bridge ve AON OTP Controller'ın birbirine ve NPU/CPU'ya nasıl bağlandığını gösteren teknik ara bağlantı şartnamesidir. |
-| **`zc-core-threat-model.md`** | **HAYIR (Gereksiz)** | Mevcut `zero-cloud-core-attack-taxonomy.md` genişletilmelidir. | Mevcut attack taxonomy belgesi zaten T1-T10 ve AT-001..AT-010'u içeriyor; buraya AT-011 ve AT-012 eklemek yeterlidir. |
+| **`zc-core-security-profiles.md`** | **YES (Mandatory)** | Create as a standalone architectural specification. | Provides a clean home to define STRICT and HYBRID security objectives, data flow rules, and permitted bounds without distorting M1–M10. |
+| **`zc-core-information-flow-policy.md`** | **NO (Consolidate)** | Integrate directly into `zero-cloud-core-scope-boundary.md` and the hybrid suite. | Enriching existing scope boundary documentation with telemetry and OTA policies simplifies governance. |
+| **`zc-core-hybrid-interconnect.md`** | **YES (Mandatory)** | Create as a technical reference architecture specification. | Specifies how the Gate C SPI Firewall, OBI Bridge, and AON OTP Controller interconnect with the CPU/NPU. |
+| **`zc-core-threat-model.md`** | **NO (Consolidate)** | Expand `zero-cloud-core-attack-taxonomy.md` and `threat-model-and-control-flows.md`. | Extending the existing attack taxonomy with AT-011 and AT-012 avoids duplicate threat registries. |
 
 ---
 
-## 6. Değişiklik Disiplini ve Yönetişim Taahhüdü
+## 6. Change Discipline and Governance Commitment
 
-Bu boşluk analizi raporunun hazırlanması sürecinde bağımsız denetçinin koyduğu tüm yönetişim kurallarına kesin olarak uyulmuştur:
-1. Mevcut hiçbir normatif belge (`zero-cloud-*.md`) otomatik olarak değiştirilmemiştir.
-2. M1–M10 değişmezleri yeniden tanımlanmamış, anlamları kaydırılmamıştır.
-3. Gate C kapanış kararı (`PARTIAL / QUALIFIED`) geriye dönük genişletilmemiştir.
-4. Hibrit mimari mevcut depoda "tamamlanmış" veya "sertifikalı" olarak gösterilmemiştir.
-5. Üretim RTL'si, formal harness'ler ve CI iş akışlarına dokunulmamıştır.
-6. Zenodo yayını yapılmamış, GitHub release açılmamıştır.
-
----
-
-## 7. Sonuç ve Bağımsız Denetçiye Sunulacak Eylem Planı
-
-1. Bu rapor (`evidence/architecture/HYBRID_DOCUMENTATION_GAP_AUDIT.md`), depodaki mimari eksiklikleri madde madde ortaya koymaktadır.
-2. Zenodo Defensive Publication öncesinde atılması gereken en sağlıklı adım:
-   - **Adım 1:** `zc-core-security-profiles.md` belgesini hazırlayarak STRICT vs HYBRID ayrımını normatif olarak sabitlemek.
-   - **Adım 2:** `zc-core-hybrid-interconnect.md` belgesini hazırlayarak Gate C'de ispatlanan SPI/OBI/OTP bloklarının hibrit mimarideki yerini netleştirmek.
-   - **Adım 3:** `zero-cloud-core-defensive-publication.md` belgesine yeni buluşları (Claim Family 8) eklemek.
-   - **Adım 4:** Bu güncellemelerin ardından **Zenodo Defensive Publication Preflight** paketini bağımsız denetim onayına sunmak.
-
-Bu yaklaşım, hem Zero-Cloud'un katı kurallarını koruyacak hem de Gate C'de elde edilen üstün formal başarıyı dünya çapında sağlam bir fikri mülkiyet kalkanına dönüştürecektir.
-
+Throughout the preparation of this gap audit report, strict governance rules were enforced:
+1. No baseline normative document (`zero-cloud-*.md`) was silently altered without audit tracking.
+2. Invariants M1–M10 were preserved without weakening their core security guarantees.
+3. The Gate C closure verdict (`PARTIAL / QUALIFIED`) was not retroactively expanded.
+4. The hybrid architecture is never represented as physically certified or complete at the silicon level.
+5. Production RTL and formal harnesses remain frozen.
+6. The Zenodo publication hold (stand-down) remains strictly enforced.
 
 ---
 
-## 8. Tarihsel Boşlukların Özet Durum Tablosu (Summary Status of Historical Gaps)
+## 7. Action Plan Summary
 
-| İnceleme Konusu | Değerlendirme & Statü | İlgili Dosyalar & Sınırlar |
+1. Establish `zc-core-security-profiles.md` and the `hybrid-zero-cloud-edge-security-architecture/` suite to codify the STRICT vs. HYBRID distinction.
+2. Establish `zc-core-hybrid-interconnect.md` to map the Gate C SPI/OBI/OTP blocks into the hybrid architecture.
+3. Add Claim Family 8 (`ZC-CORE-008`) to `zero-cloud-core-defensive-publication.md`.
+4. Submit the consolidated `v4.0.0-rc2` candidate package for independent audit verification prior to any external archival release.
+
+---
+
+## 8. Summary Status of Historical Gaps (v4.0.0-rc2 Resolution Tracking)
+
+| Review Area | Assessment & Status | Associated Files & Boundaries |
 | :--- | :--- | :--- |
-| **Hibrit mimari dokümantasyonu** | **KAPATILDI (MÜSTAKİL ADAY KÜME)** | Hibrit mimari ayrı bir aday belge kümesinde (`hybrid-zero-cloud-edge-security-architecture/`) müstakil olarak tanımlanmış; kök normatif metinle ilişkisi `strict-hybrid-compatibility.md` ile haritalandırılmıştır. |
-| **Kaynak RTL / SVA / Testbench mevcudiyeti** | **KAPATILDI (ARŞİVDE MEVCUT)** | `rtl/` (4 dosya), `fv/` (9 dosya) ve `tb/` (5 dosya) eksiksiz olarak depoda ve dağıtım arşivinde mevcuttur. |
-| **Tarihsel Gate C kanıtının referanslanması** | **KAYIT ALTINDA** | Gate C Run #45 (`eb3ed5a`, 2026-10-20) formal kanıt kayıtlarına atıf yapılmıştır. |
-| **Güncel RC2 üzerinde RTL simülasyonu ve formal ispat** | **DOĞRULANMADI (ÇALIŞTIRILMADI)** | Mevcut derleme/çalışma ortamında EDA simülatörü (Verilator/ModelSim/VCS) ve formal çözücü (sby/smtbmc) bulunmadığından simülasyon ve formal ispat bu oturumda yeniden koşturulmamıştır. |
-| **Fiziksel donanım / silikon (Gate D)** | **ERTELENDİ / DOĞRULANMADI** | Analog PVT, saat kayması, PCB iz yansımaları ve optokuplör fiziksel sınırları Gate D kapsamına ertelenmiştir. |
-| **CTS profil uyumluluğu ve telemetri sınırları** | **KAPATILDI / GATE D ERTELENDİ** | CTS (`zero-cloud-core-conformance-test-specification.md`) Annex A ve B içinde STRICT ve HYBRID profil test sınırları belgelenmiştir; fiziksel netlist doğrulaması Gate D kapsamına ertelenmiştir. |
-| **Kök manifest ayrımı** | **KAPSAM AYRIMI NETLEŞTİRİLDİ** | 18 dosyalık kök manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`) kök normatif standardı mühürler; 7 belgeli hibrit mimari müstakil aday küme olarak açıkça kapsam dışı bırakılmıştır. |
+| **Hybrid architecture documentation** | **CLOSED (STANDALONE CANDIDATE SUITE)** | The hybrid architecture is defined in a dedicated candidate documentation suite (`hybrid-zero-cloud-edge-security-architecture/`), with its relationship to root normative text mapped in `strict-hybrid-compatibility.md`. |
+| **Source RTL / SVA / Testbench availability** | **CLOSED (PRESENT IN ARCHIVE)** | `rtl/` (4 files), `fv/` (9 files), and `tb/` (5 files) are present in full within the repository and distribution archive. |
+| **Referencing of historical Gate C evidence** | **RECORDED** | Historical Gate C Run #45 (`eb3ed5a`, 2026-10-20) formal proof records are explicitly cited. |
+| **RTL simulation and formal proof on current RC2** | **UNVERIFIED (NOT RERUN LOCALLY)** | Because no EDA simulator (Verilator/ModelSim/VCS) or formal solver (`sby`/`smtbmc`) is installed in the current host environment, HDL simulation and formal solvers were not re-executed in this session. |
+| **Physical hardware / silicon (Gate D)** | **DEFERRED / UNVERIFIED** | Analog PVT corners, clock skew, PCB trace reflections, and physical optocoupler bounds are strictly deferred to Gate D. |
+| **CTS profile conformance and telemetry bounds** | **CLOSED / DEFERRED TO GATE D** | STRICT and HYBRID profile test boundaries are documented in CTS (`zero-cloud-core-conformance-test-specification.md`) Annex A and B; physical netlist/laboratory validation is deferred to Gate D. |
+| **Root manifest scope separation** | **SCOPE DEMARCATION CLARIFIED** | The 18-artifact root manifest (`ZERO-CLOUD-RELEASE-MANIFEST.md`) seals the root normative standard and 4 RTL blocks, while the 7-document hybrid suite is explicitly scoped as a standalone candidate suite (`README.md` line 154). |
