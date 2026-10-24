@@ -1,9 +1,9 @@
 # FREECULI ZC-CORE — Gate C HDL Modeling & Formal Verification Limits
 
-**Document ID:** ZC-CORE-GATE-C-MODELING-LIMITS  
-**Revision:** 1.1.0 (Rev. 28D P-7 & Independent Audit Alignment)  
-**Target Architecture:** FreeCuli Zero-Cloud Hardware Core (ZC-CORE)  
-**Classification:** Normative Formal Audit Technical Disclosure  
+**Document ID:** ZC-CORE-GATE-C-MODELING-LIMITS
+**Revision:** 1.1.0 (Rev. 28D P-7 & Independent Audit Alignment)
+**Target Architecture:** FreeCuli Zero-Cloud Hardware Core (ZC-CORE)
+**Classification:** Normative Formal Audit Technical Disclosure
 
 ---
 

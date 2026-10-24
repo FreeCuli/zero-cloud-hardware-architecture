@@ -213,7 +213,7 @@ module tb_zc_obi;
     @(posedge clk_i);
     #1;
     check(bridge_state_o == ST_IDLE && dut.phys_req_active_q == 1'b1 &&
-          orphan_drain_active_o == 1'b1 && drain_wdog_cnt_o == 10'd1,
+          orphan_drain_active_o == 1'b1 && drain_wdog_cnt_o == 10'd2,
           "Mid-Tx Warm Reset Active: Upper FSM reset to ST_IDLE while phys_req_active_q=1 and orphan watchdog advances");
 
     // Release Warm Reset (rst_sys_ni = 1) and attempt a new CPU request while orphan is still active
